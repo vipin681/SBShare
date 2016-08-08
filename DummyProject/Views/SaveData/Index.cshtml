@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+<script src="~/Scripts/aes.js"></script>
+<script src="~/Content/js/jquery-1.9.1.js"></script>
+<script src="~/Scripts/angular.js"></script>
+<script src="~/Content/js/bootstrap.js"></script>
+<script src="~/Scripts/ui-bootstrap.min.js"></script>
+<script src="~/Scripts/ui-bootstrap-tpls-0.10.0.js"></script>
+<script src="~/Scripts/ui-bootstrap-tpls.js"></script>
+<script src="~/Content/js/moment.js"></script>
+<script src="~/Content/js/bootstrap-datetimepicker.js"></script>
+<script src="~/Script/Controller/base.js"></script>
+<script src="~/Script/Controller/DropdownCTRL.js"></script>
+<link href="~/css/My.css" rel="stylesheet" />
+<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/3.0.7/ui-grid.min.js"></script>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/3.0.7/ui-grid.min.css" type="text/css" />
+<body ng-app="MyApp">
+    <div class="login">
+        <h1>Login</h1>
+        <form>
+            
+                <div ng-controller="DropdownCtrl" class="container" style="min-height: 450px;">
+                <input type="text"  placeholder="Username" ng-model="UserName" required="required" />
+      
+                <input type="password" placeholder="Password" ng-model="Password" required="required" />
+                 @*Role:<select class="form-control" ng-model="RoleId" ng-options="r.RoleId as r.RoleName  for r in RoleList">
+                        <option value="">--Select Role--</option>
+                    </select><br />*@  
+                <button type="submit" class="btn btn-primary btn-block btn-large" ng-click="SignIn(UserName,Password)">LogIn.</button>
+                <button type="submit" class="btn btn-primary btn-block btn-large" onclick="Registration()">Register</button>
+              
+            </div>
+        </form>
+
+    </div>
+</body>
+
+
+@*<body ng-app="MyApp">
+
+    <div ng-controller="DropdownCtrl" class="container" style="min-height: 450px;">
+        User Name: <input type="text" ng-model="UserDetail.UserName" /><br />
+        Last Name:   <input type="text" ng-model="UserDetail.LastName" /><br />
+        Password:  <input type="text" ng-model="UserDetail.Password" /><br />
+        Phone No   <input type="text" ng-model="UserDetail.Phone" /><br />
+        Email   <input type="text" ng-model="UserDetail.Email" /><br />
+        <input type="button" value="Button" ng-click="SaveUser()" /><br/>
+        Search Data  <input type="text" ng-model="UserDetail.keyword" /><br />
+        <input type="button" value="Search" ng-click="SearchDetails()" />
+    </div>
+
+
+
+</body>*@
+<script type="text/javascript">
+    function Registration() {
+        window.location = VirtualDirectoryPath + 'SaveData/Registration';
+    };
+    </script>

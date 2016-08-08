@@ -1,0 +1,153 @@
+﻿
+@{
+    ViewBag.Title = "DashBoard";
+}
+
+<h2>DashBoard</h2>
+
+<script src="~/Scripts/aes.js"></script>
+<script src="~/Content/js/jquery-1.9.1.js"></script>
+<script src="~/Scripts/angular.js"></script>
+
+<script src="~/Content/js/bootstrap.js"></script>
+<script src="~/Scripts/ui-bootstrap.min.js"></script>
+<script src="~/Scripts/ui-bootstrap-tpls-0.10.0.js"></script>
+<script src="~/Scripts/ui-bootstrap-tpls.js"></script>
+<script src="~/Content/js/moment.js"></script>
+<script src="~/Content/js/bootstrap-datetimepicker.js"></script>
+<script src="~/Script/Controller/base.js"></script>
+<script src="~/Script/Controller/DropdownCTRL.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/3.0.7/ui-grid.min.js"></script>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/3.0.7/ui-grid.min.css" type="text/css" />
+
+
+<body style="font:15px Verdana;" ng-app="MyApp" ng-controller="DropdownCtrl">
+    <div class="row" id="divTop" style="margin-bottom: 15px; border: 0px solid black;">
+        <div class="col-md-12">
+            <div class="row" style="margin-bottom: 15px";>
+                <div class="form-group">
+                    <div class="col-sm-8">
+                        <input type="search" class="form-control" id="txtName" 
+                               @*ng-disabled="Save.HRIsAdditionalApprovalRequired == '0' || Save.IsHRTabDisable"*@
+                               @*ng-required='Save.HRIsAdditionalApprovalRequired == 1' name="AdditionalApproverName"*@
+                               ng-model="UserDetails.Search" placeholder="Search"
+                               typeahead="a.UserName as a.UserName for a in EmployeeLookup($viewValue)"
+                               typeahead-min-length="2"
+                               typeahead-wait-ms="100"
+                               typeahead-loading="loadingEmployee"
+                               typeahead-editable="false"
+                               typeahead-on-select="onSelect($item, $model, $label)">
+</div>
+                  Piyush:{{Details}}
+
+                    UserName:  <input type="text" class="form-control" ng-model="UserDetail.Name" />
+                    Password:  <input type="text" class="form-control" ng-model="UserDetail.Password" />
+                    WorkerID:  <input type="text" class="form-control" ng-model="UserDetail.WorkerID" />
+                    EmailID:   <input type="text" class="form-control" ng-model="UserDetail.Email" />
+
+                   Name:{{UserName}}
+                    @*<div>Selected: <span>{{selected}}</span></div>
+                    <div><input type="text" ng-model="selected" typeahead="name for name in states | filter:selected"></div>*@
+
+                        @*<input ng-model="UserDetail.keyword" class="form-control" type="text" name="Search" />
+                        <button type="button" ng-click="SearchDetails()" title="Search" class="btn btn-default1" style="width: 85px;">Search</button>*@
+                    </div>
+                    <div class="row" style="margin-bottom: 15px" ;>
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+            <div class="col-md-12">
+                <div class="row">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="row" style="margin-bottom: 15px">
+                    @*<button type="button" ng-click="searchData()" title="Search" class="btn btn-default1" style="width: 85px;">Get Result</button>*@
+                    @*<button type="button"ng-click="EditUser()"
+                             class="btn btn-default1" style="width: 85px;">Edit</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="CountryName">Country</label>
+                        <div class="col-sm-8">
+                            <select ng-model="selected" ng-options="b.CountryName  for b in list">
+                                <option value="">-- Select a Country --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="officeLocation">State</label>
+                        <div class="col-sm-8">
+                            <select ng-model="selected" ng-options="b.StateName  for b in StateList">
+                                <option value="">-- Select a State --</option>
+                            </select>
+                        </div>
+                        @*<canvastc-chartjs-polarareachart-data ="sampleDataSource" chart-options="sampleOptions" width="250" height="250"></canvas>*@
+</div>
+                </div>
+            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div id="grid1" ui-grid="gridOptions1" ui-grid-selection ui-grid-pagination ui-grid-exporter ui-grid-move-columns class="grid "></div>
+                    <div class="nodatatxt" ng-if="gridOptions1.data.length==0">No Records Found</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+    <table style="color:#9F000F;font-size:large" cellpadding="4" cellspacing="6">
+
+        <tr>
+            <td>
+                <b>Menu ID</b>
+            </td>
+
+            <td>
+                : <input type="text" name="txtMenuID" ng-model="sMenuID" value="" />
+                <br />
+            </td>
+
+            <td>
+                <b>   Menu Name </b>
+            </td>
+
+            <td>
+                :
+                <input type="text" name="txtMenuName" ng-model="sMenuName" />
+
+            </td>
+            <td>
+                <input type="submit" value="Search" style="background-color:#336699;color:#FFFFFF" ng-click="searchMenuDetails()" />
+
+            </td>
+        </tr>
+
+
+    </table>  
+
+
+
+
+
+
+
+
+
+</body>

@@ -1,0 +1,71 @@
+﻿
+@{
+    ViewBag.Title = "Registration";
+}
+<script src="~/Content/js/jquery-1.9.1.js"></script>
+<script src="~/Scripts/angular.js"></script>
+
+<script src="~/Content/js/bootstrap.js"></script>
+<script src="~/Scripts/ui-bootstrap.min.js"></script>
+<script src="~/Scripts/ui-bootstrap-tpls-0.10.0.js"></script>
+<script src="~/Scripts/ui-bootstrap-tpls.js"></script>
+<script src="~/Content/js/moment.js"></script>
+<script src="~/Content/js/bootstrap-datetimepicker.js"></script>
+
+<script src="~/Script/Controller/base.js"></script>
+  <script src="~/Content/js/ui-bootstrap.min.js"></script>
+    <script src="~/Content/js/ui-bootstrap-tpls-0.10.0.js"></script>
+<script src="~/Script/Controller/DropdownCTRL.js"></script>
+@*<link href="~/css/My.css" rel="stylesheet" />*@
+<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/3.0.7/ui-grid.min.js"></script>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/3.0.7/ui-grid.min.css" type="text/css" />
+<body ng-app="MyApp" ng-controller="DropdownCtrl">
+    <div class="container"  >
+        <h1>Registration</h1>
+        
+        @*<form>*@
+            <div >
+                <div class="row" id="divTop" style="margin-bottom: 15px; border: 0px solid black;">
+                    <div class="col-md-12">
+                        <div class="row">
+                    UserName:<input type="text"
+                                     @*ng-show="myVar"*@
+                                     @*ng-disabled="myVar"*@
+                                    @*ng-disabled="UserDetail.UserName"*@
+                                     class="form-control"  ng-model="UserDetail.UserName"  /><br/>
+                    Password:<input class="form-control" type="password" ng-model="UserDetail.Password"  /><br />
+                    LastName:<input type="text" class="form-control" ng-model="UserDetail.LastName" /><br />
+                    Role:<select class="form-control" ng-model="UserDetail.RoleId"  ng-options="r.RoleId as r.RoleName  for r in RoleList">
+                         <option value="">--Select Role--</option>
+                          </select><br />
+                          @*UserNameData: {{UserDetail.UserName}}*@
+                            {{Details}}
+
+                        Country:<select ng-model="UserDetail.CountryId" class="form-control" ng-options="b.CountryId as b.CountryName  for b in list">
+                                <option value="">-- Select  Country --</option>
+                            </select>
+                           Phone:
+                                <input type="text" class="form-control" ng-model="UserDetail.Phone" />
+                                <br />
+                                Email:
+                                <input type="text" class="form-control" ng-model="UserDetail.Email" />
+
+                                <br />
+                            <div ng-show="Worker">
+                            WorkerID:<input type="text" ng-disabled="UserDetail.WorkerID"   class="form-control" ng-model="UserDetail.WorkerID" />
+                                </div><br />
+                           @*Status
+                                <input type="checkbox" ng-model="UserDetail.IsActive" id="chkActive" ng-disabled="partmaster.ID==0" />*@
+                            </div>
+                                <button type="submit" class="btn btn-primary btn-block btn-large" ng-click="SaveUser()">
+                                Save User
+                                </button>
+</div>
+                        </div>
+                    </div>
+                </div>
+@*</form>*@
+
+    @*</div>*@
+</body>
+
