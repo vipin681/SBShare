@@ -12,7 +12,7 @@ namespace DummyProjectDAL
     {
         static public SqlConnection CreateConnection()
         {
-            SqlConnection con = new SqlConnection("Data Source=piyush1;Initial Catalog=Test;Integrated Security=true");
+            SqlConnection con = new SqlConnection("Data Source = VIPIN1; Initial Catalog = test; User ID = sa; Password = 123456; Connect Timeout = 120");
             //string connectionString = ConfigurationSettings.AppSettings["ConnectionString"];
             //SqlConnection conn = new SqlConnection(connectionString);
             con.Open();

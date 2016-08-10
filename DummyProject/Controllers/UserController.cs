@@ -18,6 +18,55 @@ namespace DummyProject.Controllers
 
     public class UserController : ApiController
     {
+        #region Get User
+        [HttpGet]
+        public HttpResponseMessage GetUserList()
+        {
+
+            HttpResponseMessage response;
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            objResult = userBAL.GetUserList();
+            if (objResult != null)
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                objResult.errormsg = "";
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                objResult.errormsg = "Data Empty!";
+                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+            }
+            return response;
+        }
+        #endregion
+
+
+        #region Search
+        [HttpGet]
+        public HttpResponseMessage GetSearchResult(string searchbar)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            objResult = userBAL.GetUserDetailsBysearch(searchbar);
+            if (objResult != null)
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            }
+            return response;
+        }
+
+        #endregion
+
+
+        #region all
         [HttpPost]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
@@ -156,23 +205,7 @@ namespace DummyProject.Controllers
             }
             return response;
         }
-        [HttpGet]
-        public HttpResponseMessage GetUserList()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserList();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+       
         [HttpGet]
         public HttpResponseMessage GetItemDetails()
         {
@@ -290,5 +323,10 @@ namespace DummyProject.Controllers
             }
             return response;
         }
+
+
+       
+
+        #endregion 
     }
 }

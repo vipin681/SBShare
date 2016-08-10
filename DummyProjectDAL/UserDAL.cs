@@ -6,11 +6,90 @@ using System.Threading.Tasks;
 using DummyProjectStateClass;
 using System.Data.SqlClient;
 using System.Data;
+using System.Net;
 
 namespace DummyProjectDAL
 {
     public class UserDAL
     {
+        #region GetUser
+        public Result GetUserList()
+        {
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                UserDetails user = null;
+                using (SqlCommand sqlcmd = new SqlCommand())
+                {
+                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+                    DataSet ds = new DataSet();
+                    sqlcmd.CommandText = "usp_GetUserList";
+                    sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Connection = conn;
+                    // sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = ID;
+                    sqlad.Fill(ds);
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                        user = new UserDetails();
+                        //user.ID = Convert.ToInt64(ds.Tables[0].Rows[0]["ID"].ToString());
+                        //user.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
+                        //user.LastName = ds.Tables[0].Rows[0]["LastName"].ToString();
+                        //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+                        //user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+                        //user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+                        return new Result
+                        {
+                            Results = ds.Tables[0],
+                        };
+                    }
+                    return new Result
+                    {
+                        errormsg = "Data Not found",
+                        Status = Convert.ToString((int)HttpStatusCode.NotFound),
+                        Results = null
+                    };
+                }
+            }
+        }
+        #endregion
+
+        #region SearchUser
+        public Result GetUserListByID(String keyword)
+        {
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                using (SqlCommand sqlcmd = new SqlCommand())
+                {
+                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+                    DataSet ds = new DataSet();
+                    sqlcmd.CommandText = "usp_GetAllUser";
+                    sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Connection = conn;
+                    sqlcmd.Parameters.Add("@TypeHeadKeyword", SqlDbType.NVarChar, 200).Value = keyword;
+                    sqlad.Fill(ds);
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                        return new Result
+                        {
+                            Results = new
+                            {
+                                Data = ds.Tables[0],
+                            }
+                        };
+                    }
+                    return new Result
+                    {
+                        Results = null
+                    };
+                }
+            }
+        }
+        #endregion
+
+
+
+
+
+        #region all
         public Result InsertUser(UserDetails user)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -140,74 +219,56 @@ namespace DummyProjectDAL
                 }
             }
         }
-        public Result GetUserList()
-        {
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                UserDetails user = null;
-                using (SqlCommand sqlcmd = new SqlCommand())
-                {
-                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
-                    DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetUserList";
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Connection = conn;
-                    // sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = ID;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        user = new UserDetails();
-                        //user.ID = Convert.ToInt64(ds.Tables[0].Rows[0]["ID"].ToString());
-                        //user.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
-                        //user.LastName = ds.Tables[0].Rows[0]["LastName"].ToString();
-                        //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
-                        //user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
-                        //user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
-                        return new Result
-                        {
-                            Results = ds.Tables[0],
-                        };
-                    }
-                    return new Result
-                    {
-                        Status = false,
-                        MessageId = 1,
-                        Results = null
-                    };
-                }
-            }
-        }
-        public Result GetUserListByID(String keyword)
-        {
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                using (SqlCommand sqlcmd = new SqlCommand())
-                {
-                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
-                    DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetAllUser";
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Connection = conn;
-                    sqlcmd.Parameters.Add("@keyword", SqlDbType.NVarChar, 200).Value = keyword;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        return new Result
-                        {
-                            Results = new
-                            {
-                                Data = ds.Tables[0],
-                            }
-                        };
-                    }
-                    return new Result
-                    {
-                        Results = null
-                    };
-                }
-            }
-        }
+        //public Result GetUserDetailsBysearch(string searchstring)
+        //{
+        //    using (SqlConnection conn = DbHelper.CreateConnection())
+        //    {
+        //        UserDetails user = null;
+        //        using (SqlCommand sqlcmd = new SqlCommand())
+        //        {
+        //            SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+        //            DataSet ds = new DataSet();
+        //            sqlcmd.CommandText = "usp_GetUserDetailsBysearch";
+        //            sqlcmd.CommandType = CommandType.StoredProcedure;
+        //            sqlcmd.Connection = conn;
+        //            sqlcmd.Parameters.Add("@searchstring", SqlDbType.NVarChar, 50).Value = searchstring;
+        //            sqlad.Fill(ds);
+        //            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //            {
+        //                user = new UserDetails();
+        //                user.ID = Convert.ToInt64(ds.Tables[0].Rows[0]["ID"].ToString());
+        //                user.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
+        //                user.LastName = ds.Tables[0].Rows[0]["LastName"].ToString();
+        //                user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+        //                user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+        //                user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+        //                //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
+        //                if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
+        //                    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
+        //                if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
+        //                    user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+        //                if (ds.Tables[0].Rows[0]["RoleID"] != DBNull.Value)
+        //                    user.role.RoleID = Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
 
+        //                if (ds.Tables[0].Rows[0]["RoleName"] != DBNull.Value)
+        //                    user.role.RoleName = ds.Tables[0].Rows[0]["RoleName"].ToString();
+        //                user.WorkerID = ds.Tables[0].Rows[0]["WorkerID"].ToString();
+        //                //return new Result
+        //                //{
+        //                //    Results = user
+        //                //};
+        //            }
+        //            return new Result
+        //            {
+        //                // Status = false,
+        //                // MessageId = 1,
+        //                // Results = null
+        //            };
+        //        }
+        //    }
+        //}
+        
+     
 
 
 
@@ -616,6 +677,7 @@ namespace DummyProjectDAL
                 }
             }
         }
+        #endregion
 
     }
 }

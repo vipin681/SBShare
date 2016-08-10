@@ -6,11 +6,29 @@ using System.Threading.Tasks;
 using DummyProjectStateClass;
 using DummyProjectDAL;
 using System.Security.Cryptography;
+using System.Net;
 
 namespace DummyProjectBAL
 {
     public class UserBAL
     {
+        # region GetUser
+        public Result GetUserList()
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetUserList();
+        }
+        #endregion
+
+        #region SearchUser
+        public Result GetUserDetailsBysearch(string searchstring)
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetUserListByID(searchstring);
+        }
+        #endregion
+
+        #region All
         public Result InsertUser(UserDetails user)
         {
             UserDAL userDAL = new UserDAL();
@@ -34,6 +52,7 @@ namespace DummyProjectBAL
             UserDAL userDAL = new UserDAL();
             return userDAL.GetUserDetailsByID(ID);
         }
+   
         public Result UserLookup(String TypeHeadKeyword)
         {
             UserDAL userDAL = new UserDAL();
@@ -59,8 +78,8 @@ namespace DummyProjectBAL
                 {
                     return new Result
                     {
-                        Status = true,
-                        MessageId = 0,
+                        Status = Convert.ToString((int)HttpStatusCode.OK),
+                        errormsg="",
                         Results = new
                         {
                             UserID = objUser.ID,
@@ -75,7 +94,7 @@ namespace DummyProjectBAL
                 {
                     return new Result
                     {
-                        Status = false,
+                        Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
                         MessageId = 11,
                         Results = null
                     };
@@ -85,7 +104,7 @@ namespace DummyProjectBAL
             {
                 return new Result
                 {
-                    Status = false,
+                    Status = Convert.ToString((int)HttpStatusCode.NotFound),
                     MessageId = 12,
                     Results = null
                 };
@@ -106,11 +125,7 @@ namespace DummyProjectBAL
             UserDAL userDAL = new UserDAL();
             return userDAL.GetStateList();
         }
-        public Result GetUserList()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetUserList();
-        }
+  
         public UserToken GetUserDetailsByTokenID(string tokenID)
         {
             UserDAL objUserDAL = new UserDAL();
@@ -226,6 +241,10 @@ namespace DummyProjectBAL
             return Convert.ToBase64String(ByteHash);
 
         }
+
+#endregion 
+
+
 
     }
 }
