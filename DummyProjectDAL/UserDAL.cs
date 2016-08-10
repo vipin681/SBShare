@@ -72,6 +72,26 @@ namespace DummyProjectDAL
                 }
             }
         }
+        public Result Updatepassword(UserDetails user)
+        {
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                using (SqlCommand sqlcmd = new SqlCommand())
+                {
+                    sqlcmd.CommandText = "UpdateUserPassword";
+                    sqlcmd.Connection = conn;
+                    sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Parameters.Add("@paramuserid", SqlDbType.BigInt).Value = user.ID;
+                    sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.NVarChar, 150).Value = user.Password;
+                    sqlcmd.Parameters.Add("@modifiedby", SqlDbType.Bit).Value = user.ID;
+                    sqlcmd.ExecuteNonQuery();
+                    return new Result
+                    {
+                       Results = (sqlcmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@paramuserid"].Value)
+                    };
+                }
+            }
+        }
         public Result GetUserDetailsByID(Int64 ID)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())

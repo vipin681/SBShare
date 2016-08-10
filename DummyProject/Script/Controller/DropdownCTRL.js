@@ -38,6 +38,12 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         }).error(function (response) {
         });
     }
+              //Update Password
+    $scope.UpdatePassword = function () {
+
+    }
+
+
     $scope.SearchDetails = function (keyword) {
         return $http.get(VirtualDirectoryPath + 'api/User/GetListByID?keyword=' + $rootScope.UserDetail.keyword).success(function (data) {
             if (data.Status === false) {
