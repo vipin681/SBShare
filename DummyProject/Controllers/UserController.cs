@@ -61,34 +61,6 @@ namespace DummyProject.Controllers
                 response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
             return response;
-
-            ////Category ct = new Category();
-            ////DataSet ds = new DataSet();
-            ////var users = ct.GetUserDetails();
-            ////return users;
-
-            //List<Employee> emp = new List<Employee>();
-            //Category ct = new Category();
-            //DataSet ds = new DataSet();
-            ////try
-            ////{
-            ////throw new Exception();
-
-            //var users = ct.GetSearchResult(searcheddata);
-            //if (users == null)
-            //{
-            //    throw new HttpResponseException(HttpStatusCode.NotFound);
-            //}
-            //return users;
-
-            ////}
-            ////catch (Exception ex)
-            ////{
-            ////ExceptionLogging.SendExcepToDB(ex, 0);
-            ////}
-            //HttpResponseMessage response;
-            //response = Request.CreateResponse(HttpStatusCode.OK, "");
-            //return response;
         }
 
         #endregion
