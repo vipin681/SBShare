@@ -8,6 +8,18 @@ namespace DummyProject.Controllers
 {
     public class SaveDataController : Controller
     {
+        #region GetUser
+
+        public ActionResult DashBoard()
+        {
+
+            return View();
+        }
+
+        #endregion
+
+
+
         // GET: SaveData
         public ActionResult Index()
         {
@@ -19,11 +31,7 @@ namespace DummyProject.Controllers
 
             return View();
         }
-        public ActionResult DashBoard()
-        {
-
-            return View();
-        }
+       
         public ActionResult Menu()
         {
 

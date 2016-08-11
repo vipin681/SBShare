@@ -18,6 +18,83 @@ namespace DummyProject.Controllers
 
     public class UserController : ApiController
     {
+        #region Get User
+        [HttpGet]
+        public HttpResponseMessage GetUserList()
+        {
+
+            HttpResponseMessage response;
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            objResult = userBAL.GetUserList();
+            if (objResult != null)
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                objResult.errormsg = "";
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                objResult.errormsg = "Data Empty!";
+                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+            }
+            return response;
+        }
+        #endregion
+
+
+        #region Search
+        [HttpGet]
+        public HttpResponseMessage GetSearchResult(string searchbar)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            objResult = userBAL.GetUserDetailsBysearch(searchbar);
+            if (objResult != null)
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            }
+            return response;
+
+            ////Category ct = new Category();
+            ////DataSet ds = new DataSet();
+            ////var users = ct.GetUserDetails();
+            ////return users;
+
+            //List<Employee> emp = new List<Employee>();
+            //Category ct = new Category();
+            //DataSet ds = new DataSet();
+            ////try
+            ////{
+            ////throw new Exception();
+
+            //var users = ct.GetSearchResult(searcheddata);
+            //if (users == null)
+            //{
+            //    throw new HttpResponseException(HttpStatusCode.NotFound);
+            //}
+            //return users;
+
+            ////}
+            ////catch (Exception ex)
+            ////{
+            ////ExceptionLogging.SendExcepToDB(ex, 0);
+            ////}
+            //HttpResponseMessage response;
+            //response = Request.CreateResponse(HttpStatusCode.OK, "");
+            //return response;
+        }
+
+        #endregion
+
+
+        #region all
         [HttpPost]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
@@ -156,23 +233,7 @@ namespace DummyProject.Controllers
             }
             return response;
         }
-        [HttpGet]
-        public HttpResponseMessage GetUserList()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserList();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+       
         [HttpGet]
         public HttpResponseMessage GetItemDetails()
         {
@@ -290,5 +351,10 @@ namespace DummyProject.Controllers
             }
             return response;
         }
+
+
+       
+
+        #endregion 
     }
 }

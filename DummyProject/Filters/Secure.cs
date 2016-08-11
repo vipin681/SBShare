@@ -34,7 +34,7 @@ namespace DummyProject.Filters
             }
             Result outResult = new Result
             {
-                Status = false,
+                Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
                 MessageId = -1
             };
             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, outResult);
