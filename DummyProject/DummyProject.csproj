@@ -305,6 +305,10 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="angularjs-plugin\wrappers\.DS_Store" />
     <Content Include="angularjs-plugin\wrappers\angularjs\README.md" />
+    <Content Include="NLog.config" />
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

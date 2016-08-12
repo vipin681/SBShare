@@ -147,7 +147,7 @@ namespace DummyProjectDAL
                     //sqlcmd.Parameters.Add("@modifiedby", SqlDbType.Int).Value = user.modifiedby;
                    // sqlcmd.Parameters.Add("@modifieddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.modifieddate);
                    // sqlcmd.Parameters.Add("@timestamp", SqlDbType.Timestamp).Value = user.timestamp;
-                    sqlcmd.Parameters.Add("@SaltValue", SqlDbType.VarChar, 5000).Value = user.SaltValue;
+                   // sqlcmd.Parameters.Add("@SaltValue", SqlDbType.VarChar, 5000).Value = user.SaltValue;
                     
                     sqlcmd.ExecuteNonQuery();
                     return new Result
