@@ -25,7 +25,8 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         IsActive: '',
         ID: '',
         WorkerID: '',
-        Name: ''
+        Name: '',
+        searchbar:''
     };
     $scope.Worker = false;
     $scope.payGroup = {};
@@ -37,7 +38,10 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
 
         }).error(function (response) {
         });
-    }
+    
+        $scope.UpdatePassword = function () {
+
+        }
     $scope.SearchDetails = function (keyword) {
         return $http.get(VirtualDirectoryPath + 'api/User/GetListByID?keyword=' + $rootScope.UserDetail.keyword).success(function (data) {
             if (data.Status === false) {
@@ -47,6 +51,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         }).error(function (err) {
         });
     }
+
 
 
 
@@ -183,18 +188,12 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         enableFiltering: true,
 
         columnDefs: [
-          {
-              name: 'ID', displayName: ' ID',
-              cellTemplate: '<a ng-click="grid.appScope.RedirectToIDPage(row)" style="cursor:pointer" title="Click to Approve/Reject single request">{{row.entity.ID}}</a>'
-          },
-
-        { name: 'ID', displayName: 'ID' },
-         { name: 'WorkerID', displayName: 'WorkerID' },
-                    { name: 'UserName', field: 'UserName' },
-                      { name: 'LastName', field: 'LastName' },
-                      { name: 'Phone', displayName: 'Phone' },
-                       { name: 'Email', displayName: 'Email' },
-                        // { name: 'RoleName', displayName: 'RoleName' },
+         
+                     { name: 'Name', field: 'Fullname' },
+                     { name: 'Email', field: 'emailId' },
+                     { name: 'workerid', displayName: 'Worker ID' },
+                     { name: 'appRole', displayName: 'RoleName' },
+                     { name: 'status', displayName: 'Status' },
         ]
 
     };
@@ -238,6 +237,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         //$http.post(VirtualDirectoryPath + 'Home/GetData', $scope.searchModel)
         $http.get(VirtualDirectoryPath + 'api/User/GetUserList')
         .success(function (data) {
+            alert(JSON.stringify(data.Results));
             $scope.gridOptions1.data = data.Results;
         });
     }
@@ -247,20 +247,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
 
 
 
-    // $http.get(VirtualDirectoryPath+'/api/User/GetItemDetails/',
-    //{
-    //    params:
-    //    {
-    //        ItemName: ItemName
-    //    }
-    //}).success(function (data) {
-    //    $scope.itemData = data;
-    //    $scope.itemCount = $scope.itemData.length;
-    //    $scope.selectedItem = $scope.itemData[0].SaleCount;
-    //}).error(function () {
-    //    $scope.error = "An Error has occured while loading posts!";
-    //});
-
+   
     $scope.EmployeeLookup = function () {
 
         var TypeHeadKeyword = '';
@@ -279,20 +266,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
 
 
 
-    $scope.onSelect = function ($item, $model, $label) {
-        $scope.UserDetail.Name = $item.UserName;
-        $scope.UserDetail.Email = $item.Email;
-        $scope.UserDetail.Phone = $item.Phone;
-        $scope.UserDetail.WorkerID = $item.WorkerID;
-
-        //  var Arr = $item.EmpNotesName.split('/');
-        //  $scope.Save.EmpNotesName = $item.EmpNotesName
-        //$scope.Save.EmpNotesName = $item.EmpNotesName
-        //$scope.Save.EmpNotesName = Arr[0].toString();
-
-    }
-
-   // select MenuDetails($scope.sMenuID, $scope.sMenuName);  
+ 
   
     function selectMenuDetails(menuID, menuName) {  
        
@@ -328,7 +302,25 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
     }  
 
 
+    $scope.searchuserfunc = function () {
+        
+       if ($rootScope.UserDetail.searchbar != '') {
+        $http.get(VirtualDirectoryPath + 'api/User/GetSearchResult', { params: { searchbar: $rootScope.UserDetail.searchbar } }).
+                   success(function (data1) {
+                       alert(JSON.stringify(data1.Results));
 
+                   }).
+                   error(function (data) {
+
+                      $scope.ErrorMessage = 'Error in Employee Insertion';
+                   });
+        }
+        //else {
+        //   // $scope.GetDetails();
+        //}
+       
+
+    };
 
 
 

@@ -6,16 +6,44 @@ using System.Threading.Tasks;
 using DummyProjectStateClass;
 using DummyProjectDAL;
 using System.Security.Cryptography;
+using System.Net;
 
 namespace DummyProjectBAL
 {
     public class UserBAL
     {
+        # region GetUser
+        public Result GetUserList()
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetUserList();
+        }
+        #endregion
+
+        #region SearchUser
+        public Result GetUserDetailsBysearch(string searchstring)
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetUserListByID(searchstring);
+        }
+        #endregion
+        #region Update Password
+       public Result UpdateUserPassword(UpdateUserPassword userPassword)
+        {
+            UserDAL userDAL = new UserDAL();
+            Result result = userDAL.Updatepassword(userPassword);
+            return result;
+
+        }
+        #endregion
+
+        #region Insert\Update user
+
         public Result InsertUser(UserDetails user)
         {
             UserDAL userDAL = new UserDAL();
             user.SaltValue = GenerateSalt();
-          //  user.Password = GetHashedValue(user.Password, user.SaltValue);
+            user.password = GetHashedValue(user.password, user.SaltValue);
             Result result = userDAL.InsertUser(user);
 
             return result;
@@ -24,16 +52,24 @@ namespace DummyProjectBAL
         {
             //using (TransactionScope scope = new TransactionScope())
             //{
-                UserDAL userDAL = new UserDAL();
-                Result result = userDAL.UpdateUser(user);
-                return result;
-           // }
+            UserDAL userDAL = new UserDAL();
+            Result result = userDAL.UpdateUser(user);
+            return result;
+            // }
         }
+
+        #endregion
+
+
+
+        #region All
+
         public Result GetUserDetailsByID(Int64 ID)
         {
             UserDAL userDAL = new UserDAL();
             return userDAL.GetUserDetailsByID(ID);
         }
+   
         public Result UserLookup(String TypeHeadKeyword)
         {
             UserDAL userDAL = new UserDAL();
@@ -55,18 +91,17 @@ namespace DummyProjectBAL
             objUser = userDAL.IsValidUser(userName, userPassword);
             if (objUser != null)
             {
-                if (objUser.Password == userPassword)
+                if (objUser.password == userPassword)
                 {
                     return new Result
                     {
-                        Status = true,
-                        MessageId = 0,
+                        Status = Convert.ToString((int)HttpStatusCode.OK),
+                        errormsg="",
                         Results = new
                         {
-                            UserID = objUser.ID,
-                            UserName = objUser.UserName,
+                            UserID = objUser.userid,
                             TokenID = objUser.TokenID,
-                            Role = objUser.Role,
+                            Role = objUser.roleid,
                             // Language = objUser.Language.LanguageName
                         }
                     };
@@ -75,7 +110,7 @@ namespace DummyProjectBAL
                 {
                     return new Result
                     {
-                        Status = false,
+                        Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
                         MessageId = 11,
                         Results = null
                     };
@@ -85,7 +120,7 @@ namespace DummyProjectBAL
             {
                 return new Result
                 {
-                    Status = false,
+                    Status = Convert.ToString((int)HttpStatusCode.NotFound),
                     MessageId = 12,
                     Results = null
                 };
@@ -106,11 +141,7 @@ namespace DummyProjectBAL
             UserDAL userDAL = new UserDAL();
             return userDAL.GetStateList();
         }
-        public Result GetUserList()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetUserList();
-        }
+  
         public UserToken GetUserDetailsByTokenID(string tokenID)
         {
             UserDAL objUserDAL = new UserDAL();
@@ -122,23 +153,23 @@ namespace DummyProjectBAL
             UserDAL userDAL = new UserDAL();
             return userDAL.GetItemDetails();
         }
-        public Result GetMenuCRUDSelect(string menuID, string menuName)
-        {
-            UserDAL userDAL = new UserDAL();
-            if (menuID == null)
-                menuID = "";
-            if (menuName == null)
-                menuName = "";
-            return userDAL.GetMenuCRUDSelect(menuID, menuName);
-        }
+        //public Result GetMenuCRUDSelect(string menuID, string menuName)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    if (menuID == null)
+        //        menuID = "";
+        //    if (menuName == null)
+        //        menuName = "";
+        //    return userDAL.GetMenuCRUDSelect(menuID, menuName);
+        //}
         
-        public Result getUserRoleDetails(string UserRole)
-        {
-            UserDAL userDAL = new UserDAL();
-            if (UserRole == null)
-                UserRole = "";
-            return userDAL.getUserRoleDetails(UserRole);
-        }
+        //public Result getUserRoleDetails(string UserRole)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    if (UserRole == null)
+        //        UserRole = "";
+        //    return userDAL.getUserRoleDetails(UserRole);
+        //}
 
         public Result getMenubyUserRole(string UserRole)
         {
@@ -148,15 +179,15 @@ namespace DummyProjectBAL
             return userDAL.getMenubyUserRole(UserRole);
         }
 
-        public Result insertMenu(UserDetails user)
-        {
-            UserDAL userDAL = new UserDAL();
-            user.SaltValue = GenerateSalt();
-            //  user.Password = GetHashedValue(user.Password, user.SaltValue);
-            Result result = userDAL.insertMenu(user);
+        //public Result insertMenu(UserDetails user)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    user.SaltValue = GenerateSalt();
+        //    //  user.Password = GetHashedValue(user.Password, user.SaltValue);
+        //    Result result = userDAL.insertMenu(user);
 
-            return result;
-        }
+        //    return result;
+        //}
 
         public static string GenerateSalt()
         {
@@ -226,6 +257,10 @@ namespace DummyProjectBAL
             return Convert.ToBase64String(ByteHash);
 
         }
+
+#endregion 
+
+
 
     }
 }
