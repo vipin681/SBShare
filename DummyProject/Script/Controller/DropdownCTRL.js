@@ -38,8 +38,20 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
 
         }).error(function (response) {
         });
+    
+        $scope.UpdatePassword = function () {
+
+        }
+    $scope.SearchDetails = function (keyword) {
+        return $http.get(VirtualDirectoryPath + 'api/User/GetListByID?keyword=' + $rootScope.UserDetail.keyword).success(function (data) {
+            if (data.Status === false) {
+                $scope.gridOptions1 = data.Results.Data[0];
+                //return data.Results;
+            }
+        }).error(function (err) {
+        });
     }
-  
+
 
 
 

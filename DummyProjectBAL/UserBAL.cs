@@ -27,6 +27,15 @@ namespace DummyProjectBAL
             return userDAL.GetUserListByID(searchstring);
         }
         #endregion
+        #region Update Password
+       public Result UpdateUserPassword(UpdateUserPassword userPassword)
+        {
+            UserDAL userDAL = new UserDAL();
+            Result result = userDAL.Updatepassword(userPassword);
+            return result;
+
+        }
+        #endregion
 
         #region Insert\Update user
 

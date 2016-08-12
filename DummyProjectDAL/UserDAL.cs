@@ -83,6 +83,30 @@ namespace DummyProjectDAL
         }
         #endregion
 
+        #region Update User Password
+        public Result Updatepassword(UpdateUserPassword userPassword)
+        {
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                using (SqlCommand sqlcmd = new SqlCommand())
+                {
+                    sqlcmd.CommandText = "UpdateUserPassword";
+                    sqlcmd.Connection = conn;
+                    sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Parameters.Add("@paramuserid", SqlDbType.BigInt).Value = userPassword.userid;
+                    sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.NVarChar, 150).Value = userPassword.Password;
+                    sqlcmd.Parameters.Add("@parammodifiedby", SqlDbType.NVarChar, 150).Value = userPassword.modifiedby;
+                    sqlcmd.Parameters.Add("@parammodifieddate", SqlDbType.NVarChar, 150).Value = userPassword.modifieddate;
+                    sqlcmd.ExecuteNonQuery();
+                    return new Result
+                    {
+                        Results = (sqlcmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@paramuserid"].Value)
+                    };
+                }
+            }
+        }
+        #endregion
+
 
 
 
@@ -184,6 +208,7 @@ namespace DummyProjectDAL
                 }
             }
         }
+      
         public Result GetUserDetailsByID(Int64 ID)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())

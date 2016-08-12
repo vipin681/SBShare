@@ -38,5 +38,9 @@ namespace DummyProject.Controllers
             return View();
 
         }
+        public ActionResult UpdatePassword()
+        {
+            return View();
+        }
     }
 }
