@@ -93,6 +93,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseClass.cs" />
     <Compile Include="Books.cs" />
     <Compile Include="Country.cs" />
     <Compile Include="Line.cs" />

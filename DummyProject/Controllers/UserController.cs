@@ -15,10 +15,13 @@ using DummyProject.Filters;
 namespace DummyProject.Controllers
 {
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
-
     public class UserController : ApiController
     {
         #region Get User
+        /// <summary>
+        /// Get all the user list
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public HttpResponseMessage GetUserList()
         {
@@ -43,8 +46,13 @@ namespace DummyProject.Controllers
         }
         #endregion
 
-
         #region Search
+        /// <summary>
+        /// Search user on basis of First name,LastName,workerid  and emailid
+        /// </summary> 
+        /// <param name="searchbar">
+        /// Enter any string to filter on basis of First name,LastName,workerid  and emailid</param>
+        /// <returns></returns>
         [HttpGet]
         public HttpResponseMessage GetSearchResult(string searchbar)
         {
@@ -54,10 +62,14 @@ namespace DummyProject.Controllers
             objResult = userBAL.GetUserDetailsBysearch(searchbar);
             if (objResult != null)
             {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                objResult.errormsg = "";
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
             }
             else
             {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                objResult.errormsg = "Data Empty!";
                 response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
             return response;
@@ -65,8 +77,17 @@ namespace DummyProject.Controllers
 
         #endregion
 
+        #region Submit\post user
 
-        #region all
+        /// <summary>
+        /// Submit the new user data
+        /// </summary>
+        /// <param name="user">
+        /// id should be zero,
+        /// client id should be present client eg.20,
+        /// location id should be present client eg.2,
+        /// role should be present role eg.1</param>
+        /// <returns>A value</returns>
         [HttpPost]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
@@ -76,7 +97,7 @@ namespace DummyProject.Controllers
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
-            if (user.ID == 0)
+            if (user.userid == 0)
             {
                 // user.InsertedBy = ID;
                 objResult = userBLL.InsertUser(user);
@@ -88,16 +109,82 @@ namespace DummyProject.Controllers
             }
             if (objResult != null)
             {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                objResult.errormsg = "";
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
             }
             else
             {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+                objResult = new Result();
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                objResult.errormsg = "Data Empty!";
+                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
             }
             return response;
         }
+        #endregion
+
+
+        #region Edit\post user
+        /// <summary>
+        /// Edit the Existing user data
+        /// </summary>
+        /// <param name="user">
+        /// id should be a existing userid,
+        /// client id should be present client eg.20,
+        /// location id should be present client eg.2,
+        /// role should be present role eg.1</param>
+        /// <returns>A value</returns>
+        [HttpPut]
+        public HttpResponseMessage EditUserDetails(UserDetails user)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            // Int64 userID = Int64.Parse(User.Identity.Name);
+            UserBAL userBLL = new UserBAL();
+            if (user.userid == 0)
+            {
+                objResult = new Result();
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                objResult.errormsg = "Data not found";
+                response = Request.CreateResponse(HttpStatusCode.NotFound, objResult);
+            }
+            else
+            {
+               objResult = userBLL.UpdateUser(user);
+            }
+            if (objResult != null)
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                objResult.errormsg = "";
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                objResult = new Result();
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                objResult.errormsg = "Data Empty!";
+                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+            }
+            return response;
+        }
+
+        #endregion
+
+        #region all
+
+
         [HttpGet]
-        [Secure]
+
+        /// <summary>
+        /// Edit the Existing user data by userid
+        /// </summary>
+        /// <param name="ID">
+        /// id should be a existing userid
+        /// </param>
+        /// <returns>User detail</returns>
         public HttpResponseMessage GetUserDetailsByID(int ID)
         {
             HttpResponseMessage response;
@@ -106,14 +193,21 @@ namespace DummyProject.Controllers
             objResult = userBAL.GetUserDetailsByID(ID);
             if (objResult != null)
             {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                objResult.errormsg = "";
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
             }
             else
             {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+                objResult = new Result();
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                objResult.errormsg = "Data not found";
+                response = Request.CreateResponse(HttpStatusCode.NotFound, objResult);
+                
             }
             return response;
         }
+
         [HttpGet]
        // [NotImplExceptionFilterAttribute]
         public HttpResponseMessage GetListByID(String keyword)
@@ -133,6 +227,7 @@ namespace DummyProject.Controllers
             }
             return response;
         }
+
         [HttpPost]
         [OnExceptionHandler]
         public HttpResponseMessage CheckLogin(string UserName, string Password)
@@ -151,6 +246,7 @@ namespace DummyProject.Controllers
             }
             return response;
         }
+
         [HttpGet]
         public HttpResponseMessage GetRole()
         {
@@ -169,6 +265,7 @@ namespace DummyProject.Controllers
             }
             return response;
         }
+
         [HttpGet]
         public HttpResponseMessage GetCountryList()
         {
@@ -187,6 +284,7 @@ namespace DummyProject.Controllers
             }
             return response;
         }
+
         [HttpGet]
         [OnExceptionHandler]
         public HttpResponseMessage GetStateList()
@@ -225,6 +323,7 @@ namespace DummyProject.Controllers
             }
             return response;
         }
+
         [HttpGet]
         public HttpResponseMessage UserLookup(String TypeHeadKeyword)
         {
@@ -243,40 +342,43 @@ namespace DummyProject.Controllers
             }
             return response;
         }
-        [HttpGet]
-        public HttpResponseMessage GetMenuCRUDSelect(string menuID, string menuName)
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetMenuCRUDSelect(menuID, menuName);
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
-        [HttpGet]
-        public HttpResponseMessage getUserRoleDetails(string UserRole)
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL userBAL = new UserBAL();
-            objResult = userBAL.getUserRoleDetails(UserRole);
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+
+        //[HttpGet]
+        //public HttpResponseMessage GetMenuCRUDSelect(string menuID, string menuName)
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    UserBAL userBAL = new UserBAL();
+        //    objResult = userBAL.GetMenuCRUDSelect(menuID, menuName);
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
+
+        //[HttpGet]
+        //public HttpResponseMessage getUserRoleDetails(string UserRole)
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    UserBAL userBAL = new UserBAL();
+        //    objResult = userBAL.getUserRoleDetails(UserRole);
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
+
         [HttpGet]
         public HttpResponseMessage getMenubyUserRole(string UserRole)
         {
@@ -294,35 +396,36 @@ namespace DummyProject.Controllers
             }
             return response;
         }
-        [HttpPost]
-        public HttpResponseMessage insertMenu(UserDetails user)
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            // Int64 userID = Int64.Parse(User.Identity.Name);
-            UserBAL userBLL = new UserBAL();
-            if (user.ID == 0)
-            {
-                // user.InsertedBy = ID;
-                objResult = userBLL.insertMenu(user);
-            }
-            else
-            {
-                // user.UpdatedBy = userID;
-                objResult = userBLL.UpdateUser(user);
-            }
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+
+        //[HttpPost]
+        //public HttpResponseMessage insertMenu(UserDetails user)
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    HttpClient client = new HttpClient();
+        //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //    // Int64 userID = Int64.Parse(User.Identity.Name);
+        //    UserBAL userBLL = new UserBAL();
+        //    if (user.userid == 0)
+        //    {
+        //        // user.InsertedBy = ID;
+        //        objResult = userBLL.insertMenu(user);
+        //    }
+        //    else
+        //    {
+        //        // user.UpdatedBy = userID;
+        //        objResult = userBLL.UpdateUser(user);
+        //    }
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
 
 
        

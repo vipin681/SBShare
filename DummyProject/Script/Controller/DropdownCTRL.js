@@ -226,7 +226,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         //$http.post(VirtualDirectoryPath + 'Home/GetData', $scope.searchModel)
         $http.get(VirtualDirectoryPath + 'api/User/GetUserList')
         .success(function (data) {
-          
+            alert(JSON.stringify(data.Results));
             $scope.gridOptions1.data = data.Results;
         });
     }
