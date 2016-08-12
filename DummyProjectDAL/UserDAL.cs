@@ -187,10 +187,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
-
-
-
         public Result UserLookup(String TypeHeadKeyword)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -235,6 +231,10 @@ namespace DummyProjectDAL
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Parameters.Add("@userName", SqlDbType.NVarChar, 100).Value = userName;
                     sqlcmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
+                    //sqlcmd.Parameters["@flag"].Direction = ParameterDirection.Output;
+
+                   // int res = sqlcmd.ExecuteNonQuery();
+                  
                     sqlad.Fill(ds);
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
@@ -247,6 +247,9 @@ namespace DummyProjectDAL
                             objUser.TokenID = ds.Tables[0].Rows[i]["TokenID"].ToString();
                         }
                     }
+            
+
+
                 }
             }
             return objUser;
@@ -380,8 +383,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
-
         public Result GetItemDetails()
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -412,8 +413,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
-
         public Result GetMenuCRUDSelect(string menuID, string menuName)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -463,8 +462,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
-
         public Result getUserRoleDetails(string UserRole)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -514,7 +511,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
         public Result getMenubyUserRole(string UserRole)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -564,9 +560,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
-
-
         public Result insertMenu(UserDetails user)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -596,6 +589,5 @@ namespace DummyProjectDAL
                 }
             }
         }
-
     }
 }

@@ -12,12 +12,14 @@ using DummyProject.CustomFilters;
 using System.Net.Http.Headers;
 using System.Data.SqlClient;
 using DummyProject.Filters;
+using NLog;
 namespace DummyProject.Controllers
 {
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
-
+    
     public class UserController : ApiController
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         [HttpPost]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
@@ -27,6 +29,20 @@ namespace DummyProject.Controllers
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
+            try
+            {
+                if (user.ID == 0)
+                {
+
+                    objResult = userBLL.InsertUser(user);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorException("Error Occured", ex);
+                // throw;
+            }
             if (user.ID == 0)
             {
                 // user.InsertedBy = ID;
@@ -66,7 +82,8 @@ namespace DummyProject.Controllers
             return response;
         }
         [HttpGet]
-       // [NotImplExceptionFilterAttribute]
+        // [NotImplExceptionFilterAttribute]
+        [Secure]
         public HttpResponseMessage GetListByID(String keyword)
         {
             HttpResponseMessage response;
@@ -85,22 +102,58 @@ namespace DummyProject.Controllers
             return response;
         }
         [HttpPost]
-        [OnExceptionHandler]
+        //[OnExceptionHandler]
+
+       
         public HttpResponseMessage CheckLogin(string UserName, string Password)
         {
+            logger.Debug("Debug Level");
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
             objResult = objUserBLL.IsValidUser(UserName, Password);
             if (objResult != null)
             {
+                logger.Debug("Debug Level");
+                Exception e = new Exception();
+                logger.ErrorException("Data  Found",e);
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
             }
             else
             {
+                Exception e = new Exception();
+                logger.ErrorException("Data Empty", e);
                 response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
             return response;
+          
+
+
+            // HttpResponseMessage response;
+            // Result objResult = null;
+            // UserBAL objUserBLL = new UserBAL();
+            // try
+            // {
+            //     objResult = objUserBLL.IsValidUser(UserName, Password);
+            //     logger.Debug("No");
+            // }
+            // catch (Exception ex)
+            // {  
+
+            // logger.ErrorException("Error Occured", ex);
+
+
+            // }
+            // if (objResult != null)
+            // {
+            //     response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+
+            // }
+            // else
+            // {
+            //     response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            // }
+            // return response;
         }
         [HttpGet]
         public HttpResponseMessage GetRole()
@@ -139,7 +192,7 @@ namespace DummyProject.Controllers
             return response;
         }
         [HttpGet]
-        [OnExceptionHandler]
+
         public HttpResponseMessage GetStateList()
         {
             HttpResponseMessage response;
@@ -157,6 +210,7 @@ namespace DummyProject.Controllers
             return response;
         }
         [HttpGet]
+       // [Secure]
         public HttpResponseMessage GetUserList()
         {
             HttpResponseMessage response;
@@ -174,6 +228,7 @@ namespace DummyProject.Controllers
             return response;
         }
         [HttpGet]
+        [Secure]
         public HttpResponseMessage GetItemDetails()
         {
             HttpResponseMessage response;
