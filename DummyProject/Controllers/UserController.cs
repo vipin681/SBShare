@@ -60,6 +60,20 @@ namespace DummyProject.Controllers
             return response;
         }
         #endregion
+        #region Update Password
+        [HttpPost]
+        public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            UserBAL userBLL = new UserBAL();
+            objResult = userBLL.UpdateUserPassword(userPassword);
+            response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
+            return response;
+        }
+        #endregion
 
         #region Get User by id
         /// <summary>
