@@ -5,11 +5,13 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
 
 namespace DummyProject.Controllers
 {
     public class ErrorController : ApiController
     {
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet, HttpPost, HttpPut, HttpDelete, HttpHead, HttpOptions]
         public IHttpActionResult NotFound(string path)
         {

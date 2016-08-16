@@ -22,7 +22,7 @@ namespace DummyProjectDAL
                 {
                     SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
                     DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetUserList";
+                    sqlcmd.CommandText = "[security].[usp_GetUserList]";
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Connection = conn;
                     // sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = ID;
@@ -61,7 +61,7 @@ namespace DummyProjectDAL
                 {
                     SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
                     DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetAllUser";
+                    sqlcmd.CommandText = "security.usp_GetAllUser";
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Connection = conn;
                     sqlcmd.Parameters.Add("@TypeHeadKeyword", SqlDbType.NVarChar, 200).Value = keyword;
@@ -107,7 +107,45 @@ namespace DummyProjectDAL
         }
         #endregion
 
+        #region Get User Details ByID
+        public Result GetUserDetailsByID(Int32 ID)
+        {
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                UserDetails user = null;
+                using (SqlCommand sqlcmd = new SqlCommand())
+                {
+                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+                    DataSet ds = new DataSet();
+                    sqlcmd.CommandText = "usp_GetUserbyid";
+                    sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Connection = conn;
+                    sqlcmd.Parameters.Add("@userid", SqlDbType.Int).Value = ID;
+                    sqlad.Fill(ds);
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                        //user = new UserDetails();
+                        //user.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                        //user.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
+                        //user.emailaddress = ds.Tables[0].Rows[0]["emailaddress"].ToString();
+                        //user.workerid = ds.Tables[0].Rows[0]["workerid"].ToString();
 
+
+                        return new Result
+                        {
+                            Results = ds.Tables[0],
+                        };
+                    }
+                    return new Result
+                    {
+                        errormsg = "Data Not found",
+                        Status = Convert.ToString((int)HttpStatusCode.NotFound),
+                        Results = null
+                    };
+                }
+            }
+        }
+        #endregion
 
 
 
@@ -164,7 +202,7 @@ namespace DummyProjectDAL
             {
                 using (SqlCommand sqlcmd = new SqlCommand())
                 {
-                    sqlcmd.CommandText = "usp_UpdateUser";
+                    sqlcmd.CommandText = "security.usp_UpdateUser";
                     sqlcmd.Connection = conn;
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Parameters.Add("@userid", SqlDbType.Int).Value = user.userid; ;
@@ -209,54 +247,7 @@ namespace DummyProjectDAL
             }
         }
       
-        public Result GetUserDetailsByID(Int64 ID)
-        {
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                UserDetails user = null;
-                using (SqlCommand sqlcmd = new SqlCommand())
-                {
-                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
-                    DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetUserDetailsByID";
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Connection = conn;
-                    sqlcmd.Parameters.Add("@userid", SqlDbType.BigInt).Value = ID;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        user = new UserDetails();
-                        user.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
-                        user.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
-                        user.emailaddress = ds.Tables[0].Rows[0]["emailaddress"].ToString();
-                        user.workerid = ds.Tables[0].Rows[0]["workerid"].ToString();
-
-                        //user.password = ds.Tables[0].Rows[0]["password"].ToString();
-                        //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
-                        //if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
-                        //    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
-                        //if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
-                        //    user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
-                        //if (ds.Tables[0].Rows[0]["RoleID"] != DBNull.Value)
-                        //    user.role.RoleID =Convert.ToInt32( ds.Tables[0].Rows[0]["RoleID"].ToString());
-
-                        //if (ds.Tables[0].Rows[0]["RoleName"] != DBNull.Value)
-                        //    user.role.RoleName = ds.Tables[0].Rows[0]["RoleName"].ToString();
-
-                        return new Result
-                        {
-                            Results = user
-                        };
-                    }
-                    return new Result
-                    {
-                       // Status = false,
-                       // MessageId = 1,
-                       // Results = null
-                    };
-                }
-            }
-        }
+      
         //public Result GetUserDetailsBysearch(string searchstring)
         //{
         //    using (SqlConnection conn = DbHelper.CreateConnection())

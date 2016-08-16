@@ -13,6 +13,8 @@ using System.Net.Http.Headers;
 using System.Data.SqlClient;
 using DummyProject.Filters;
 using NLog;
+using System.Web.Http.Description;
+
 namespace DummyProject.Controllers
 {
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
@@ -59,6 +61,47 @@ namespace DummyProject.Controllers
         }
         #endregion
 
+        #region Get User by id
+        /// <summary>
+        /// Get all the user list by id
+        /// </summary>
+        /// <param name="ID">
+        /// Enter corresponding Userid to search for specific user</param>
+        /// <returns></returns>
+        [HttpGet]
+        public HttpResponseMessage GetUserById(int ID)
+        {
+            logger.Debug("get all user by id started");
+            HttpResponseMessage response = new HttpResponseMessage();
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            objResult = userBAL.GetUserDetailsByID(ID);
+            try
+            {
+                if (objResult != null)
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                    objResult.errormsg = "";
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                }
+                else
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                    objResult.errormsg = "Data Empty!";
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                }
+            }
+            catch (Exception)
+            {
+                Exception e = new Exception();
+                logger.ErrorException("Data Empty", e);
+
+            }
+            logger.Debug("get all user by id finished");
+            return response;
+        }
+        #endregion
+
         #region Search
         /// <summary>
         /// Search user on basis of First name,LastName,workerid  and emailid
@@ -76,7 +119,7 @@ namespace DummyProject.Controllers
             try
             {
                 objResult = userBAL.GetUserDetailsBysearch(searchbar);
-            if (objResult != null)
+            if (objResult.Results != null)
             {
                 objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
                 objResult.errormsg = "";
@@ -86,12 +129,12 @@ namespace DummyProject.Controllers
             {
                 objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
                 objResult.errormsg = "Data Empty!";
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
             }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Exception e = new Exception();
+               
                 logger.ErrorException("Data Empty", e);
 
             }
@@ -140,9 +183,8 @@ namespace DummyProject.Controllers
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Exception e = new Exception();
                 logger.ErrorException("Data Empty", e);
 
             }
@@ -165,7 +207,6 @@ namespace DummyProject.Controllers
             return response;
         }
         #endregion
-
 
         #region Edit\post user
         /// <summary>
@@ -202,9 +243,8 @@ namespace DummyProject.Controllers
                     objResult = userBLL.UpdateUser(user);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Exception e = new Exception();
                 logger.ErrorException("Data Empty", e);
 
             }
@@ -229,18 +269,10 @@ namespace DummyProject.Controllers
         #endregion
 
         #region all
-
-
+        
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
-
-        /// <summary>
-        /// Edit the Existing user data by userid
-        /// </summary>
-        /// <param name="ID">
-        /// id should be a existing userid
-        /// </param>
-        /// <returns>User detail</returns>
-        public HttpResponseMessage GetUserDetailsByID(int ID)
+        public HttpResponseMessage GetUserDetailsByID1(int ID)
         {
             HttpResponseMessage response;
             Result objResult = null;
@@ -263,8 +295,8 @@ namespace DummyProject.Controllers
             return response;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
-
         public HttpResponseMessage GetListByID(String keyword)
         {
             HttpResponseMessage response;
@@ -283,8 +315,8 @@ namespace DummyProject.Controllers
             return response;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
-
         public HttpResponseMessage CheckLogin(string UserName, string Password)
         {
             HttpResponseMessage response;
@@ -302,6 +334,7 @@ namespace DummyProject.Controllers
             return response;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public HttpResponseMessage GetRole()
         {
@@ -321,6 +354,7 @@ namespace DummyProject.Controllers
             return response;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public HttpResponseMessage GetCountryList()
         {
@@ -340,6 +374,7 @@ namespace DummyProject.Controllers
             return response;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [OnExceptionHandler]
         public HttpResponseMessage GetStateList()
@@ -359,6 +394,7 @@ namespace DummyProject.Controllers
             return response;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public HttpResponseMessage GetItemDetails()
         {
@@ -379,6 +415,7 @@ namespace DummyProject.Controllers
             return response;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public HttpResponseMessage UserLookup(String TypeHeadKeyword)
         {
@@ -417,6 +454,7 @@ namespace DummyProject.Controllers
         //    return response;
         //}
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public HttpResponseMessage getMenubyUserRole(string UserRole)
         {
