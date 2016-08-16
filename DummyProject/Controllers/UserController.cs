@@ -322,52 +322,52 @@ namespace DummyProject.Controllers
         }
         #endregion
 
-        //#region all
+        #region all
 
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[HttpGet]
-        //public HttpResponseMessage GetUserDetailsByID1(int ID)
-        //{
-        //    HttpResponseMessage response;
-        //    Result objResult = null;
-        //    UserBAL userBAL = new UserBAL();
-        //    objResult = userBAL.GetUserDetailsByID(ID);
-        //    if (objResult != null)
-        //    {
-        //        objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-        //        objResult.errormsg = "";
-        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        //    }
-        //    else
-        //    {
-        //        objResult = new Result();
-        //        objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-        //        objResult.errormsg = "Data not found";
-        //        response = Request.CreateResponse(HttpStatusCode.NotFound, objResult);
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet]
+        public HttpResponseMessage GetUserDetailsByID1(int ID)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            objResult = userBAL.GetUserDetailsByID(ID);
+            if (objResult != null)
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                objResult.errormsg = "";
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                objResult = new Result();
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                objResult.errormsg = "Data not found";
+                response = Request.CreateResponse(HttpStatusCode.NotFound, objResult);
 
-        //    }
-        //    return response;
-        //}
+            }
+            return response;
+        }
 
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[HttpGet]
-        //public HttpResponseMessage GetListByID(String keyword)
-        //{
-        //    HttpResponseMessage response;
-        //    Result objResult = null;
-        //    //  Int64 userID = Int64.Parse(User.Identity.Name);
-        //    UserBAL objUserBAL = new UserBAL();
-        //    objResult = objUserBAL.GetUserListByID(keyword);
-        //    if (objResult != null)
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        //    }
-        //    else
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-        //    }
-        //    return response;
-        //}
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet]
+        public HttpResponseMessage GetListByID(String keyword)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            //  Int64 userID = Int64.Parse(User.Identity.Name);
+            UserBAL objUserBAL = new UserBAL();
+            objResult = objUserBAL.GetUserListByID(keyword);
+            if (objResult != null)
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            }
+            return response;
+        }
 
        
 
@@ -431,74 +431,35 @@ namespace DummyProject.Controllers
         //    return response;
         //}
 
-        //[ApiExplorerSettings(IgnoreApi = true)]
+     
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet]
+        public HttpResponseMessage UserLookup(String TypeHeadKeyword)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            //  Int64 userID = Int64.Parse(User.Identity.Name);
+            UserBAL objUserBAL = new UserBAL();
+            objResult = objUserBAL.UserLookup(TypeHeadKeyword);
+            if (objResult != null)
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            }
+            return response;
+        }
+
+
         //[HttpGet]
-        //public HttpResponseMessage GetItemDetails()
-        //{
-        //    HttpResponseMessage response;
-        //    Result objResult = null;
-        //    //  Int64 userID = Int64.Parse(User.Identity.Name);
-        //    UserBAL objUserBAL = new UserBAL();
-        //    //objResult = objUserBAL.GetItemDetails(ItemName);
-        //    objResult = objUserBAL.GetItemDetails();
-        //    if (objResult != null)
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        //    }
-        //    else
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-        //    }
-        //    return response;
-        //}
-
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[HttpGet]
-        //public HttpResponseMessage UserLookup(String TypeHeadKeyword)
-        //{
-        //    HttpResponseMessage response;
-        //    Result objResult = null;
-        //    //  Int64 userID = Int64.Parse(User.Identity.Name);
-        //    UserBAL objUserBAL = new UserBAL();
-        //    objResult = objUserBAL.UserLookup(TypeHeadKeyword);
-        //    if (objResult != null)
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        //    }
-        //    else
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-        //    }
-        //    return response;
-        //}
-
-
-        ////[HttpGet]
-        ////public HttpResponseMessage getUserRoleDetails(string UserRole)
-        ////{
-        ////    HttpResponseMessage response;
-        ////    Result objResult = null;
-        ////    UserBAL userBAL = new UserBAL();
-        ////    objResult = userBAL.getUserRoleDetails(UserRole);
-        ////    if (objResult != null)
-        ////    {
-        ////        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        ////    }
-        ////    else
-        ////    {
-        ////        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-        ////    }
-        ////    return response;
-        ////}
-
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[HttpGet]
-        //public HttpResponseMessage getMenubyUserRole(string UserRole)
+        //public HttpResponseMessage getUserRoleDetails(string UserRole)
         //{
         //    HttpResponseMessage response;
         //    Result objResult = null;
         //    UserBAL userBAL = new UserBAL();
-        //    objResult = userBAL.getMenubyUserRole(UserRole);
+        //    objResult = userBAL.getUserRoleDetails(UserRole);
         //    if (objResult != null)
         //    {
         //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
@@ -510,9 +471,28 @@ namespace DummyProject.Controllers
         //    return response;
         //}
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet]
+        public HttpResponseMessage getMenubyUserRole(string UserRole)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            objResult = userBAL.getMenubyUserRole(UserRole);
+            if (objResult != null)
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            }
+            return response;
+        }
 
 
 
-        //#endregion
+
+        #endregion
     }
 }

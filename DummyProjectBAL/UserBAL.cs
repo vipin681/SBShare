@@ -13,11 +13,11 @@ namespace DummyProjectBAL
     public class UserBAL
     {
         # region GetUser
-        //public Result GetUserList()
-        //{
-        //    UserDAL userDAL = new UserDAL();
-        //    return userDAL.GetUserList();
-        //}
+        public Result GetUserList()
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetUserList();
+        }
         #endregion
 
         #region SearchUser
