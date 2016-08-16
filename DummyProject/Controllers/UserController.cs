@@ -18,35 +18,35 @@ namespace DummyProject.Controllers
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
     public class UserController : ApiController
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+      //  private static Logger logger = LogManager.GetCurrentClassLogger();
         Exception e = new Exception();
         #region Get User
         /// <summary>
         /// Get all the user list
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public HttpResponseMessage GetUserList()
-        {
+        //[HttpGet]
+        //public HttpResponseMessage GetUserList()
+        //{
 
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserList();
-            if (objResult != null)
-            {
-                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                objResult.errormsg = "";
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-                objResult.errormsg = "Data Empty!";
-                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
-            }
-            return response;
-        }
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    UserBAL userBAL = new UserBAL();
+        //    objResult = userBAL.GetUserList();
+        //    if (objResult != null)
+        //    {
+        //        objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+        //        objResult.errormsg = "";
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+        //        objResult.errormsg = "Data Empty!";
+        //        response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+        //    }
+        //    return response;
+        //}
         #endregion
 
         #region Search
@@ -91,64 +91,113 @@ namespace DummyProject.Controllers
         /// location id should be present client eg.2,
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
-        [HttpPost]
+        /// 
+
+
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
-            logger.Debug("Debug Level");
+           // Logger logger = LogManager.GetCurrentClassLogger();
             HttpResponseMessage response;
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
-           
-                // user.InsertedBy = ID;
-                try
-                {
-                if (user.userid == 0)
-                {
+            try
+            {
+                //if (user.userid == 0)
+                //{
+
                     objResult = userBLL.InsertUser(user);
-                    Exception e = new Exception();
-                    logger.ErrorException("Data Empty", e);
-                }
-                else
-                {
-                    // user.UpdatedBy = userID;
-                    Exception e = new Exception();
-                    logger.ErrorException("Data Empty", e);
-                    objResult = userBLL.UpdateUser(user);
-                }
+               // }
 
             }
-                catch (Exception)
-                {
-                Exception e = new Exception();
-                logger.ErrorException("Data Empty", e);
-                logger.Debug("User Logged in ");
-                    logger.ErrorException("Data Empty", e);
-
-                    
-                }
-               
-              
-           
+            catch (Exception ex)
+            {
+                Logger logger = LogManager.GetCurrentClassLogger();
+                logger.ErrorException("Error Occured", ex);
+                // throw;
+            }
+            //if (user.userid == 0)
+            //{
+            //    // user.InsertedBy = ID;
+            //    objResult = userBLL.InsertUser(user);
+            //}
+            //else
+            //{
+            //    // user.UpdatedBy = userID;
+            //    objResult = userBLL.UpdateUser(user);
+            //}
             if (objResult != null)
             {
-               
-                logger.ErrorException("Data Empty", e);
-                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                objResult.errormsg = "";
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
             }
             else
             {
-                objResult = new Result();
-                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-                logger.ErrorException("Data Empty", e);
-                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
             return response;
         }
+
+        //[HttpPost]
+        //public HttpResponseMessage SaveUserDetails(UserDetails user)
+        //{
+        //    logger.Debug("Debug Level");
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    HttpClient client = new HttpClient();
+        //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //    // Int64 userID = Int64.Parse(User.Identity.Name);
+        //    UserBAL userBLL = new UserBAL();
+
+        //        // user.InsertedBy = ID;
+        //        try
+        //        {
+        //        if (user.userid == 0)
+        //        {
+        //            objResult = userBLL.InsertUser(user);
+        //            Exception e = new Exception();
+        //            logger.ErrorException("Data Empty", e);
+        //        }
+        //        else
+        //        {
+        //            // user.UpdatedBy = userID;
+        //            Exception e = new Exception();
+        //            logger.ErrorException("Error Occured", ex);
+        //            //logger.ErrorException("Data Empty", e);
+        //            objResult = userBLL.UpdateUser(user);
+        //        }
+
+        //    }
+        //        catch (Exception ex)
+        //        {
+        //        Exception e = new Exception();
+        //        logger.ErrorException("Data Empty", e);
+        //        logger.Debug("User Logged in ");
+        //            logger.ErrorException("Data Empty", e);
+
+
+        //        }
+
+
+
+        //    if (objResult != null)
+        //    {
+
+        //        logger.ErrorException("Data Empty", e);
+        //        objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+        //        objResult.errormsg = "";
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        objResult = new Result();
+        //        objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+        //        logger.ErrorException("Data Empty", e);
+        //        response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+        //    }
+        //    return response;
+        //}
         #endregion
 
 
@@ -255,81 +304,135 @@ namespace DummyProject.Controllers
             return response;
         }
 
+        //[HttpPost]
+
+        //public HttpResponseMessage CheckLogin(string UserName, string Password)
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    UserBAL objUserBLL = new UserBAL();
+        //    objResult = objUserBLL.IsValidUser(UserName, Password);
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
+
+
         [HttpPost]
-    
+        //[OnExceptionHandler]
         public HttpResponseMessage CheckLogin(string UserName, string Password)
         {
+             Logger logger = LogManager.GetCurrentClassLogger();
+            logger.Debug("Debug Level");
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
             objResult = objUserBLL.IsValidUser(UserName, Password);
             if (objResult != null)
             {
+                logger.Debug("Debug Level");
+                Exception e = new Exception();
+                logger.ErrorException("Data  Found", e);
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
             }
             else
             {
+                Exception e = new Exception();
+                logger.ErrorException("Data Empty", e);
                 response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
             return response;
-        }
 
-        [HttpGet]
-        public HttpResponseMessage GetRole()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            //  Int64 userID = Int64.Parse(User.Identity.Name);
-            UserBAL objUserBAL = new UserBAL();
-            objResult = objUserBAL.GetRole();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
 
-        [HttpGet]
-        public HttpResponseMessage GetCountryList()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
 
-            UserBAL obj = new UserBAL();
-            objResult = obj.GetCountryList();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+            // HttpResponseMessage response;
+            // Result objResult = null;
+            // UserBAL objUserBLL = new UserBAL();
+            // try
+            // {
+            //     objResult = objUserBLL.IsValidUser(UserName, Password);
+            //     logger.Debug("No");
+            // }
+            // catch (Exception ex)
+            // {  
 
-        [HttpGet]
-        [OnExceptionHandler]
-        public HttpResponseMessage GetStateList()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL obj = new UserBAL();
-            objResult = obj.GetStateList();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
+            // logger.ErrorException("Error Occured", ex);
+
+
+            // }
+            // if (objResult != null)
+            // {
+            //     response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+
+            // }
+            // else
+            // {
+            //     response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            // }
+            // return response;
         }
+        //[HttpGet]
+        //public HttpResponseMessage GetRole()
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    //  Int64 userID = Int64.Parse(User.Identity.Name);
+        //    UserBAL objUserBAL = new UserBAL();
+        //    objResult = objUserBAL.GetRole();
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
+
+        //[HttpGet]
+        //public HttpResponseMessage GetCountryList()
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+
+        //    UserBAL obj = new UserBAL();
+        //    objResult = obj.GetCountryList();
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
+
+        //[HttpGet]
+        //[OnExceptionHandler]
+        //public HttpResponseMessage GetStateList()
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    UserBAL obj = new UserBAL();
+        //    objResult = obj.GetStateList();
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
        
         [HttpGet]
         public HttpResponseMessage GetItemDetails()

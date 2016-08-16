@@ -361,6 +361,7 @@
     <Content Include="Views\SaveData\DashBoard.cshtml" />
     <Content Include="Views\SaveData\Menu.cshtml" />
     <Content Include="Views\SaveData\UpdatePassword.cshtml" />
+    <Content Include="Views\SaveData\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="APiLog\" />

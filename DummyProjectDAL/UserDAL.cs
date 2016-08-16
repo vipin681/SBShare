@@ -13,43 +13,43 @@ namespace DummyProjectDAL
     public class UserDAL
     {
         #region GetUser
-        public Result GetUserList()
-        {
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                UserDetails user = null;
-                using (SqlCommand sqlcmd = new SqlCommand())
-                {
-                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
-                    DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetUserList";
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Connection = conn;
-                    // sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = ID;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        user = new UserDetails();
-                        //user.ID = Convert.ToInt64(ds.Tables[0].Rows[0]["ID"].ToString());
-                        //user.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
-                        //user.LastName = ds.Tables[0].Rows[0]["LastName"].ToString();
-                        //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
-                        //user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
-                        //user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
-                        return new Result
-                        {
-                            Results = ds.Tables[0],
-                        };
-                    }
-                    return new Result
-                    {
-                        errormsg = "Data Not found",
-                        Status = Convert.ToString((int)HttpStatusCode.NotFound),
-                        Results = null
-                    };
-                }
-            }
-        }
+        //public Result GetUserList()
+        //{
+        //    using (SqlConnection conn = DbHelper.CreateConnection())
+        //    {
+        //        UserDetails user = null;
+        //        using (SqlCommand sqlcmd = new SqlCommand())
+        //        {
+        //            SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+        //            DataSet ds = new DataSet();
+        //            sqlcmd.CommandText = "usp_GetUserList";
+        //            sqlcmd.CommandType = CommandType.StoredProcedure;
+        //            sqlcmd.Connection = conn;
+        //            // sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = ID;
+        //            sqlad.Fill(ds);
+        //            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //            {
+        //                user = new UserDetails();
+        //                //user.ID = Convert.ToInt64(ds.Tables[0].Rows[0]["ID"].ToString());
+        //                //user.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
+        //                //user.LastName = ds.Tables[0].Rows[0]["LastName"].ToString();
+        //                //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+        //                //user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+        //                //user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+        //                return new Result
+        //                {
+        //                    Results = ds.Tables[0],
+        //                };
+        //            }
+        //            return new Result
+        //            {
+        //                errormsg = "Data Not found",
+        //                Status = Convert.ToString((int)HttpStatusCode.NotFound),
+        //                Results = null
+        //            };
+        //        }
+        //    }
+        //}
         #endregion
 
         #region SearchUser
@@ -360,7 +360,7 @@ namespace DummyProjectDAL
                         for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                         {
                             objUser = new UserDetails();
-                            objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[i]["userid"].ToString());
+                           // objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[i]["userid"].ToString());
                             objUser.password = ds.Tables[0].Rows[i]["Password"].ToString();
                             objUser.TokenID = ds.Tables[0].Rows[i]["TokenID"].ToString();
                         }
@@ -369,110 +369,110 @@ namespace DummyProjectDAL
             }
             return objUser;
         }
-        public Result GetRole()
-        {
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                using (SqlCommand sqlcmd = new SqlCommand())
-                {
-                    UserDetails user = new UserDetails();
-                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
-                    DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetRole";
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Connection = conn;
-                    //sqlcmd.Parameters.Add("@Keyword", SqlDbType.NVarChar, 200).Value = keyword;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        user = new UserDetails();
+        //public Result GetRole()
+        //{
+        //    using (SqlConnection conn = DbHelper.CreateConnection())
+        //    {
+        //        using (SqlCommand sqlcmd = new SqlCommand())
+        //        {
+        //            UserDetails user = new UserDetails();
+        //            SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+        //            DataSet ds = new DataSet();
+        //            sqlcmd.CommandText = "usp_GetRole";
+        //            sqlcmd.CommandType = CommandType.StoredProcedure;
+        //            sqlcmd.Connection = conn;
+        //            //sqlcmd.Parameters.Add("@Keyword", SqlDbType.NVarChar, 200).Value = keyword;
+        //            sqlad.Fill(ds);
+        //            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //            {
+        //                user = new UserDetails();
 
-                        //user.Role = ds.Tables[0].Rows[0]["RoleName"].ToString();
-                        //user.RoleID =Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
-                        //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
-                        // user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
-                        //  user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
-                        return new Result
-                        {
-                            //Results = new
-                            //{
-                            Results = ds.Tables[0],
-                            // }
-                        };
-                    }
-                    return new Result
-                    {
-                        Results = null
-                    };
-                }
-            }
-        }
-        public Result GetCountryList()
-        {
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                using (SqlCommand sqlcmd = new SqlCommand())
-                {
-                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
-                    DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetAllCountry";
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Connection = conn;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        Country country = new Country();
-                        UserDetails user = new UserDetails();
-                        //  country.CountryID =Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
-                        //  country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
-                        return new Result
-                        {
+        //                //user.Role = ds.Tables[0].Rows[0]["RoleName"].ToString();
+        //                //user.RoleID =Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
+        //                //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+        //                // user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+        //                //  user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+        //                return new Result
+        //                {
+        //                    //Results = new
+        //                    //{
+        //                    Results = ds.Tables[0],
+        //                    // }
+        //                };
+        //            }
+        //            return new Result
+        //            {
+        //                Results = null
+        //            };
+        //        }
+        //    }
+        //}
+        //public Result GetCountryList()
+        //{
+        //    using (SqlConnection conn = DbHelper.CreateConnection())
+        //    {
+        //        using (SqlCommand sqlcmd = new SqlCommand())
+        //        {
+        //            SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+        //            DataSet ds = new DataSet();
+        //            sqlcmd.CommandText = "usp_GetAllCountry";
+        //            sqlcmd.CommandType = CommandType.StoredProcedure;
+        //            sqlcmd.Connection = conn;
+        //            sqlad.Fill(ds);
+        //            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //            {
+        //                Country country = new Country();
+        //                UserDetails user = new UserDetails();
+        //                //  country.CountryID =Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
+        //                //  country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+        //                return new Result
+        //                {
 
-                            Results = ds.Tables[0]
-                        };
-                    }
-                    return new Result
-                    {
-                        //Status = false,
-                        //MessageId = 7,
-                        //Results = null
-                    };
-                }
-            }
-        }
-        public Result GetStateList()
-        {
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                using (SqlCommand sqlcmd = new SqlCommand())
-                {
-                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
-                    DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetState";
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Connection = conn;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        Country country = new Country();
-                        UserDetails user = new UserDetails();
-                        //  country.CountryID =Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
-                        //  country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
-                        return new Result
-                        {
+        //                    Results = ds.Tables[0]
+        //                };
+        //            }
+        //            return new Result
+        //            {
+        //                //Status = false,
+        //                //MessageId = 7,
+        //                //Results = null
+        //            };
+        //        }
+        //    }
+        //}
+        //public Result GetStateList()
+        //{
+        //    using (SqlConnection conn = DbHelper.CreateConnection())
+        //    {
+        //        using (SqlCommand sqlcmd = new SqlCommand())
+        //        {
+        //            SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+        //            DataSet ds = new DataSet();
+        //            sqlcmd.CommandText = "usp_GetState";
+        //            sqlcmd.CommandType = CommandType.StoredProcedure;
+        //            sqlcmd.Connection = conn;
+        //            sqlad.Fill(ds);
+        //            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //            {
+        //                Country country = new Country();
+        //                UserDetails user = new UserDetails();
+        //                //  country.CountryID =Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
+        //                //  country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+        //                return new Result
+        //                {
 
-                            Results = ds.Tables[0]
-                        };
-                    }
-                    return new Result
-                    {
-                        //Status = false,
-                        //MessageId = 7,
-                        //Results = null
-                    };
-                }
-            }
-        }
+        //                    Results = ds.Tables[0]
+        //                };
+        //            }
+        //            return new Result
+        //            {
+        //                //Status = false,
+        //                //MessageId = 7,
+        //                //Results = null
+        //            };
+        //        }
+        //    }
+        //}
         public UserToken GetUserDetailsByTokenID(string tokenID)
         {
             UserToken objUserToken = null;
