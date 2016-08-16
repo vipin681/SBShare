@@ -369,87 +369,67 @@ namespace DummyProject.Controllers
 
        
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet]
-        public HttpResponseMessage GetRole()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            //  Int64 userID = Int64.Parse(User.Identity.Name);
-            UserBAL objUserBAL = new UserBAL();
-            objResult = objUserBAL.GetRole();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //[HttpGet]
+        //public HttpResponseMessage GetRole()
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    //  Int64 userID = Int64.Parse(User.Identity.Name);
+        //    UserBAL objUserBAL = new UserBAL();
+        //    objResult = objUserBAL.GetRole();
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet]
-        public HttpResponseMessage GetCountryList()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //[HttpGet]
+        //public HttpResponseMessage GetCountryList()
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
 
-            UserBAL obj = new UserBAL();
-            objResult = obj.GetCountryList();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+        //    UserBAL obj = new UserBAL();
+        //    objResult = obj.GetCountryList();
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet]
-        [OnExceptionHandler]
-        public HttpResponseMessage GetStateList()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL obj = new UserBAL();
-            objResult = obj.GetStateList();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //[HttpGet]
+        //[OnExceptionHandler]
+        //public HttpResponseMessage GetStateList()
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    UserBAL obj = new UserBAL();
+        //    objResult = obj.GetStateList();
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet]
-        public HttpResponseMessage GetItemDetails()
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            //  Int64 userID = Int64.Parse(User.Identity.Name);
-            UserBAL objUserBAL = new UserBAL();
-            //objResult = objUserBAL.GetItemDetails(ItemName);
-            objResult = objUserBAL.GetItemDetails();
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
-
+     
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public HttpResponseMessage UserLookup(String TypeHeadKeyword)

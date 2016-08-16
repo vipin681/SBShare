@@ -73,7 +73,8 @@ namespace DummyProjectDAL
                 {
                     retStr = retStr + b.ToString("X2");
                 }
-                return retStr.ToLower();
+                //return retStr.ToLower();
+                return retStr;
             }
             catch(Exception ex)
             {

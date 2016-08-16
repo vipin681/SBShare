@@ -130,21 +130,21 @@ namespace DummyProjectBAL
                 };
             }
         }
-        public Result GetRole()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetRole();
-        }
-        public Result GetCountryList()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetCountryList();
-        }
-        public Result GetStateList()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetStateList();
-        }
+        //public Result GetRole()
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    return userDAL.GetRole();
+        //}
+        //public Result GetCountryList()
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    return userDAL.GetCountryList();
+        //}
+        //public Result GetStateList()
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    return userDAL.GetStateList();
+        //}
   
         public UserToken GetUserDetailsByTokenID(string tokenID)
         {
