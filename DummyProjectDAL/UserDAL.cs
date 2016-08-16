@@ -90,13 +90,13 @@ namespace DummyProjectDAL
             {
                 using (SqlCommand sqlcmd = new SqlCommand())
                 {
-                    sqlcmd.CommandText = "UpdateUserPassword";
+                    sqlcmd.CommandText = "security.UpdateUserPassword";
                     sqlcmd.Connection = conn;
                     sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Parameters.Add("@paramuserid", SqlDbType.BigInt).Value = userPassword.userid;
-                    sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.NVarChar, 150).Value = userPassword.Password;
-                    sqlcmd.Parameters.Add("@parammodifiedby", SqlDbType.NVarChar, 150).Value = userPassword.modifiedby;
-                    sqlcmd.Parameters.Add("@parammodifieddate", SqlDbType.NVarChar, 150).Value = userPassword.modifieddate;
+                    sqlcmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userPassword.userid;
+                    sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = userPassword.Password;
+                    sqlcmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
+                    sqlcmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
                     sqlcmd.ExecuteNonQuery();
                     return new Result
                     {

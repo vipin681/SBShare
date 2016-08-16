@@ -60,7 +60,14 @@ namespace DummyProject.Controllers
             return response;
         }
         #endregion
+
         #region Update Password
+        /// <summary>
+        /// Update Password
+        /// </summary>
+        /// <param name="userPassword">
+        /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
+        /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
@@ -282,8 +289,28 @@ namespace DummyProject.Controllers
 
         #endregion
 
+        //#region Check
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //[HttpPost]
+        //public HttpResponseMessage CheckLogin(string UserName, string Password)
+        //{
+        //    HttpResponseMessage response;
+        //    Result objResult = null;
+        //    UserBAL objUserBLL = new UserBAL();
+        //    objResult = objUserBLL.IsValidUser(UserName, Password);
+        //    if (objResult != null)
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+        //    }
+        //    else
+        //    {
+        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+        //    }
+        //    return response;
+        //}
+
         #region all
-        
+
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public HttpResponseMessage GetUserDetailsByID1(int ID)
@@ -329,24 +356,7 @@ namespace DummyProject.Controllers
             return response;
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPost]
-        public HttpResponseMessage CheckLogin(string UserName, string Password)
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL objUserBLL = new UserBAL();
-            objResult = objUserBLL.IsValidUser(UserName, Password);
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+       
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
