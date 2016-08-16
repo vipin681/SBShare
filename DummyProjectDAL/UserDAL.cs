@@ -7,6 +7,7 @@ using DummyProjectStateClass;
 using System.Data.SqlClient;
 using System.Data;
 using System.Net;
+using DummyProjectDAL;
 
 
 
@@ -88,24 +89,30 @@ namespace DummyProjectDAL
         #region Update User Password
         public Result Updatepassword(UpdateUserPassword userPassword)
         {
-            using (SqlConnection conn = DbHelper.CreateConnection())
+            try
             {
-                using (SqlCommand sqlcmd = new SqlCommand())
+                using (SqlConnection conn = DbHelper.CreateConnection())
                 {
-                    sqlcmd.CommandText = "security.UpdateUserPassword";
-                    sqlcmd.Connection = conn;
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userPassword.userid;
-                    
-                    sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = (userPassword.Password);
-                    sqlcmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
-                    sqlcmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
-                    sqlcmd.ExecuteNonQuery();
-                    return new Result
+                    using (SqlCommand sqlcmd = new SqlCommand())
                     {
-                        Results = (sqlcmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@paramuserid"].Value)
-                    };
+                        sqlcmd.CommandText = "security.UpdateUserPassword";
+                        sqlcmd.Connection = conn;
+                        sqlcmd.CommandType = CommandType.StoredProcedure;
+                        sqlcmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userPassword.userid;
+                        sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = CommonFunctions.MD5Encryption(userPassword.Password);
+                        sqlcmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
+                        sqlcmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
+                        sqlcmd.ExecuteNonQuery();
+                        return new Result
+                        {
+                            Results = (sqlcmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@paramuserid"].Value)
+                        };
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
         #endregion

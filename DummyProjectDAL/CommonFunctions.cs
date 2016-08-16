@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 
-namespace DummyProjectBAL
+namespace DummyProjectDAL
 {
-    public class CommonFunctions
+    public  static class CommonFunctions
     {
         #region Fields
 
@@ -62,16 +62,23 @@ namespace DummyProjectBAL
         }
         public static string MD5Encryption(string strVal)
         {
-            MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider();
-            byte[] hashBytes;
-            UTF8Encoding encoder = new UTF8Encoding();
-            hashBytes = md5Hasher.ComputeHash(encoder.GetBytes(strVal));
-            String retStr = "";
-            foreach (byte b in hashBytes)
+            try
             {
-                retStr = retStr + b.ToString("X2");
+                MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider();
+                byte[] hashBytes;
+                UTF8Encoding encoder = new UTF8Encoding();
+                hashBytes = md5Hasher.ComputeHash(encoder.GetBytes(strVal));
+                String retStr = "";
+                foreach (byte b in hashBytes)
+                {
+                    retStr = retStr + b.ToString("X2");
+                }
+                return retStr.ToLower();
             }
-            return retStr.ToLower();
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
         #endregion
 
@@ -91,5 +98,6 @@ namespace DummyProjectBAL
             return newChars;
 
         }
+
     }
 }
