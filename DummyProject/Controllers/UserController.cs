@@ -28,23 +28,33 @@ namespace DummyProject.Controllers
         [HttpGet]
         public HttpResponseMessage GetUserList()
         {
-
-            HttpResponseMessage response;
+            logger.Debug("get all users started");
+            HttpResponseMessage response = new HttpResponseMessage(); 
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
             objResult = userBAL.GetUserList();
-            if (objResult != null)
+            try
             {
-                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                objResult.errormsg = "";
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                if (objResult != null)
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                    objResult.errormsg = "";
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                }
+                else
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                    objResult.errormsg = "Data Empty!";
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                }
             }
-            else
+            catch (Exception)
             {
-                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-                objResult.errormsg = "Data Empty!";
-                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                Exception e = new Exception();
+                logger.ErrorException("Data Empty", e);
+
             }
+            logger.Debug("get all users finished");
             return response;
         }
         #endregion
@@ -59,10 +69,13 @@ namespace DummyProject.Controllers
         [HttpGet]
         public HttpResponseMessage GetSearchResult(string searchbar)
         {
-            HttpResponseMessage response;
+            logger.Debug("SearchResult function started for searching");
+            HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserDetailsBysearch(searchbar);
+            try
+            {
+                objResult = userBAL.GetUserDetailsBysearch(searchbar);
             if (objResult != null)
             {
                 objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
@@ -75,6 +88,14 @@ namespace DummyProject.Controllers
                 objResult.errormsg = "Data Empty!";
                 response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
+            }
+            catch (Exception)
+            {
+                Exception e = new Exception();
+                logger.ErrorException("Data Empty", e);
+
+            }
+            logger.Debug("SearchResult function finished for searching");
             return response;
         }
 
@@ -94,48 +115,42 @@ namespace DummyProject.Controllers
         [HttpPost]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
-            logger.Debug("Debug Level");
+            logger.Debug("Submit user started");
             HttpResponseMessage response;
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
-           
-                // user.InsertedBy = ID;
-                try
-                {
+
+            // user.InsertedBy = ID;
+            try
+            {
                 if (user.userid == 0)
                 {
                     objResult = userBLL.InsertUser(user);
-                    Exception e = new Exception();
-                    logger.ErrorException("Data Empty", e);
+
                 }
                 else
                 {
                     // user.UpdatedBy = userID;
-                    Exception e = new Exception();
-                    logger.ErrorException("Data Empty", e);
+                    //Exception e = new Exception();
+                    //logger.ErrorException("Data Empty", e);
                     objResult = userBLL.UpdateUser(user);
                 }
 
             }
-                catch (Exception)
-                {
+            catch (Exception)
+            {
                 Exception e = new Exception();
                 logger.ErrorException("Data Empty", e);
-                logger.Debug("User Logged in ");
-                    logger.ErrorException("Data Empty", e);
 
-                    
-                }
-               
-              
-           
+            }
+
+
+
             if (objResult != null)
             {
-               
-                logger.ErrorException("Data Empty", e);
                 objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
                 objResult.errormsg = "";
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
@@ -144,9 +159,9 @@ namespace DummyProject.Controllers
             {
                 objResult = new Result();
                 objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-                logger.ErrorException("Data Empty", e);
                 response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
             }
+            logger.Debug("Submit user ended");
             return response;
         }
         #endregion
@@ -165,22 +180,33 @@ namespace DummyProject.Controllers
         [HttpPut]
         public HttpResponseMessage EditUserDetails(UserDetails user)
         {
+            logger.Debug("Edit user started");
             HttpResponseMessage response;
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
-            if (user.userid == 0)
+            try
             {
-                objResult = new Result();
-                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-                objResult.errormsg = "Data not found";
-                response = Request.CreateResponse(HttpStatusCode.NotFound, objResult);
+
+                if (user.userid == 0)
+                {
+                    objResult = new Result();
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                    objResult.errormsg = "Data not found";
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, objResult);
+                }
+                else
+                {
+                    objResult = userBLL.UpdateUser(user);
+                }
             }
-            else
+            catch (Exception)
             {
-               objResult = userBLL.UpdateUser(user);
+                Exception e = new Exception();
+                logger.ErrorException("Data Empty", e);
+
             }
             if (objResult != null)
             {
@@ -195,6 +221,8 @@ namespace DummyProject.Controllers
                 objResult.errormsg = "Data Empty!";
                 response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
             }
+
+            logger.Debug("Edit user finished");
             return response;
         }
 
@@ -230,13 +258,13 @@ namespace DummyProject.Controllers
                 objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
                 objResult.errormsg = "Data not found";
                 response = Request.CreateResponse(HttpStatusCode.NotFound, objResult);
-                
+
             }
             return response;
         }
 
         [HttpGet]
-     
+
         public HttpResponseMessage GetListByID(String keyword)
         {
             HttpResponseMessage response;
@@ -256,7 +284,7 @@ namespace DummyProject.Controllers
         }
 
         [HttpPost]
-    
+
         public HttpResponseMessage CheckLogin(string UserName, string Password)
         {
             HttpResponseMessage response;
@@ -330,7 +358,7 @@ namespace DummyProject.Controllers
             }
             return response;
         }
-       
+
         [HttpGet]
         public HttpResponseMessage GetItemDetails()
         {
@@ -370,7 +398,7 @@ namespace DummyProject.Controllers
             return response;
         }
 
-       
+
         //[HttpGet]
         //public HttpResponseMessage getUserRoleDetails(string UserRole)
         //{
@@ -407,9 +435,9 @@ namespace DummyProject.Controllers
             return response;
         }
 
-        
-       
 
-        #endregion 
+
+
+        #endregion
     }
 }
