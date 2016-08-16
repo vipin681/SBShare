@@ -289,25 +289,25 @@ namespace DummyProject.Controllers
 
         #endregion
 
-        //#region Check
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[HttpPost]
-        //public HttpResponseMessage CheckLogin(string UserName, string Password)
-        //{
-        //    HttpResponseMessage response;
-        //    Result objResult = null;
-        //    UserBAL objUserBLL = new UserBAL();
-        //    objResult = objUserBLL.IsValidUser(UserName, Password);
-        //    if (objResult != null)
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        //    }
-        //    else
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-        //    }
-        //    return response;
-        //}
+        #region CheckLogin
+        [HttpPost]
+        public HttpResponseMessage CheckLogin(string UserName, string Password)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            UserBAL objUserBLL = new UserBAL();
+            objResult = objUserBLL.IsValidUser(UserName, Password);
+            if (objResult != null)
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            }
+            return response;
+        }
+        #endregion
 
         #region all
 
