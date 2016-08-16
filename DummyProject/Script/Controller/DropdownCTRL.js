@@ -69,7 +69,6 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
                     UserName: res.Results.UserName,
                     UserRole: res.Results.Role,
                     TokenID: CryptoJS.AES.encrypt(res.Results.TokenID, "superman").toString()
-
                 };
                 $scope.UserID = res.Results.UserID;
                 $scope.UserData = res.Results;
@@ -152,15 +151,15 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         alert(status);
     });
 
-    var arrItem = new Array();
-    $http.get(VirtualDirectoryPath + 'api/User/GetItemDetails').success(function (data) {
-        $.map(data.Results, function (item) {
-            arrItem.push(item);
-        });
-        $scope.ItemList = arrItem;
-    }).error(function (status) {
-        alert(status);
-    });
+    //var arrItem = new Array();
+    //$http.get(VirtualDirectoryPath + 'api/User/GetItemDetails').success(function (data) {
+    //    $.map(data.Results, function (item) {
+    //        arrItem.push(item);
+    //    });
+    //    $scope.ItemList = arrItem;
+    //}).error(function (status) {
+    //    alert(status);
+    //});
 
 
     $scope.fillProductList = function () {
@@ -238,7 +237,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         //$http.post(VirtualDirectoryPath + 'Home/GetData', $scope.searchModel)
         $http.get(VirtualDirectoryPath + 'api/User/GetUserList')
         .success(function (data) {
-          
+            alert(JSON.stringify(data.Results));
             $scope.gridOptions1.data = data.Results;
         });
     }

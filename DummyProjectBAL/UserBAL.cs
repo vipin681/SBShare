@@ -38,12 +38,13 @@ namespace DummyProjectBAL
         }
         #endregion
 
-        #region All
+        #region Insert\Update user
+
         public Result InsertUser(UserDetails user)
         {
             UserDAL userDAL = new UserDAL();
             user.SaltValue = GenerateSalt();
-          //  user.Password = GetHashedValue(user.Password, user.SaltValue);
+            user.password = GetHashedValue(user.password, user.SaltValue);
             Result result = userDAL.InsertUser(user);
 
             return result;
@@ -52,11 +53,18 @@ namespace DummyProjectBAL
         {
             //using (TransactionScope scope = new TransactionScope())
             //{
-                UserDAL userDAL = new UserDAL();
-                Result result = userDAL.UpdateUser(user);
-                return result;
-           // }
+            UserDAL userDAL = new UserDAL();
+            Result result = userDAL.UpdateUser(user);
+            return result;
+            // }
         }
+
+        #endregion
+
+
+
+        #region All
+
         public Result GetUserDetailsByID(Int64 ID)
         {
             UserDAL userDAL = new UserDAL();
@@ -84,7 +92,7 @@ namespace DummyProjectBAL
             objUser = userDAL.IsValidUser(userName, userPassword);
             if (objUser != null)
             {
-                if (objUser.Password == userPassword)
+                if (objUser.password == userPassword)
                 {
                     return new Result
                     {
@@ -92,10 +100,9 @@ namespace DummyProjectBAL
                         errormsg="",
                         Results = new
                         {
-                            UserID = objUser.ID,
-                            UserName = objUser.UserName,
+                            UserID = objUser.userid,
                             TokenID = objUser.TokenID,
-                            Role = objUser.Role,
+                            Role = objUser.roleid,
                             // Language = objUser.Language.LanguageName
                         }
                     };
@@ -147,23 +154,23 @@ namespace DummyProjectBAL
             UserDAL userDAL = new UserDAL();
             return userDAL.GetItemDetails();
         }
-        public Result GetMenuCRUDSelect(string menuID, string menuName)
-        {
-            UserDAL userDAL = new UserDAL();
-            if (menuID == null)
-                menuID = "";
-            if (menuName == null)
-                menuName = "";
-            return userDAL.GetMenuCRUDSelect(menuID, menuName);
-        }
+        //public Result GetMenuCRUDSelect(string menuID, string menuName)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    if (menuID == null)
+        //        menuID = "";
+        //    if (menuName == null)
+        //        menuName = "";
+        //    return userDAL.GetMenuCRUDSelect(menuID, menuName);
+        //}
         
-        public Result getUserRoleDetails(string UserRole)
-        {
-            UserDAL userDAL = new UserDAL();
-            if (UserRole == null)
-                UserRole = "";
-            return userDAL.getUserRoleDetails(UserRole);
-        }
+        //public Result getUserRoleDetails(string UserRole)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    if (UserRole == null)
+        //        UserRole = "";
+        //    return userDAL.getUserRoleDetails(UserRole);
+        //}
 
         public Result getMenubyUserRole(string UserRole)
         {
@@ -173,15 +180,15 @@ namespace DummyProjectBAL
             return userDAL.getMenubyUserRole(UserRole);
         }
 
-        public Result insertMenu(UserDetails user)
-        {
-            UserDAL userDAL = new UserDAL();
-            user.SaltValue = GenerateSalt();
-            //  user.Password = GetHashedValue(user.Password, user.SaltValue);
-            Result result = userDAL.insertMenu(user);
+        //public Result insertMenu(UserDetails user)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    user.SaltValue = GenerateSalt();
+        //    //  user.Password = GetHashedValue(user.Password, user.SaltValue);
+        //    Result result = userDAL.insertMenu(user);
 
-            return result;
-        }
+        //    return result;
+        //}
 
         public static string GenerateSalt()
         {
