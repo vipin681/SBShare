@@ -51,10 +51,9 @@ namespace DummyProject.Controllers
                     response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Exception e = new Exception();
-                logger.ErrorException("Data Empty", e);
+              logger.ErrorException("Data Empty", e);
 
             }
             logger.Debug("get all users finished");
@@ -113,10 +112,9 @@ namespace DummyProject.Controllers
                     response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Exception e = new Exception();
-                logger.ErrorException("Data Empty", e);
+               logger.ErrorException("Data Empty", e);
 
             }
             logger.Debug("get all user by id finished");
