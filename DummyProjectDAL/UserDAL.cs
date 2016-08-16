@@ -343,17 +343,27 @@ namespace DummyProjectDAL
                     sqlcmd.CommandText = "usp_IsValidUser";
                     sqlcmd.Connection = conn;
                     sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Parameters.Add("@userName", SqlDbType.NVarChar, 100).Value = userName;
+                    sqlcmd.Parameters.Add("@emailaddress", SqlDbType.NVarChar, 100).Value = userName;
                     sqlcmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
                     sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[1].Rows.Count > 0)
                     {
-                        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                        if ((Convert.ToInt32(ds.Tables[1].Rows[0]["status"])) == 1)
                         {
-                            objUser = new UserDetails();
-                            objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[i]["userid"].ToString());
-                            objUser.password = ds.Tables[0].Rows[i]["Password"].ToString();
-                            objUser.TokenID = ds.Tables[0].Rows[i]["TokenID"].ToString();
+                            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                            {
+                                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                                {
+                                    objUser = new UserDetails();
+                                    objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[i]["userid"].ToString());
+                                    objUser.password = ds.Tables[0].Rows[i]["Password"].ToString();
+                                    objUser.TokenID = ds.Tables[0].Rows[i]["TokenID"].ToString();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            objUser = null;
                         }
                     }
                 }
