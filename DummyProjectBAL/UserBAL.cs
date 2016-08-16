@@ -27,6 +27,7 @@ namespace DummyProjectBAL
             return userDAL.GetUserListByID(searchstring);
         }
         #endregion
+
         #region Update Password
        public Result UpdateUserPassword(UpdateUserPassword userPassword)
         {
@@ -60,16 +61,19 @@ namespace DummyProjectBAL
 
         #endregion
 
-
-
-        #region All
-
-        public Result GetUserDetailsByID(Int64 ID)
+        # region GetUserDetailsByID
+        public Result GetUserDetailsByID(Int32 ID)
         {
             UserDAL userDAL = new UserDAL();
             return userDAL.GetUserDetailsByID(ID);
         }
-   
+        #endregion
+
+
+        #region All
+
+
+
         public Result UserLookup(String TypeHeadKeyword)
         {
             UserDAL userDAL = new UserDAL();
