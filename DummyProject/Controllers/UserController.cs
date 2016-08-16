@@ -71,13 +71,25 @@ namespace DummyProject.Controllers
         [HttpPost]
         public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
-            HttpResponseMessage response;
+            logger.Debug("Update  user started");
+            HttpResponseMessage response=new HttpResponseMessage(); ;
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             UserBAL userBLL = new UserBAL();
-            objResult = userBLL.UpdateUserPassword(userPassword);
-            response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
+            try
+            {
+                objResult = userBLL.UpdateUserPassword(userPassword);
+                response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
+                return response;
+            }
+            catch(Exception )
+            {
+                Exception e = new Exception();
+                logger.ErrorException("Data Empty", e);
+            }
+
+            logger.Debug("update user finished");
             return response;
         }
         #endregion
