@@ -8,6 +8,8 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Net;
 
+
+
 namespace DummyProjectDAL
 {
     public class UserDAL
@@ -94,7 +96,8 @@ namespace DummyProjectDAL
                     sqlcmd.Connection = conn;
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userPassword.userid;
-                    sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = userPassword.Password;
+                    
+                    sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = (userPassword.Password);
                     sqlcmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
                     sqlcmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
                     sqlcmd.ExecuteNonQuery();
