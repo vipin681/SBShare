@@ -57,6 +57,7 @@ namespace DummyProject
                         //c.BasicAuth("basic")
                         //    .Description("Basic HTTP Authentication");
                         //
+						// NOTE: You must also configure 'EnableApiKeySupport' below in the SwaggerUI section
                         //c.ApiKey("apiKey")
                         //    .Description("API Key Authentication")
                         //    .Name("apiKey")
@@ -96,7 +97,7 @@ namespace DummyProject
                         // those comments into the generated docs and UI. You can enable this by providing the path to one or
                         // more Xml comment files.
                         //
-                        c.IncludeXmlComments(System.Web.Hosting.HostingEnvironment.MapPath("/bin/myapi.XML")); 
+                        //c.IncludeXmlComments(GetXmlCommentsPath());
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occasions when more control of the output is needed.
@@ -204,6 +205,11 @@ namespace DummyProject
                         //
                         //c.DocExpansion(DocExpansion.List);
 
+                        // Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables
+                        // it for all operations.
+                        //
+                        //c.SupportedSubmitMethods("GET", "HEAD");
+
                         // Use the CustomAsset option to provide your own version of assets used in the swagger-ui.
                         // It's typically used to instruct Swashbuckle to return your version instead of the default
                         // when a request is made for "index.html". As with all custom content, the file must be included
@@ -222,7 +228,18 @@ namespace DummyProject
                         // If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
                         //
-                        //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+                        //c.EnableOAuth2Support(
+                        //    clientId: "test-client-id",
+                        //    clientSecret: null,
+                        //    realm: "test-realm",
+                        //    appName: "Swagger UI"
+                        //    //additionalQueryStringParams: new Dictionary<string, string>() { { "foo", "bar" } }
+                        //);
+
+                        // If your API supports ApiKey, you can override the default values.
+                        // "apiKeyIn" can either be "query" or "header"                                                
+                        //
+                        //c.EnableApiKeySupport("apiKey", "header");
                     });
         }
     }
