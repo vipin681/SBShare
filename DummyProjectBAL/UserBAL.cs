@@ -6,16 +6,48 @@ using System.Threading.Tasks;
 using DummyProjectStateClass;
 using DummyProjectDAL;
 using System.Security.Cryptography;
+using System.Net;
+using NLog;
 
 namespace DummyProjectBAL
 {
     public class UserBAL
     {
+        Logger logger = LogManager.GetCurrentClassLogger();
+        # region GetUser
+        public Result GetUserList()
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetUserList();
+        }
+        #endregion
+
+        #region SearchUser
+        public Result GetUserDetailsBysearch(string searchstring)
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetUserListByID(searchstring);
+        }
+        #endregion
+
+        #region Update Password
+        public Result UpdateUserPassword(UpdateUserPassword userPassword)
+        {
+            UserDAL userDAL = new UserDAL();
+            Result result = userDAL.Updatepassword(userPassword);
+            return result;
+
+        }
+        #endregion
+
+        #region Insert\Update user
+
         public Result InsertUser(UserDetails user)
         {
             UserDAL userDAL = new UserDAL();
             user.SaltValue = GenerateSalt();
-          //  user.Password = GetHashedValue(user.Password, user.SaltValue);
+            logger.Debug("DAl Started");
+            user.password = GetHashedValue(user.password, user.SaltValue);
             Result result = userDAL.InsertUser(user);
 
             return result;
@@ -24,16 +56,27 @@ namespace DummyProjectBAL
         {
             //using (TransactionScope scope = new TransactionScope())
             //{
-                UserDAL userDAL = new UserDAL();
-                Result result = userDAL.UpdateUser(user);
-                return result;
-           // }
+            UserDAL userDAL = new UserDAL();
+            Result result = userDAL.UpdateUser(user);
+            return result;
+            // }
         }
-        public Result GetUserDetailsByID(Int64 ID)
+
+        #endregion
+
+        # region GetUserDetailsByID
+        public Result GetUserDetailsByID(Int32 ID)
         {
             UserDAL userDAL = new UserDAL();
             return userDAL.GetUserDetailsByID(ID);
         }
+        #endregion
+
+
+        #region All
+
+
+
         public Result UserLookup(String TypeHeadKeyword)
         {
             UserDAL userDAL = new UserDAL();
@@ -47,26 +90,25 @@ namespace DummyProjectBAL
             return userDAL.GetUserListByID(keyword);
         }
 
-        public Result IsValidUser(String userName, String userPassword)
+        public Result IsValidUser(String emailaddress, String userPassword)
         {
             UserDAL userDAL = new UserDAL();
 
             UserDetails objUser = null;
-            objUser = userDAL.IsValidUser(userName, userPassword);
+            objUser = userDAL.IsValidUser(emailaddress, userPassword);
             if (objUser != null)
             {
-                if (objUser.Password == userPassword)
+                if (objUser.password == userPassword)
                 {
                     return new Result
                     {
-                        Status = true,
-                        MessageId = 0,
+                        Status = Convert.ToString((int)HttpStatusCode.OK),
+                        errormsg = "",
                         Results = new
                         {
-                            UserID = objUser.ID,
-                            UserName = objUser.UserName,
+                            UserID = objUser.userid,
                             TokenID = objUser.TokenID,
-                            Role = objUser.Role,
+                            Role = objUser.roleid,
                             // Language = objUser.Language.LanguageName
                         }
                     };
@@ -75,7 +117,7 @@ namespace DummyProjectBAL
                 {
                     return new Result
                     {
-                        Status = false,
+                        Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
                         MessageId = 11,
                         Results = null
                     };
@@ -85,32 +127,28 @@ namespace DummyProjectBAL
             {
                 return new Result
                 {
-                    Status = false,
+                    Status = Convert.ToString((int)HttpStatusCode.NotFound),
                     MessageId = 12,
                     Results = null
                 };
             }
         }
-        public Result GetRole()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetRole();
-        }
-        public Result GetCountryList()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetCountryList();
-        }
-        public Result GetStateList()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetStateList();
-        }
-        public Result GetUserList()
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.GetUserList();
-        }
+        //public Result GetRole()
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    return userDAL.GetRole();
+        //}
+        //public Result GetCountryList()
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    return userDAL.GetCountryList();
+        //}
+        //public Result GetStateList()
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    return userDAL.GetStateList();
+        //}
+
         public UserToken GetUserDetailsByTokenID(string tokenID)
         {
             UserDAL objUserDAL = new UserDAL();
@@ -122,23 +160,23 @@ namespace DummyProjectBAL
             UserDAL userDAL = new UserDAL();
             return userDAL.GetItemDetails();
         }
-        public Result GetMenuCRUDSelect(string menuID, string menuName)
-        {
-            UserDAL userDAL = new UserDAL();
-            if (menuID == null)
-                menuID = "";
-            if (menuName == null)
-                menuName = "";
-            return userDAL.GetMenuCRUDSelect(menuID, menuName);
-        }
-        
-        public Result getUserRoleDetails(string UserRole)
-        {
-            UserDAL userDAL = new UserDAL();
-            if (UserRole == null)
-                UserRole = "";
-            return userDAL.getUserRoleDetails(UserRole);
-        }
+        //public Result GetMenuCRUDSelect(string menuID, string menuName)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    if (menuID == null)
+        //        menuID = "";
+        //    if (menuName == null)
+        //        menuName = "";
+        //    return userDAL.GetMenuCRUDSelect(menuID, menuName);
+        //}
+
+        //public Result getUserRoleDetails(string UserRole)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    if (UserRole == null)
+        //        UserRole = "";
+        //    return userDAL.getUserRoleDetails(UserRole);
+        //}
 
         public Result getMenubyUserRole(string UserRole)
         {
@@ -148,15 +186,15 @@ namespace DummyProjectBAL
             return userDAL.getMenubyUserRole(UserRole);
         }
 
-        public Result insertMenu(UserDetails user)
-        {
-            UserDAL userDAL = new UserDAL();
-            user.SaltValue = GenerateSalt();
-            //  user.Password = GetHashedValue(user.Password, user.SaltValue);
-            Result result = userDAL.insertMenu(user);
+        //public Result insertMenu(UserDetails user)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    user.SaltValue = GenerateSalt();
+        //    //  user.Password = GetHashedValue(user.Password, user.SaltValue);
+        //    Result result = userDAL.insertMenu(user);
 
-            return result;
-        }
+        //    return result;
+        //}
 
         public static string GenerateSalt()
         {
@@ -226,6 +264,10 @@ namespace DummyProjectBAL
             return Convert.ToBase64String(ByteHash);
 
         }
+
+        #endregion
+
+
 
     }
 }

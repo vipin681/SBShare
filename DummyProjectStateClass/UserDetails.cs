@@ -6,31 +6,28 @@ using System.Threading.Tasks;
 
 namespace DummyProjectStateClass
 {
-    public class UserDetails
+    public class UserDetails: BaseClass
     {
-        public Int64 ID { get; set; }
-        public String UserName { get; set; }
-        public String Password { get; set; }
-        public String LastName { get; set; }
-        public String Phone { get; set; }
-        public String Email { get; set; }
-        public String TokenID { get; set; }
-        public String CountryId { get; set; }
-        public Country country { get; set; }
-        public bool IsActice { get; set;}
-        public Role role { get; set; }
-        public String Role { get; set; }
-        public Int64 RoleID { get; set; }
-        public String WorkerID { get; set; }
+        public Int32 userid { get; set; }
+        public string emailaddress { get; set; }
+        public String firstname { get; set; }
+        public String lastname { get; set; }
+        public String middleinitial { get; set; }
+        public String password { get; set; }
+        public String workerid { get; set; }
+        public Int32 hrparentid { get; set; }
+        public Int32 supervisorid { get; set; }
+        public Int32 locationid { get; set; }
+        public Int32 locationparentid { get; set; }
+        public Int32 teamid { get; set; }
+        public Int32 teamparentid { get; set; }
+        public Int32 unitid { get; set; }
+        public Int32 unitparentid { get; set; }
+        public Int32 roleid { get; set; }
+        public Int32 appid { get; set; }
+        public bool acceptedTerms { get; set; }
+        public DateTime firstTimeLogin { get; set; }
         public String SaltValue { get; set; }
-        public Nullable<Int64> InsertedBy { get; set; }
-       public string menuID { get; set; }
-       public string menuName{ get; set; }
-       public string parentMenuID { get; set; }
-       public string UserRole { get; set; }
-       public string menuFileName { get; set; }
-       public string MenuURL { get; set; }
-       public string UseYN { get; set; }
 
 
 
@@ -47,13 +44,13 @@ namespace DummyProjectStateClass
 
 
 
-        public UserDetails()
-        {
-            country = new Country();
-            role = new Role();
-        //        UserToken = new UserToken();
-        //        //UserRoleAccessMapList = new List<UserRoleAccessMap>();
+        //public UserDetails()
+        //{
+        //    country = new Country();
+        //    role = new Role();
+        ////        UserToken = new UserToken();
+        ////        //UserRoleAccessMapList = new List<UserRoleAccessMap>();
 
-        }
+        //}
     }
 }
