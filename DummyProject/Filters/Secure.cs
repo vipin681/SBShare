@@ -18,9 +18,9 @@ namespace DummyProject.Filters
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             var authorizeHeader = actionContext.Request.Headers.Authorization;
-            if (authorizeHeader == null && authorizeHeader != null  && String.IsNullOrEmpty(authorizeHeader.Parameter) == false)
+            if (authorizeHeader == null && authorizeHeader != null && String.IsNullOrEmpty(authorizeHeader.Parameter) == false)
             {
-               UserBAL objUserBLL = new UserBAL();
+                UserBAL objUserBLL = new UserBAL();
                 var existingToken = objUserBLL.GetUserDetailsByTokenID(authorizeHeader.Parameter);
                 if (existingToken != null)
                 {

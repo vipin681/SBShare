@@ -7,11 +7,13 @@ using DummyProjectStateClass;
 using DummyProjectDAL;
 using System.Security.Cryptography;
 using System.Net;
+using NLog;
 
 namespace DummyProjectBAL
 {
     public class UserBAL
     {
+        Logger logger = LogManager.GetCurrentClassLogger();
         # region GetUser
         public Result GetUserList()
         {
@@ -29,7 +31,7 @@ namespace DummyProjectBAL
         #endregion
 
         #region Update Password
-       public Result UpdateUserPassword(UpdateUserPassword userPassword)
+        public Result UpdateUserPassword(UpdateUserPassword userPassword)
         {
             UserDAL userDAL = new UserDAL();
             Result result = userDAL.Updatepassword(userPassword);
@@ -44,6 +46,7 @@ namespace DummyProjectBAL
         {
             UserDAL userDAL = new UserDAL();
             user.SaltValue = GenerateSalt();
+            logger.Debug("DAl Started");
             user.password = GetHashedValue(user.password, user.SaltValue);
             Result result = userDAL.InsertUser(user);
 
@@ -87,12 +90,12 @@ namespace DummyProjectBAL
             return userDAL.GetUserListByID(keyword);
         }
 
-        public Result IsValidUser(String userName, String userPassword)
+        public Result IsValidUser(String emailaddress, String userPassword)
         {
             UserDAL userDAL = new UserDAL();
 
             UserDetails objUser = null;
-            objUser = userDAL.IsValidUser(userName, userPassword);
+            objUser = userDAL.IsValidUser(emailaddress, userPassword);
             if (objUser != null)
             {
                 if (objUser.password == userPassword)
@@ -100,7 +103,7 @@ namespace DummyProjectBAL
                     return new Result
                     {
                         Status = Convert.ToString((int)HttpStatusCode.OK),
-                        errormsg="",
+                        errormsg = "",
                         Results = new
                         {
                             UserID = objUser.userid,
@@ -145,7 +148,7 @@ namespace DummyProjectBAL
         //    UserDAL userDAL = new UserDAL();
         //    return userDAL.GetStateList();
         //}
-  
+
         public UserToken GetUserDetailsByTokenID(string tokenID)
         {
             UserDAL objUserDAL = new UserDAL();
@@ -166,7 +169,7 @@ namespace DummyProjectBAL
         //        menuName = "";
         //    return userDAL.GetMenuCRUDSelect(menuID, menuName);
         //}
-        
+
         //public Result getUserRoleDetails(string UserRole)
         //{
         //    UserDAL userDAL = new UserDAL();
@@ -262,7 +265,7 @@ namespace DummyProjectBAL
 
         }
 
-#endregion 
+        #endregion
 
 
 

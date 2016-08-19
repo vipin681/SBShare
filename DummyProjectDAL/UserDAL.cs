@@ -8,13 +8,14 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Net;
 using DummyProjectDAL;
-
+using NLog;
 
 
 namespace DummyProjectDAL
 {
     public class UserDAL
     {
+        Logger logger = LogManager.GetCurrentClassLogger();
         #region GetUser
         public Result GetUserList()
         {
@@ -74,7 +75,7 @@ namespace DummyProjectDAL
                         return new Result
                         {
                             Results = ds.Tables[0],
-                            
+
                         };
                     }
                     return new Result
@@ -110,7 +111,7 @@ namespace DummyProjectDAL
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -162,6 +163,7 @@ namespace DummyProjectDAL
         #region all
         public Result InsertUser(UserDetails user)
         {
+            logger.Debug("Database Inserted");
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 using (SqlCommand sqlcmd = new SqlCommand())
@@ -191,18 +193,19 @@ namespace DummyProjectDAL
                     sqlcmd.Parameters.Add("@acceptedTerms", SqlDbType.Bit).Value = user.acceptedTerms;
                     sqlcmd.Parameters.Add("@firstTimeLogin", SqlDbType.DateTime).Value = user.firstTimeLogin;
                     sqlcmd.Parameters.Add("@createdby", SqlDbType.Int).Value = user.createdby;
-                   // sqlcmd.Parameters.Add("@createddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.createddate);
+                    // sqlcmd.Parameters.Add("@createddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.createddate);
                     //sqlcmd.Parameters.Add("@modifiedby", SqlDbType.Int).Value = user.modifiedby;
-                   // sqlcmd.Parameters.Add("@modifieddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.modifieddate);
-                   // sqlcmd.Parameters.Add("@timestamp", SqlDbType.Timestamp).Value = user.timestamp;
-                   // sqlcmd.Parameters.Add("@SaltValue", SqlDbType.VarChar, 5000).Value = user.SaltValue;
-                    
+                    // sqlcmd.Parameters.Add("@modifieddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.modifieddate);
+                    // sqlcmd.Parameters.Add("@timestamp", SqlDbType.Timestamp).Value = user.timestamp;
+                    // sqlcmd.Parameters.Add("@SaltValue", SqlDbType.VarChar, 5000).Value = user.SaltValue;
+
                     sqlcmd.ExecuteNonQuery();
                     return new Result
                     {
 
                         Results = (sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int32)sqlcmd.Parameters["@UserID"].Value)
                     };
+                    logger.Debug("Save Data");
                 }
             }
         }
@@ -240,24 +243,24 @@ namespace DummyProjectDAL
                     //sqlcmd.Parameters.Add("@createdby", SqlDbType.Int).Value = user.createdby;
                     // sqlcmd.Parameters.Add("@createddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.createddate);
                     sqlcmd.Parameters.Add("@modifiedby", SqlDbType.Int).Value = user.modifiedby;
-                  //  sqlcmd.Parameters.Add("@modifieddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.modifieddate);
+                    //  sqlcmd.Parameters.Add("@modifieddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.modifieddate);
                     // sqlcmd.Parameters.Add("@timestamp", SqlDbType.Timestamp).Value = user.timestamp;
                     sqlcmd.Parameters.Add("@SaltValue", SqlDbType.VarChar, 5000).Value = user.SaltValue;
 
                     sqlcmd.ExecuteNonQuery();
                     return new Result
                     {
-                       // MessageId = Convert.ToInt32(sqlcmd.Parameters["@MessageID"].Value),
+                        // MessageId = Convert.ToInt32(sqlcmd.Parameters["@MessageID"].Value),
                         //Status = Convert.ToBoolean(sqlcmd.Parameters["@Status"].Value),
-                   
+
                         Results = (sqlcmd.Parameters["@insertedSuccesfully"].Value == DBNull.Value ? 0 : (Int32)sqlcmd.Parameters["@insertedSuccesfully"].Value)
 
                     };
                 }
             }
         }
-      
-      
+
+
         //public Result GetUserDetailsBysearch(string searchstring)
         //{
         //    using (SqlConnection conn = DbHelper.CreateConnection())
@@ -306,8 +309,8 @@ namespace DummyProjectDAL
         //        }
         //    }
         //}
-        
-     
+
+
 
 
 
@@ -341,7 +344,7 @@ namespace DummyProjectDAL
                 }
             }
         }
-        public UserDetails IsValidUser(String userName, String userPassword)
+        public UserDetails IsValidUser(String emailaddress, String userPassword)
         {
             UserDetails objUser = null;
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -353,29 +356,19 @@ namespace DummyProjectDAL
                     sqlcmd.CommandText = "usp_IsValidUser";
                     sqlcmd.Connection = conn;
                     sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Parameters.Add("@emailaddress", SqlDbType.NVarChar, 100).Value = userName;
+                    sqlcmd.Parameters.Add("@emailaddress", SqlDbType.NVarChar, 100).Value = emailaddress;
                     sqlcmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
                     sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[1].Rows.Count > 0)
-                    {
-                        if ((Convert.ToInt32(ds.Tables[1].Rows[0]["status"])) == 1)
-                        {
-                            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                            {
-                                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                                {
-                                    objUser = new UserDetails();
-                                    objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[i]["userid"].ToString());
-                                    objUser.password = ds.Tables[0].Rows[i]["Password"].ToString();
-                                    objUser.TokenID = ds.Tables[0].Rows[i]["TokenID"].ToString();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            objUser = null;
-                        }
-                    }
+                    //if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    //{
+                    //    //for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    //    //{
+                    //    //    objUser = new UserDetails();
+                    //    //   // objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[i]["userid"].ToString());
+                    //    //    //objUser.password = ds.Tables[0].Rows[i]["Password"].ToString();
+                    //    //    objUser.TokenID = ds.Tables[0].Rows[i]["TokenID"].ToString();
+                    //    //}
+                    //}
                 }
             }
             return objUser;
@@ -522,7 +515,7 @@ namespace DummyProjectDAL
                     sqlcmd.CommandText = "USP_Item_Select";
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Connection = conn;
-                  //sqlcmd.Parameters.Add("@ItemName", SqlDbType.NVarChar, 200).Value = ItemName;
+                    //sqlcmd.Parameters.Add("@ItemName", SqlDbType.NVarChar, 200).Value = ItemName;
                     sqlad.Fill(ds);
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
@@ -662,16 +655,16 @@ namespace DummyProjectDAL
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
                         user = new UserDetails();
-                        user.userid= Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                        user.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
                         user.lastname = ds.Tables[0].Rows[0]["LastName"].ToString();
-                        user.emailaddress= ds.Tables[0].Rows[0]["emailaddress"].ToString();
+                        user.emailaddress = ds.Tables[0].Rows[0]["emailaddress"].ToString();
                         user.password = ds.Tables[0].Rows[0]["Password"].ToString();
                         //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
                         //if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
                         //    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
                         //if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
-                          //  user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
-                        
+                        //  user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+
                         user.workerid = ds.Tables[0].Rows[0]["workerid"].ToString();
                         //return new Result
                         //{

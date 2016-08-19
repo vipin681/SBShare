@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DummyProjectStateClass
 {
-    public class BaseClass
+  public  class BaseClass
     {
-
         public Int32 clientid { get; set; }
         public bool status { get; set; }
         public Int32 createdby { get; set; }

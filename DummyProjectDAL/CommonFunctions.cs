@@ -7,10 +7,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-
 namespace DummyProjectDAL
 {
-    public  static class CommonFunctions
+ public static   class CommonFunctions
     {
         #region Fields
 
@@ -56,6 +55,7 @@ namespace DummyProjectDAL
             }
             catch (Exception ex)
             {
+                throw ex;
                 // System.Web.HttpContext.Current.Response.Redirect("");
             }
             return string.Empty;
@@ -76,7 +76,7 @@ namespace DummyProjectDAL
                 //return retStr.ToLower();
                 return retStr;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -99,6 +99,5 @@ namespace DummyProjectDAL
             return newChars;
 
         }
-
     }
 }
