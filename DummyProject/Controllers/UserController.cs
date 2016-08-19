@@ -30,6 +30,7 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Secure]
         public HttpResponseMessage GetUserList()
         {
             logger.Debug("get all users started");

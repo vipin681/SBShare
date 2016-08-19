@@ -14,6 +14,7 @@ namespace DummyProject.Controllers
         public ActionResult Index()
         {
            
+
             return View();
         }
         public ActionResult Registration()

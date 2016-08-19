@@ -8,6 +8,7 @@ using DummyProjectDAL;
 using System.Security.Cryptography;
 using System.Net;
 using NLog;
+using System.Configuration;
 
 namespace DummyProjectBAL
 {
@@ -49,6 +50,14 @@ namespace DummyProjectBAL
             logger.Debug("DAl Started");
             user.password = GetHashedValue(user.password, user.SaltValue);
             Result result = userDAL.InsertUser(user);
+            var payload = new Dictionary<string, object>()
+             {
+                { "Userid", result.Results },
+                { "roleid", user.roleid }
+               
+             };
+            var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
+            string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
 
             return result;
         }
