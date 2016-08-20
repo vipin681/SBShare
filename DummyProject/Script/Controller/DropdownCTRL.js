@@ -271,7 +271,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
             }
         }).then(function (response) {
             return response.data.Results.Data;
-            alert(response.data.Results.Data);
+           // alert(response.data.Results.Data);
             // console.log(response.data.Results.Data);
             //.slice(0, 15);
         });

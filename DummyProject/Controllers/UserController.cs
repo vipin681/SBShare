@@ -72,7 +72,7 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
         /// <returns></returns>
         [HttpPost]
-
+        [Secure]
         public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
             logger.Info("Started");
@@ -108,6 +108,7 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid to search for specific user</param>
         /// <returns></returns>
         [HttpGet]
+        [Secure]
         public HttpResponseMessage GetUserById(int ID)
         {
             logger.Debug("get all user by id started");
@@ -149,6 +150,7 @@ namespace DummyProject.Controllers
         /// Enter any string to filter on basis of First name,LastName,workerid  and emailid</param>
         /// <returns></returns>
         [HttpGet]
+        [Secure]
         public HttpResponseMessage GetSearchResult(string searchbar)
         {
             logger.Debug("SearchResult function started for searching");
@@ -195,6 +197,7 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPost]
+        [AllowAnonymous]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
@@ -261,6 +264,7 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPut]
+        [Secure]
         public HttpResponseMessage EditUserDetails(UserDetails user)
         {
             logger.Debug("Edit user started");
@@ -312,6 +316,7 @@ namespace DummyProject.Controllers
 
         #region CheckLogin
         [HttpPost]
+        [AllowAnonymous]
         public HttpResponseMessage CheckLogin(string emailaddress, string Password)
         {
             HttpResponseMessage response;
