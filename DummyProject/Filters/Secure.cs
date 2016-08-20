@@ -28,6 +28,7 @@ namespace DummyProject.Filters
             {
                 IEnumerable<string> authHeaderValues;
                 request.Headers.TryGetValues("Authorization", out authHeaderValues);
+             
 
 
                 if (authHeaderValues == null)

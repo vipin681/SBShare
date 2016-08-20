@@ -54,11 +54,11 @@ namespace DummyProjectBAL
              {
                 { "Userid", result.Results },
                 { "roleid", user.roleid }
+
                
              };
             var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
-            string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
-
+           result.token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
             return result;
         }
         public Result UpdateUser(UserDetails user)

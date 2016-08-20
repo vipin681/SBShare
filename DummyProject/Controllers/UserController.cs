@@ -206,7 +206,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            // Int64 userID = Int64.Parse(User.Identity.Name);
+           // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
 
             // user.InsertedBy = ID;
@@ -216,6 +216,8 @@ namespace DummyProject.Controllers
                 {
                     logger.Debug("BLL started");
                     objResult = userBLL.InsertUser(user);
+                    objResult.token.ToString();
+
 
                 }
                 else
