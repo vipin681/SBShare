@@ -146,24 +146,27 @@ namespace DummyProject.Filters
 
                     switch (pair.Key)
                     {
-                        case "name":
+                        case "firstname":
                             claims.Add(new Claim(ClaimTypes.Name, pair.Value.ToString(), ClaimValueTypes.String));
                             break;
-                        case "surname":
+                        case "lastname":
                             claims.Add(new Claim(ClaimTypes.Surname, pair.Value.ToString(), ClaimValueTypes.String));
                             break;
-                        case "email":
+                        case "emailid":
                             claims.Add(new Claim(ClaimTypes.Email, pair.Value.ToString(), ClaimValueTypes.Email));
                             break;
-                        case "role":
+                        case "roleid":
                             claims.Add(new Claim(ClaimTypes.Role, pair.Value.ToString(), ClaimValueTypes.String));
                             break;
-                        case "userId":
+                        case "userid":
                             claims.Add(new Claim(ClaimTypes.UserData, pair.Value.ToString(), ClaimValueTypes.Integer));
                             break;
-                        default:
-                            claims.Add(new Claim(claimType, pair.Value.ToString(), ClaimValueTypes.String));
+                        case "exp":
+                            claims.Add(new Claim(ClaimTypes.Expiration, pair.Value.ToString(), ClaimValueTypes.String));
                             break;
+                        //default:
+                       //     claims.Add(new Claim(claimType, pair.Value.ToString(), ClaimValueTypes.String));
+                       //     break;
                     }
                 }
 
