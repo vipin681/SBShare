@@ -18,9 +18,11 @@ using System.Web.Http.Description;
 
 namespace DummyProject.Controllers
 {
+    /// <summary>
+    /// APIs for Crud operation on user and Login page
+    /// </summary>
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
-
-    public class UserController : ApiController
+     public class UserController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         Exception e = new Exception();
@@ -318,6 +320,10 @@ namespace DummyProject.Controllers
         #endregion
 
         #region CheckLogin
+        /// <summary>
+        /// check is user a valid user in Login page
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
         public HttpResponseMessage CheckLogin(string emailaddress, string Password)

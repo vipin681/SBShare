@@ -79,7 +79,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
 
         }).error(function (e) {
 
-           // alert(JSON.stringify(e));
+          //  alert(JSON.stringify(e));
         });
     };
    
@@ -121,7 +121,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         });
         $scope.list = arrCountry;
     }).error(function (status) {
-      //  alert(status);
+       // alert(status);
     });
 
 
@@ -132,7 +132,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
         });
         $scope.RoleList = arrRole;
     }).error(function (status) {
-     //   alert(status);
+      //  alert(status);
     });
 
 

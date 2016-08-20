@@ -50,27 +50,7 @@ namespace DummyProjectBAL
             logger.Debug("DAl Started");
             user.password = GetHashedValue(user.password, user.SaltValue);
             Result result = userDAL.InsertUser(user);
-
-            #region Create Token region
-            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
-            var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
-            
-            var payload = new Dictionary<string, object>()
-             {
-                { "userid", result.Results },
-                { "roleid", user.roleid },
-                { "emailid", user.emailaddress },
-                { "exp", user.roleid },
-                { "iat", issuedAt},
-                { "exp", expiry}
-
-             };
-            var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
-            string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
-            result.Token = token;
-            #endregion
-
+            result.Token = CreateToken(user, result);
             return result;
         }
         public Result UpdateUser(UserDetails user)
@@ -93,6 +73,30 @@ namespace DummyProjectBAL
         }
         #endregion
 
+
+        #region Create Token region
+        public string CreateToken(UserDetails user,Result result)
+        {
+            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var expiry = Math.Round((DateTime.UtcNow.AddMinutes(2) - unixEpoch).TotalSeconds);
+            var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+
+            var payload = new Dictionary<string, object>()
+             {
+                { "firstname", user.firstname },
+                { "lastname", user.lastname },
+                { "userid", result.Results },
+                { "roleid", user.roleid },
+                { "emailid", user.emailaddress },
+                { "iat", issuedAt},
+                { "exp", expiry}
+
+             };
+            var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
+            string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+            return token;
+        }
+        #endregion
 
         #region All
 

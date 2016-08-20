@@ -323,6 +323,7 @@
     <Content Include="Content\Site1.css" />
     <Content Include="Content\Site2.css" />
     <Content Include="css\My.css" />
+    <EmbeddedResource Include="customscripts\basic-auth.js" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -404,7 +405,6 @@
     <Folder Include="Content\fonts\" />
     <Folder Include="Content\img\" />
     <Folder Include="Content\themes\" />
-    <Folder Include="customscripts\" />
     <Folder Include="Images\" />
     <Folder Include="js\" />
     <Folder Include="LogError\" />
