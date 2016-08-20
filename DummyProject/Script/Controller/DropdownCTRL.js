@@ -241,7 +241,7 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
             $scope.gridOptions1.data = data.Results;
         });
     }
-    $scope.searchData();
+    //$scope.searchData();
 
 
 

@@ -381,16 +381,20 @@ namespace DummyProjectDAL
                     //    }
 
                     //}
-                    //if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    //{
-                    //    //for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                    //    //{
-                    //    //    objUser = new UserDetails();
-                    //    //   // objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[i]["userid"].ToString());
-                    //    //    //objUser.password = ds.Tables[0].Rows[i]["Password"].ToString();
-                    //    //    objUser.TokenID = ds.Tables[0].Rows[i]["TokenID"].ToString();
-                    //    //}
-                    //}
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+
+                        
+                        //for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                        //{
+                        objUser = new UserDetails();
+                        objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                        objUser.password = ds.Tables[0].Rows[0]["Password"].ToString();
+                        objUser.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
+                        objUser.firstname = ds.Tables[0].Rows[0]["firstname"].ToString();
+                        objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
+                        //}
+                    }
                 }
             }
             return objUser;
