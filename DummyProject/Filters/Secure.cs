@@ -18,11 +18,12 @@ namespace DummyProject.Filters
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             var authorizeHeader = actionContext.Request.Headers.Authorization;
-            if (authorizeHeader == null && authorizeHeader != null && String.IsNullOrEmpty(authorizeHeader.Parameter) == false)
-            {
+            //if (authorizeHeader == null && authorizeHeader != null&& String.IsNullOrEmpty(authorizeHeader.Parameter)== false)
+            //{
                 UserBAL objUserBLL = new UserBAL();
-                var existingToken = objUserBLL.GetUserDetailsByTokenID(authorizeHeader.Parameter);
-                if (existingToken != null)
+              //  var existingToken = objUserBLL.GetUserDetailsByTokenID(authorizeHeader.Parameter);
+            var existingToken = objUserBLL.GetUserDetailsByTokenID("4A9636B0-21A0-4ECA-9775-A7C55A06D56C");
+            if (existingToken != null)
                 {
                     var principal = new GenericPrincipal((new GenericIdentity(existingToken.UserID.ToString())),
                                                                     (new[] { existingToken.RoleID.ToString() }));
@@ -37,7 +38,7 @@ namespace DummyProject.Filters
                 Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
                 MessageId = -1
             };
-            actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, outResult);
+          //  actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, outResult);
         }
     }
-}
+//}

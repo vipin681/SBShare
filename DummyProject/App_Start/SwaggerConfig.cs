@@ -67,7 +67,7 @@ namespace DummyProject
                         //    .Description("OAuth2 Implicit Grant")
                         //    .Flow("implicit")
                         //    .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
-                        //    //.TokenUrl("https://tempuri.org/token")
+                        //    //.TokenUrl("https://tempuri.org/token")  
                         //    .Scopes(scopes =>
                         //    {
                         //        scopes.Add("read", "Read access to protected resources");

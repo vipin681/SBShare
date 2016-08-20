@@ -359,6 +359,28 @@ namespace DummyProjectDAL
                     sqlcmd.Parameters.Add("@emailaddress", SqlDbType.NVarChar, 100).Value = emailaddress;
                     sqlcmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
                     sqlad.Fill(ds);
+                    //int attempts;
+                    //if (ds != null)
+                    //{
+                    //    if (ds.Tables[0].Rows.Count > 0)
+                    //    {
+                    //        UserDetails user = new UserDetails();
+                    //       // attempts = Convert.ToInt32(ViewState["attempts"]);
+                    //       // attempts = Convert.ToInt32(ds.Tables[0].Rows[0]["AttemptCount"]);
+                    //        SqlDataAdapter sqlada = new SqlDataAdapter(sqlcmd);
+                    //        DataSet dsa = new DataSet();
+                    //        sqlcmd.CommandText = "SecurityLoginAttempts";
+                    //        sqlcmd.Connection = conn;
+                    //        sqlcmd.CommandType = CommandType.StoredProcedure;
+                    //        sqlcmd.Parameters.Add("@LoginTime", SqlDbType.NVarChar, 100).Value = DateTime.Now.ToString();
+                    //        sqlcmd.Parameters.Add("@LoginStatus", SqlDbType.NVarChar, 100).Value = "Active";
+                    //        sqlcmd.Parameters.Add("@AttemptCount", SqlDbType.NVarChar, 100).Value = 1;
+                    //        int i= sqlcmd.ExecuteNonQuery();
+                    //        //sqlcmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
+
+                    //    }
+
+                    //}
                     //if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     //{
                     //    //for (int i = 0; i < ds.Tables[0].Rows.Count; i++)

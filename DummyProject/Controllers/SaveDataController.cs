@@ -5,11 +5,17 @@ using System.Web;
 using System.Web.Mvc;
 using NLog;
 using DummyProject.Models;
+
 namespace DummyProject.Controllers
 {
     public class SaveDataController : Controller
     {
         Logger logger = LogManager.GetLogger("databaseLogger");
+        private readonly string _token;
+        public SaveDataController()
+        {
+           // var securityService = new SecurityService();
+        }
         // GET: SaveData
         public ActionResult Index()
         {

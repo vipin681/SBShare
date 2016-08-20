@@ -29,38 +29,39 @@ namespace DummyProject.Controllers
         /// Get all the user list
         /// </summary>
         /// <returns></returns>
-        //[HttpGet]
-        //public HttpResponseMessage GetUserList()
-        //{
-        //    logger.Debug("get all users started");
-        //    HttpResponseMessage response = new HttpResponseMessage();
-        //    Result objResult = null;
-        //    UserBAL userBAL = new UserBAL();
-        //    objResult = userBAL.GetUserList();
-        //    try
-        //    {
-        //        if (objResult != null)
-        //        {
-        //            objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-        //            objResult.errormsg = "";
-        //            response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        //        }
-        //        else
-        //        {
-        //            objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-        //            objResult.errormsg = "Data Empty!";
-        //            response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        Exception e = new Exception();
-        //        logger.ErrorException("Data Empty", e);
+        [HttpGet]
+        [Secure]
+        public HttpResponseMessage GetUserList()
+        {
+            logger.Debug("get all users started");
+            HttpResponseMessage response = new HttpResponseMessage();
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            objResult = userBAL.GetUserList();
+            try
+            {
+                if (objResult != null)
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                    objResult.errormsg = "";
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                }
+                else
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                    objResult.errormsg = "Data Empty!";
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                }
+            }
+            catch (Exception)
+            {
+                Exception e = new Exception();
+                logger.ErrorException("Data Empty", e);
 
-        //    }
-        //    logger.Debug("get all users finished");
-        //    return response;
-        //}
+            }
+            logger.Debug("get all users finished");
+            return response;
+        }
         #endregion
 
         #region Update Password
@@ -224,6 +225,7 @@ namespace DummyProject.Controllers
 
             }
             catch (Exception e)
+
             {
                 logger.ErrorException("Data Empty", e);
 
