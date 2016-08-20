@@ -19,8 +19,6 @@ namespace DummyProject.Controllers
         // GET: SaveData
         public ActionResult Index()
         {
-           
-
             return View();
         }
         public ActionResult Registration()
