@@ -198,6 +198,7 @@ namespace DummyProject.Controllers
         /// <returns>A value</returns>
         [HttpPost]
         [AllowAnonymous]
+      //  [Secure]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
