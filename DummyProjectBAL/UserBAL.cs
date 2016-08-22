@@ -7,11 +7,14 @@ using DummyProjectStateClass;
 using DummyProjectDAL;
 using System.Security.Cryptography;
 using System.Net;
+using NLog;
+using System.Configuration;
 
 namespace DummyProjectBAL
 {
     public class UserBAL
     {
+        Logger logger = LogManager.GetCurrentClassLogger();
         # region GetUser
         public Result GetUserList()
         {
@@ -29,7 +32,7 @@ namespace DummyProjectBAL
         #endregion
 
         #region Update Password
-       public Result UpdateUserPassword(UpdateUserPassword userPassword)
+        public Result UpdateUserPassword(UpdateUserPassword userPassword)
         {
             UserDAL userDAL = new UserDAL();
             Result result = userDAL.Updatepassword(userPassword);
@@ -44,9 +47,10 @@ namespace DummyProjectBAL
         {
             UserDAL userDAL = new UserDAL();
             user.SaltValue = GenerateSalt();
+            logger.Debug("DAl Started");
             user.password = GetHashedValue(user.password, user.SaltValue);
             Result result = userDAL.InsertUser(user);
-
+            result.Token = CreateToken(user, result);
             return result;
         }
         public Result UpdateUser(UserDetails user)
@@ -70,6 +74,30 @@ namespace DummyProjectBAL
         #endregion
 
 
+        #region Create Token region
+        public string CreateToken(UserDetails user,Result result)
+        {
+            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var expiry = Math.Round((DateTime.UtcNow.AddMinutes(2) - unixEpoch).TotalSeconds);
+            var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+
+            var payload = new Dictionary<string, object>()
+             {
+                { "firstname", user.firstname },
+                { "lastname", user.lastname },
+                { "userid", result.Results },
+                { "roleid", user.roleid },
+                { "emailid", user.emailaddress },
+                { "iat", issuedAt},
+                { "exp", expiry}
+
+             };
+            var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
+            string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+            return token;
+        }
+        #endregion
+
         #region All
 
 
@@ -87,27 +115,48 @@ namespace DummyProjectBAL
             return userDAL.GetUserListByID(keyword);
         }
 
-        public Result IsValidUser(String userName, String userPassword)
+        public Result IsValidUser(String emailaddress, String userPassword)
         {
             UserDAL userDAL = new UserDAL();
 
             UserDetails objUser = null;
-            objUser = userDAL.IsValidUser(userName, userPassword);
+            objUser = userDAL.IsValidUser(emailaddress, userPassword);
             if (objUser != null)
             {
                 if (objUser.password == userPassword)
                 {
+                    #region Create Token region
+                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
+                    var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+
+                    var payload = new Dictionary<string, object>()
+                         {
+                            { "firstname", objUser.firstname },
+                            { "lastname", objUser.lastname }, 
+                            { "userid", objUser.userid },
+                            { "roleid", objUser.roleid },
+                            { "emailid", emailaddress },
+                            { "iat", issuedAt},
+                            { "exp", expiry}
+
+                         };
+                    var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
+                    string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+                    
+                    #endregion
+
                     return new Result
                     {
                         Status = Convert.ToString((int)HttpStatusCode.OK),
-                        errormsg="",
+                        errormsg = "",
                         Results = new
                         {
                             UserID = objUser.userid,
-                            TokenID = objUser.TokenID,
                             Role = objUser.roleid,
-                            // Language = objUser.Language.LanguageName
-                        }
+                            
+                        },
+                        Token = token
                     };
                 }
                 else
@@ -145,7 +194,7 @@ namespace DummyProjectBAL
         //    UserDAL userDAL = new UserDAL();
         //    return userDAL.GetStateList();
         //}
-  
+
         public UserToken GetUserDetailsByTokenID(string tokenID)
         {
             UserDAL objUserDAL = new UserDAL();
@@ -166,7 +215,7 @@ namespace DummyProjectBAL
         //        menuName = "";
         //    return userDAL.GetMenuCRUDSelect(menuID, menuName);
         //}
-        
+
         //public Result getUserRoleDetails(string UserRole)
         //{
         //    UserDAL userDAL = new UserDAL();
@@ -262,7 +311,7 @@ namespace DummyProjectBAL
 
         }
 
-#endregion 
+        #endregion
 
 
 

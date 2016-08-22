@@ -8,13 +8,14 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Net;
 using DummyProjectDAL;
-
+using NLog;
 
 
 namespace DummyProjectDAL
 {
     public class UserDAL
     {
+        Logger logger = LogManager.GetCurrentClassLogger();
         #region GetUser
         public Result GetUserList()
         {
@@ -74,7 +75,7 @@ namespace DummyProjectDAL
                         return new Result
                         {
                             Results = ds.Tables[0],
-                            
+
                         };
                     }
                     return new Result
@@ -93,25 +94,24 @@ namespace DummyProjectDAL
             {
                 using (SqlConnection conn = DbHelper.CreateConnection())
                 {
-                   
-                    string strQuery;
-                    SqlCommand cmd;
-                   
-                    strQuery = "UPDATE security.Users SET [password]=@paramnewPassword,@parammodifiedby= @paramuserid,@parammodifieddate=getdate()   WHERE userid = @paramuserid ";
-                    cmd = new SqlCommand(strQuery);
-                    cmd.Connection = conn;
-                    cmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userPassword.userid;
-                    cmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = CommonFunctions.MD5Encryption(userPassword.Password);
-                    cmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
-                    cmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
-                    cmd.ExecuteNonQuery();
-                    return new Result
+                    using (SqlCommand sqlcmd = new SqlCommand())
                     {
-                        Results = (cmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)cmd.Parameters["@paramuserid"].Value)
-                    };
+                        sqlcmd.CommandText = "security.UpdateUserPassword";
+                        sqlcmd.Connection = conn;
+                        sqlcmd.CommandType = CommandType.StoredProcedure;
+                        sqlcmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userPassword.userid;
+                        sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = CommonFunctions.MD5Encryption(userPassword.Password);
+                        sqlcmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
+                        sqlcmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
+                        sqlcmd.ExecuteNonQuery();
+                        return new Result
+                        {
+                            Results = (sqlcmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@paramuserid"].Value)
+                        };
+                    }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -163,48 +163,50 @@ namespace DummyProjectDAL
         #region all
         public Result InsertUser(UserDetails user)
         {
+            logger.Debug("Database Inserted");
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
-                //using (SqlCommand sqlcmd = new SqlCommand())
-                //{
-                    string strQuery;
-                    SqlCommand cmd;
+                using (SqlCommand sqlcmd = new SqlCommand())
+                {
+                    sqlcmd.CommandText = "usp_InsertUser";
+                    sqlcmd.Connection = conn;
+                    sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Parameters.Add("@userid", SqlDbType.Int).Direction = ParameterDirection.Output;
+                    sqlcmd.Parameters.Add("@clientid", SqlDbType.Int).Value = user.clientid;
+                    sqlcmd.Parameters.Add("@emailaddress", SqlDbType.VarChar, 50).Value = user.emailaddress;
+                    sqlcmd.Parameters.Add("@firstname", SqlDbType.VarChar, 50).Value = user.firstname;
+                    sqlcmd.Parameters.Add("@lastname", SqlDbType.VarChar, 50).Value = user.lastname;
+                    sqlcmd.Parameters.Add("@password", SqlDbType.VarChar, 5000).Value = user.password;
+                    sqlcmd.Parameters.Add("@middleinitial", SqlDbType.VarChar, 100).Value = user.middleinitial;
+                    sqlcmd.Parameters.Add("@workerid", SqlDbType.VarChar, 50).Value = user.workerid;
+                    sqlcmd.Parameters.Add("@hrparentid", SqlDbType.Int).Value = user.hrparentid;
+                    sqlcmd.Parameters.Add("@supervisorid", SqlDbType.Int).Value = user.supervisorid;
+                    sqlcmd.Parameters.Add("@locationid", SqlDbType.Int).Value = user.locationid;
+                    sqlcmd.Parameters.Add("@locationparentid", SqlDbType.Int).Value = user.locationparentid;
+                    sqlcmd.Parameters.Add("@teamid", SqlDbType.Int).Value = user.teamid;
+                    sqlcmd.Parameters.Add("@teamparentid", SqlDbType.Int).Value = user.teamparentid;
+                    sqlcmd.Parameters.Add("@unitid", SqlDbType.Int).Value = user.unitid;
+                    sqlcmd.Parameters.Add("@unitparentid", SqlDbType.Int).Value = user.unitparentid;
+                    sqlcmd.Parameters.Add("@roleid", SqlDbType.Int).Value = user.roleid;
+                    sqlcmd.Parameters.Add("@appid", SqlDbType.Int).Value = user.appid;
+                    sqlcmd.Parameters.Add("@status", SqlDbType.Bit).Value = user.status;
+                    sqlcmd.Parameters.Add("@acceptedTerms", SqlDbType.Bit).Value = user.acceptedTerms;
+                    sqlcmd.Parameters.Add("@firstTimeLogin", SqlDbType.DateTime).Value = user.firstTimeLogin;
+                    sqlcmd.Parameters.Add("@createdby", SqlDbType.Int).Value = user.createdby;
+                    // sqlcmd.Parameters.Add("@createddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.createddate);
+                    //sqlcmd.Parameters.Add("@modifiedby", SqlDbType.Int).Value = user.modifiedby;
+                    // sqlcmd.Parameters.Add("@modifieddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.modifieddate);
+                    // sqlcmd.Parameters.Add("@timestamp", SqlDbType.Timestamp).Value = user.timestamp;
+                    // sqlcmd.Parameters.Add("@SaltValue", SqlDbType.VarChar, 5000).Value = user.SaltValue;
 
-                strQuery = "UPDATE security.Users SET [password]=@paramnewPassword,@parammodifiedby= @paramuserid,@parammodifieddate=getdate()   WHERE userid = @paramuserid ";
-                cmd = new SqlCommand(strQuery);
-                cmd.Connection = conn;
-                cmd.CommandText = "INSERT INTO [security].[Users] ( clientid, emailaddress, firstname, lastname, password, middleinitial, workerid, hrparentid, supervisorid, locationid, locationparentid, teamid, teamparentid, unitid, unitparentid, roleid, appid, status, acceptedTerms, firstTimeLogin, createdby, createddate ) VALUES (@clientid, @emailaddress, @firstname, @lastname, @password, @middleinitial, @workerid, @hrparentid, @supervisorid, @locationid, @locationparentid, @teamid, @teamparentid, @unitid, @unitparentid, @roleid, @appid, @status, @acceptedTerms, @firstTimeLogin, @createdby,getdate())";
-                
-                cmd.Parameters.Add("@userid", SqlDbType.Int).Direction = ParameterDirection.Output;
-                cmd.Parameters.Add("@clientid", SqlDbType.Int).Value = user.clientid;
-                cmd.Parameters.Add("@emailaddress", SqlDbType.VarChar, 50).Value = user.emailaddress;
-                cmd.Parameters.Add("@firstname", SqlDbType.VarChar, 50).Value = user.firstname;
-                cmd.Parameters.Add("@lastname", SqlDbType.VarChar, 50).Value = user.lastname;
-                cmd.Parameters.Add("@password", SqlDbType.VarChar, 5000).Value = user.password;
-                cmd.Parameters.Add("@middleinitial", SqlDbType.VarChar, 100).Value = user.middleinitial;
-                cmd.Parameters.Add("@workerid", SqlDbType.VarChar, 50).Value = user.workerid;
-                cmd.Parameters.Add("@hrparentid", SqlDbType.Int).Value = user.hrparentid;
-                cmd.Parameters.Add("@supervisorid", SqlDbType.Int).Value = user.supervisorid;
-                cmd.Parameters.Add("@locationid", SqlDbType.Int).Value = user.locationid;
-                cmd.Parameters.Add("@locationparentid", SqlDbType.Int).Value = user.locationparentid;
-                cmd.Parameters.Add("@teamid", SqlDbType.Int).Value = user.teamid;
-                cmd.Parameters.Add("@teamparentid", SqlDbType.Int).Value = user.teamparentid;
-                cmd.Parameters.Add("@unitid", SqlDbType.Int).Value = user.unitid;
-                cmd.Parameters.Add("@unitparentid", SqlDbType.Int).Value = user.unitparentid;
-                cmd.Parameters.Add("@roleid", SqlDbType.Int).Value = user.roleid;
-                cmd.Parameters.Add("@appid", SqlDbType.Int).Value = user.appid;
-                cmd.Parameters.Add("@status", SqlDbType.Bit).Value = user.status;
-                cmd.Parameters.Add("@acceptedTerms", SqlDbType.Bit).Value = user.acceptedTerms;
-                cmd.Parameters.Add("@firstTimeLogin", SqlDbType.DateTime).Value = user.firstTimeLogin;
-                cmd.Parameters.Add("@createdby", SqlDbType.Int).Value = user.createdby;
-              
-                cmd.ExecuteNonQuery();
+                    sqlcmd.ExecuteNonQuery();
                     return new Result
                     {
 
-                        Results = (cmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int32)cmd.Parameters["@UserID"].Value)
+                        Results = (sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int32)sqlcmd.Parameters["@UserID"].Value)
                     };
-                //}
+                    logger.Debug("Save Data");
+                }
             }
         }
         public Result UpdateUser(UserDetails user)
@@ -241,24 +243,24 @@ namespace DummyProjectDAL
                     //sqlcmd.Parameters.Add("@createdby", SqlDbType.Int).Value = user.createdby;
                     // sqlcmd.Parameters.Add("@createddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.createddate);
                     sqlcmd.Parameters.Add("@modifiedby", SqlDbType.Int).Value = user.modifiedby;
-                  //  sqlcmd.Parameters.Add("@modifieddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.modifieddate);
+                    //  sqlcmd.Parameters.Add("@modifieddate", SqlDbType.DateTime).Value = Convert.ToDateTime(user.modifieddate);
                     // sqlcmd.Parameters.Add("@timestamp", SqlDbType.Timestamp).Value = user.timestamp;
                     sqlcmd.Parameters.Add("@SaltValue", SqlDbType.VarChar, 5000).Value = user.SaltValue;
 
                     sqlcmd.ExecuteNonQuery();
                     return new Result
                     {
-                       // MessageId = Convert.ToInt32(sqlcmd.Parameters["@MessageID"].Value),
+                        // MessageId = Convert.ToInt32(sqlcmd.Parameters["@MessageID"].Value),
                         //Status = Convert.ToBoolean(sqlcmd.Parameters["@Status"].Value),
-                   
+
                         Results = (sqlcmd.Parameters["@insertedSuccesfully"].Value == DBNull.Value ? 0 : (Int32)sqlcmd.Parameters["@insertedSuccesfully"].Value)
 
                     };
                 }
             }
         }
-      
-      
+
+
         //public Result GetUserDetailsBysearch(string searchstring)
         //{
         //    using (SqlConnection conn = DbHelper.CreateConnection())
@@ -307,8 +309,8 @@ namespace DummyProjectDAL
         //        }
         //    }
         //}
-        
-     
+
+
 
 
 
@@ -342,7 +344,7 @@ namespace DummyProjectDAL
                 }
             }
         }
-        public UserDetails IsValidUser(String userName, String userPassword)
+        public UserDetails IsValidUser(String emailaddress, String userPassword)
         {
             UserDetails objUser = null;
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -354,18 +356,44 @@ namespace DummyProjectDAL
                     sqlcmd.CommandText = "usp_IsValidUser";
                     sqlcmd.Connection = conn;
                     sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Parameters.Add("@userName", SqlDbType.NVarChar, 100).Value = userName;
+                    sqlcmd.Parameters.Add("@emailaddress", SqlDbType.NVarChar, 100).Value = emailaddress;
                     sqlcmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
                     sqlad.Fill(ds);
+                    //int attempts;
+                    //if (ds != null)
+                    //{
+                    //    if (ds.Tables[0].Rows.Count > 0)
+                    //    {
+                    //        UserDetails user = new UserDetails();
+                    //       // attempts = Convert.ToInt32(ViewState["attempts"]);
+                    //       // attempts = Convert.ToInt32(ds.Tables[0].Rows[0]["AttemptCount"]);
+                    //        SqlDataAdapter sqlada = new SqlDataAdapter(sqlcmd);
+                    //        DataSet dsa = new DataSet();
+                    //        sqlcmd.CommandText = "SecurityLoginAttempts";
+                    //        sqlcmd.Connection = conn;
+                    //        sqlcmd.CommandType = CommandType.StoredProcedure;
+                    //        sqlcmd.Parameters.Add("@LoginTime", SqlDbType.NVarChar, 100).Value = DateTime.Now.ToString();
+                    //        sqlcmd.Parameters.Add("@LoginStatus", SqlDbType.NVarChar, 100).Value = "Active";
+                    //        sqlcmd.Parameters.Add("@AttemptCount", SqlDbType.NVarChar, 100).Value = 1;
+                    //        int i= sqlcmd.ExecuteNonQuery();
+                    //        //sqlcmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
+
+                    //    }
+
+                    //}
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
-                        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                        {
-                            objUser = new UserDetails();
-                            objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[i]["userid"].ToString());
-                            objUser.password = ds.Tables[0].Rows[i]["Password"].ToString();
-                            objUser.TokenID = ds.Tables[0].Rows[i]["TokenID"].ToString();
-                        }
+
+                        
+                        //for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                        //{
+                        objUser = new UserDetails();
+                        objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                        objUser.password = ds.Tables[0].Rows[0]["Password"].ToString();
+                        objUser.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
+                        objUser.firstname = ds.Tables[0].Rows[0]["firstname"].ToString();
+                        objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
+                        //}
                     }
                 }
             }
@@ -513,7 +541,7 @@ namespace DummyProjectDAL
                     sqlcmd.CommandText = "USP_Item_Select";
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Connection = conn;
-                  //sqlcmd.Parameters.Add("@ItemName", SqlDbType.NVarChar, 200).Value = ItemName;
+                    //sqlcmd.Parameters.Add("@ItemName", SqlDbType.NVarChar, 200).Value = ItemName;
                     sqlad.Fill(ds);
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
@@ -653,16 +681,16 @@ namespace DummyProjectDAL
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
                         user = new UserDetails();
-                        user.userid= Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                        user.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
                         user.lastname = ds.Tables[0].Rows[0]["LastName"].ToString();
-                        user.emailaddress= ds.Tables[0].Rows[0]["emailaddress"].ToString();
+                        user.emailaddress = ds.Tables[0].Rows[0]["emailaddress"].ToString();
                         user.password = ds.Tables[0].Rows[0]["Password"].ToString();
                         //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
                         //if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
                         //    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
                         //if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
-                          //  user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
-                        
+                        //  user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+
                         user.workerid = ds.Tables[0].Rows[0]["workerid"].ToString();
                         //return new Result
                         //{

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DummyProjectStateClass
 {
-    public class UserDetails : BaseClass
+    public class UserDetails: BaseClass
     {
         public Int32 userid { get; set; }
         public string emailaddress { get; set; }
@@ -28,6 +28,29 @@ namespace DummyProjectStateClass
         public bool acceptedTerms { get; set; }
         public DateTime firstTimeLogin { get; set; }
         public String SaltValue { get; set; }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //public UserDetails()
+        //{
+        //    country = new Country();
+        //    role = new Role();
+        ////        UserToken = new UserToken();
+        ////        //UserRoleAccessMapList = new List<UserRoleAccessMap>();
+
+        //}
     }
 }

@@ -12,12 +12,11 @@ namespace DummyProjectDAL
     {
         static public SqlConnection CreateConnection()
         {
-            //SqlConnection con = new SqlConnection("Data Source = piyush1; Initial Catalog = test;Integrated Security=true; Connect Timeout = 120");
-           SqlConnection con = new SqlConnection("Data Source = 10.10.1.11,1433; Initial Catalog = SupportBeacon; User ID = sa; Password= admin; Connect Timeout= 120");
-            //string connectionString = ConfigurationSettings.AppSettings["ConnectionString"];
-            //SqlConnection conn = new SqlConnection(connectionString);
-            con.Open();
-            return con;
+            //SqlConnection con = new SqlConnection("Data Source=piyush1;Initial Catalog=Test;Integrated Security=true");
+           string connectionString = ConfigurationSettings.AppSettings["ConStr"];
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+            return conn;
         }
     }
 }

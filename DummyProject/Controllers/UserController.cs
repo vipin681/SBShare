@@ -18,8 +18,11 @@ using System.Web.Http.Description;
 
 namespace DummyProject.Controllers
 {
+    /// <summary>
+    /// APIs for Crud operation on user and Login page
+    /// </summary>
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
-    public class UserController : ApiController
+     public class UserController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         Exception e = new Exception();
@@ -32,13 +35,11 @@ namespace DummyProject.Controllers
         [Secure]
         public HttpResponseMessage GetUserList()
         {
-            logger.Info("get all users started");
-            HttpResponseMessage response = new HttpResponseMessage(); 
+            logger.Debug("get all users started");
+            HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
-            logger.Debug("get all BAL started");
             UserBAL userBAL = new UserBAL();
             objResult = userBAL.GetUserList();
-            logger.Debug("get all BAL finished");
             try
             {
                 if (objResult != null)
@@ -73,24 +74,27 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
         /// <returns></returns>
         [HttpPost]
+        [Secure]
         public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
+            logger.Info("Started");
             logger.Debug("Update  user started");
-            HttpResponseMessage response=new HttpResponseMessage(); 
+            HttpResponseMessage response = new HttpResponseMessage(); ;
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             UserBAL userBLL = new UserBAL();
             try
             {
+                logger.Debug("BLL started");
                 objResult = userBLL.UpdateUserPassword(userPassword);
                 response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
                 return response;
             }
-            catch(Exception ex )
+            catch (Exception)
             {
                 Exception e = new Exception();
-                logger.ErrorException("Data Empty", ex);
+                logger.ErrorException("Data Empty", e);
             }
 
             logger.Debug("update user finished");
@@ -106,6 +110,7 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid to search for specific user</param>
         /// <returns></returns>
         [HttpGet]
+        [Secure]
         public HttpResponseMessage GetUserById(int ID)
         {
             logger.Debug("get all user by id started");
@@ -147,6 +152,7 @@ namespace DummyProject.Controllers
         /// Enter any string to filter on basis of First name,LastName,workerid  and emailid</param>
         /// <returns></returns>
         [HttpGet]
+        [Secure]
         public HttpResponseMessage GetSearchResult(string searchbar)
         {
             logger.Debug("SearchResult function started for searching");
@@ -156,22 +162,22 @@ namespace DummyProject.Controllers
             try
             {
                 objResult = userBAL.GetUserDetailsBysearch(searchbar);
-            if (objResult.Results != null)
-            {
-                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                objResult.errormsg = "";
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-                objResult.errormsg = "Data Empty!";
-                response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
-            }
+                if (objResult.Results != null)
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                    objResult.errormsg = "";
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                }
+                else
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                    objResult.errormsg = "Data Empty!";
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                }
             }
             catch (Exception e)
             {
-               
+
                 logger.ErrorException("Data Empty", e);
 
             }
@@ -193,14 +199,17 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPost]
+        [AllowAnonymous]
+      //  [Secure]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
-            logger.Debug("Submit user started");
+            logger.Info("Debug Started");
+            //logger.Debug("Submit user started");
             HttpResponseMessage response;
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            // Int64 userID = Int64.Parse(User.Identity.Name);
+           // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
 
             // user.InsertedBy = ID;
@@ -208,7 +217,10 @@ namespace DummyProject.Controllers
             {
                 if (user.userid == 0)
                 {
+                    logger.Debug("BLL started");
                     objResult = userBLL.InsertUser(user);
+                    objResult.token.ToString();
+
 
                 }
                 else
@@ -221,6 +233,7 @@ namespace DummyProject.Controllers
 
             }
             catch (Exception e)
+
             {
                 logger.ErrorException("Data Empty", e);
 
@@ -256,6 +269,7 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPut]
+        [Secure]
         public HttpResponseMessage EditUserDetails(UserDetails user)
         {
             logger.Debug("Edit user started");
@@ -306,13 +320,18 @@ namespace DummyProject.Controllers
         #endregion
 
         #region CheckLogin
+        /// <summary>
+        /// check is user a valid user in Login page
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
-        public HttpResponseMessage CheckLogin(string UserName, string Password)
+        [AllowAnonymous]
+        public HttpResponseMessage CheckLogin(string emailaddress, string Password)
         {
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
-            objResult = objUserBLL.IsValidUser(UserName, Password);
+            objResult = objUserBLL.IsValidUser(emailaddress, Password);
             if (objResult != null)
             {
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
@@ -372,7 +391,7 @@ namespace DummyProject.Controllers
             return response;
         }
 
-       
+
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpGet]
@@ -434,7 +453,7 @@ namespace DummyProject.Controllers
         //    return response;
         //}
 
-     
+
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public HttpResponseMessage UserLookup(String TypeHeadKeyword)

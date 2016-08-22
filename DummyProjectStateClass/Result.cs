@@ -9,10 +9,11 @@ namespace DummyProjectStateClass
     //This 
    public class Result
     {
-        public string Status { get; set; }
         public string errormsg { get; set; }
-        public dynamic Results { get; set; }
+        public string Status { get; set; }
+        public string Token { get; set; }
         public int MessageId { get; set; }
-        
+        public dynamic Results { get; set; }
+        public string token { get; set; }
     }
 }
