@@ -258,6 +258,7 @@
     <Compile Include="BaseClass.cs" />
     <Compile Include="Books.cs" />
     <Compile Include="Country.cs" />
+    <Compile Include="EnumClass.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Product.cs" />
     <Compile Include="Result.cs" />
