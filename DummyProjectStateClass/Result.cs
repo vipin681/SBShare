@@ -14,5 +14,6 @@ namespace DummyProjectStateClass
         public string Token { get; set; }
         public int MessageId { get; set; }
         public dynamic Results { get; set; }
+        public string token { get; set; }
     }
 }

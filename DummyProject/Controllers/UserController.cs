@@ -32,7 +32,7 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Secure]
+       // [Secure]
         public HttpResponseMessage GetUserList()
         {
             logger.Debug("get all users started");
@@ -200,6 +200,7 @@ namespace DummyProject.Controllers
         /// <returns>A value</returns>
         [HttpPost]
         [AllowAnonymous]
+      //  [Secure]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
@@ -208,7 +209,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            // Int64 userID = Int64.Parse(User.Identity.Name);
+           // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
 
             // user.InsertedBy = ID;
@@ -219,6 +220,8 @@ namespace DummyProject.Controllers
                     var level = LogLevel.Debug;
                     logger.Log(level, "BLL started");
                     objResult = userBLL.InsertUser(user);
+                    objResult.token.ToString();
+
 
                 }
                 else
