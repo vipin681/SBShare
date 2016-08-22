@@ -12,15 +12,7 @@ namespace DummyProject.Filters
     public class RoleBased : System.Web.Http.AuthorizeAttribute
     {
         public string View { get; set; }
-        public RoleBased()
-        {
-            View = "AuthorizeFailed";
-        }
-        public override void OnAuthorization(AuthorizationContext filterContext)
-        {
-            base.OnAuthorization(filterContext);
-            IsUserAuthorized(filterContext);
-        }
+      
 
     }
 }

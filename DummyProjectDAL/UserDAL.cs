@@ -94,21 +94,22 @@ namespace DummyProjectDAL
             {
                 using (SqlConnection conn = DbHelper.CreateConnection())
                 {
-                    using (SqlCommand sqlcmd = new SqlCommand())
+
+                    string strQuery;
+                    SqlCommand cmd;
+
+                    strQuery = "UPDATE security.Users SET [password]=@paramnewPassword,@parammodifiedby= @paramuserid,@parammodifieddate=getdate()   WHERE userid = @paramuserid ";
+                    cmd = new SqlCommand(strQuery);
+                    cmd.Connection = conn;
+                    cmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userPassword.userid;
+                    cmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = CommonFunctions.MD5Encryption(userPassword.Password);
+                    cmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
+                    cmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
+                    cmd.ExecuteNonQuery();
+                    return new Result
                     {
-                        sqlcmd.CommandText = "security.UpdateUserPassword";
-                        sqlcmd.Connection = conn;
-                        sqlcmd.CommandType = CommandType.StoredProcedure;
-                        sqlcmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userPassword.userid;
-                        sqlcmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = CommonFunctions.MD5Encryption(userPassword.Password);
-                        sqlcmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
-                        sqlcmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
-                        sqlcmd.ExecuteNonQuery();
-                        return new Result
-                        {
-                            Results = (sqlcmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@paramuserid"].Value)
-                        };
-                    }
+                        Results = (cmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)cmd.Parameters["@paramuserid"].Value)
+                    };
                 }
             }
             catch (Exception ex)
