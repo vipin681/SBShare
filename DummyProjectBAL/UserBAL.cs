@@ -9,6 +9,9 @@ using System.Security.Cryptography;
 using System.Net;
 using NLog;
 using System.Configuration;
+using System.Web.Script.Serialization;
+using System.Security.Claims;
+using System.Collections;
 
 namespace DummyProjectBAL
 {
@@ -78,7 +81,7 @@ namespace DummyProjectBAL
         public string CreateToken(UserDetails user,Result result)
         {
             var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var expiry = Math.Round((DateTime.UtcNow.AddMinutes(2) - unixEpoch).TotalSeconds);
+            var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
             var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
 
             var payload = new Dictionary<string, object>()
@@ -179,6 +182,144 @@ namespace DummyProjectBAL
                 };
             }
         }
+
+        public Result RefreshToken(String oldtoken)
+        {
+            string firstname = "";
+            string lastname = "";
+            string emailid = "";
+            string roleid = "";
+            string userid = "";
+            string exp_str = "";
+            string token = "";
+            var jsonSerializer = new JavaScriptSerializer();
+            var payloadJson = JsonWebToken.Decode(oldtoken, ConfigurationManager.AppSettings.Get("JWTsecret"));
+            var payloadData = jsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson);
+            try
+            {
+
+
+                object exp;
+                if (payloadData != null && (payloadData.TryGetValue("exp", out exp)))
+                {
+                    var validTo = FromUnixTime(long.Parse(exp.ToString()));
+                    if (DateTime.Compare(validTo, DateTime.UtcNow) <= 0)
+                    {
+                        //return "";
+                        throw new Exception(
+                            string.Format("Token is expired. Expiration: '{0}'. Current: '{1}'", validTo, DateTime.UtcNow));
+                    }
+                }
+
+
+
+                var subject = new ClaimsIdentity("Federation", ClaimTypes.Name, ClaimTypes.Role);
+
+                var claims = new List<Claim>();
+
+                if (payloadData != null)
+                    foreach (var pair in payloadData)
+                    {
+                        var claimType = pair.Key;
+
+                        var source = pair.Value as ArrayList;
+
+                        if (source != null)
+                        {
+                            claims.AddRange(from object item in source
+                                            select new Claim(claimType, item.ToString(), ClaimValueTypes.String));
+
+                            continue;
+                        }
+
+                        switch (pair.Key)
+                        {
+                            case "firstname":
+                                firstname = pair.Value.ToString();
+                                break;
+                            case "lastname":
+                                lastname = pair.Value.ToString();
+                                break;
+                            case "emailid":
+                                emailid = pair.Value.ToString();
+                                break;
+                            case "roleid":
+                                roleid = pair.Value.ToString();
+                                break;
+                            case "userid":
+                                userid = pair.Value.ToString();
+                                break;
+                            case "exp":
+                                exp_str = pair.Value.ToString();
+                                break;
+                                //default:
+                                //     claims.Add(new Claim(claimType, pair.Value.ToString(), ClaimValueTypes.String));
+                                //     break;
+                        }
+                    }
+
+
+                #region Create Token region
+                var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
+                var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+
+                var payload = new Dictionary<string, object>()
+                         {
+                            { "firstname", firstname },
+                            { "lastname", lastname},
+                            { "userid", userid },
+                            { "roleid", roleid },
+                            { "emailid", emailid },
+                            { "iat", issuedAt},
+                            { "exp", exp_str}
+
+                         };
+                var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
+                 token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+                return new Result
+                {
+                    Status = Convert.ToString((int)HttpStatusCode.OK),
+                    errormsg = "",
+                    Results = new
+                    {
+                        UserID = userid,
+                        Role = roleid,
+
+                    },
+                    Token = token
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Result
+                {
+                    Status = Convert.ToString((int)HttpStatusCode.InternalServerError),
+                    errormsg = ex.Message,
+                    Results = new
+                    {
+                        
+
+                    },
+                    Token = token
+                };
+            }
+                    #endregion
+            
+        }
+
+        private DateTime FromUnixTime(long unixTime)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return epoch.AddSeconds(unixTime);
+        }
+
+        public int IsUserAuthorized(int APIID, int roleid)
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.IsUserAuthorized(APIID, roleid);
+        }
+
         //public Result GetRole()
         //{
         //    UserDAL userDAL = new UserDAL();

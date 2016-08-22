@@ -158,6 +158,35 @@ namespace DummyProjectDAL
         }
         #endregion
 
+        #region IsUserAuthorized
+        public int IsUserAuthorized(int APIID, int roleid)
+        {
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                using (SqlCommand sqlcmd = new SqlCommand())
+                {
+                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+                    DataSet ds = new DataSet();
+                    sqlcmd.CommandText = "Select status from RoleAPIMatrix where roleid=@roleid and apiid=@apiid";
+                    sqlcmd.CommandType = CommandType.Text;
+                    sqlcmd.Connection = conn;
+                    sqlcmd.Parameters.Add("@roleid", SqlDbType.NVarChar, 200).Value = roleid;
+                    sqlcmd.Parameters.Add("@apiid", SqlDbType.NVarChar, 200).Value = APIID;
+                    sqlad.Fill(ds);
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                        return Convert.ToInt32(ds.Tables[0].Rows[0]["status"]);
+
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+            }
+        }
+        #endregion
+
 
 
         #region all
