@@ -393,6 +393,7 @@ namespace DummyProjectDAL
                         objUser.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
                         objUser.firstname = ds.Tables[0].Rows[0]["firstname"].ToString();
                         objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
+                        objUser.RoleName = ds.Tables[0].Rows[0]["description"].ToString();
                         //}
                     }
                 }

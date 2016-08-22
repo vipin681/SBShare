@@ -22,7 +22,7 @@ namespace DummyProject.Controllers
     /// APIs for Crud operation on user and Login page
     /// </summary>
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
-     public class UserController : ApiController
+    public class UserController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         Exception e = new Exception();
@@ -110,10 +110,14 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid to search for specific user</param>
         /// <returns></returns>
         [HttpGet]
-        [Secure]
+         [Secure]
+        // [RoleBased(Roles= "ivddirector ")]
+   
         public HttpResponseMessage GetUserById(int ID)
         {
+            logger.Info("Info Started");
             logger.Debug("get all user by id started");
+            logger.Trace("Trace");
             HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
@@ -200,7 +204,9 @@ namespace DummyProject.Controllers
         /// <returns>A value</returns>
         [HttpPost]
         [AllowAnonymous]
-      //  [Secure]
+         [Secure]
+        //[CustomAuthorize(Roles = "ivddirector  ")]
+       // [CustomAuthorize(Roles = "Yahoo.com")]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
@@ -209,7 +215,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-           // Int64 userID = Int64.Parse(User.Identity.Name);
+            // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
 
             // user.InsertedBy = ID;
