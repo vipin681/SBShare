@@ -193,31 +193,31 @@ app.controller("DropdownCtrl", function ($scope, $http, $modal, $rootScope, $win
 
 
 
-        if (location.search.replace("?", '').split('=')[1] != undefined) {
-            $scope.UserDetail.ID = location.search.replace("?", '').replace("&v1", '').split('=')[1];
-            if ($scope.UserDetail.ID != undefined && $scope.UserDetail.ID != null) {
-                $http.get(VirtualDirectoryPath + 'api/User/GetUserDetailsByID?ID=' + $scope.UserDetail.ID + '').success(function (data) {
-                    $scope.Worker = true
-                    $scope.UserDetail.LastName = data.Results.LastName;
-                    $scope.UserDetail.UserName = data.Results.UserName;
-                    $scope.UserDetail.Password = data.Results.Password;
-                    $scope.UserDetail.Phone = data.Results.Phone;
-                    $scope.UserDetail.Email = data.Results.Email;
-                    $scope.UserDetail.RoleId = data.Results.role.RoleID;
-                    $scope.UserDetail.RoleName = data.Results.role.RoleName;
-                    $scope.UserDetail.WorkerID = data.Results.WorkerID;
-                    $scope.UserDetail.CountryName = data.Results.country.CountryName;
-                    $scope.UserDetail.CountryId = data.Results.country.CountryID;
+        //if (location.search.replace("?", '').split('=')[1] != undefined) {
+        //    $scope.UserDetail.ID = location.search.replace("?", '').replace("&v1", '').split('=')[1];
+        //    if ($scope.UserDetail.ID != undefined && $scope.UserDetail.ID != null) {
+        //        $http.get(VirtualDirectoryPath + 'api/User/GetUserDetailsByID?ID=' + $scope.UserDetail.ID + '').success(function (data) {
+        //            $scope.Worker = true
+        //            $scope.UserDetail.LastName = data.Results.LastName;
+        //            $scope.UserDetail.UserName = data.Results.UserName;
+        //            $scope.UserDetail.Password = data.Results.Password;
+        //            $scope.UserDetail.Phone = data.Results.Phone;
+        //            $scope.UserDetail.Email = data.Results.Email;
+        //            $scope.UserDetail.RoleId = data.Results.role.RoleID;
+        //            $scope.UserDetail.RoleName = data.Results.role.RoleName;
+        //            $scope.UserDetail.WorkerID = data.Results.WorkerID;
+        //            $scope.UserDetail.CountryName = data.Results.country.CountryName;
+        //            $scope.UserDetail.CountryId = data.Results.country.CountryID;
 
-                });
+        //        });
 
-            }
+        //    }
 
-        }
+        //}
 
-        else {
+        //else {
 
-        }
+        //}
 
         //$scope.searchData = function () {
 

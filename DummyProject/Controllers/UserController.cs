@@ -29,13 +29,16 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Secure]
         public HttpResponseMessage GetUserList()
         {
-            logger.Debug("get all users started");
+            logger.Info("get all users started");
             HttpResponseMessage response = new HttpResponseMessage(); 
             Result objResult = null;
+            logger.Debug("get all BAL started");
             UserBAL userBAL = new UserBAL();
             objResult = userBAL.GetUserList();
+            logger.Debug("get all BAL finished");
             try
             {
                 if (objResult != null)
@@ -73,7 +76,7 @@ namespace DummyProject.Controllers
         public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
             logger.Debug("Update  user started");
-            HttpResponseMessage response=new HttpResponseMessage(); ;
+            HttpResponseMessage response=new HttpResponseMessage(); 
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -84,10 +87,10 @@ namespace DummyProject.Controllers
                 response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
                 return response;
             }
-            catch(Exception )
+            catch(Exception ex )
             {
                 Exception e = new Exception();
-                logger.ErrorException("Data Empty", e);
+                logger.ErrorException("Data Empty", ex);
             }
 
             logger.Debug("update user finished");
