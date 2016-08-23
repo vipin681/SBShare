@@ -22,7 +22,7 @@ namespace DummyProject.Controllers
     /// APIs for Crud operation on user and Login page
     /// </summary>
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
-    public class UserController : ApiController
+     public class UserController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         Exception e = new Exception();
@@ -32,7 +32,7 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Secure]
+       // [Secure]
         public HttpResponseMessage GetUserList()
         {
             logger.Debug("get all users started");
@@ -110,14 +110,10 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid to search for specific user</param>
         /// <returns></returns>
         [HttpGet]
-         [Secure]
-        // [RoleBased(Roles= "ivddirector ")]
-   
+       // [Secure]
         public HttpResponseMessage GetUserById(int ID)
         {
-            logger.Info("Info Started");
             logger.Debug("get all user by id started");
-            logger.Trace("Trace");
             HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
@@ -203,8 +199,8 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPost]
-      
-        [Secure]
+        [AllowAnonymous]
+      //  [Secure]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
@@ -213,7 +209,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            // Int64 userID = Int64.Parse(User.Identity.Name);
+           // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
 
             // user.InsertedBy = ID;
@@ -274,7 +270,7 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPut]
-        [Secure]
+        //[Secure]
         public HttpResponseMessage EditUserDetails(UserDetails user)
         {
             logger.Debug("Edit user started");
@@ -374,6 +370,32 @@ namespace DummyProject.Controllers
         }
         #endregion
 
+        #region Get User Role
+        /// <summary>
+        /// Get Role List
+        /// </summary>
+        [HttpGet]
+        public HttpResponseMessage GetRole()
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            //  Int64 userID = Int64.Parse(User.Identity.Name);
+            UserBAL objUserBAL = new UserBAL();
+            objResult = objUserBAL.GetRole();
+            if (objResult != null)
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            }
+            return response;
+        }
+        #endregion
+
         #region all
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -423,25 +445,7 @@ namespace DummyProject.Controllers
 
 
 
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[HttpGet]
-        //public HttpResponseMessage GetRole()
-        //{
-        //    HttpResponseMessage response;
-        //    Result objResult = null;
-        //    //  Int64 userID = Int64.Parse(User.Identity.Name);
-        //    UserBAL objUserBAL = new UserBAL();
-        //    objResult = objUserBAL.GetRole();
-        //    if (objResult != null)
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        //    }
-        //    else
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-        //    }
-        //    return response;
-        //}
+        
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpGet]
