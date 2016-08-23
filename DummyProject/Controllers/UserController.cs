@@ -370,6 +370,32 @@ namespace DummyProject.Controllers
         }
         #endregion
 
+        #region Get User Role
+        /// <summary>
+        /// Get Role List
+        /// </summary>
+        [HttpGet]
+        public HttpResponseMessage GetRole()
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            //  Int64 userID = Int64.Parse(User.Identity.Name);
+            UserBAL objUserBAL = new UserBAL();
+            objResult = objUserBAL.GetRole();
+            if (objResult != null)
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            }
+            else
+            {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+            }
+            return response;
+        }
+        #endregion
+
         #region all
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -419,25 +445,7 @@ namespace DummyProject.Controllers
 
 
 
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[HttpGet]
-        //public HttpResponseMessage GetRole()
-        //{
-        //    HttpResponseMessage response;
-        //    Result objResult = null;
-        //    //  Int64 userID = Int64.Parse(User.Identity.Name);
-        //    UserBAL objUserBAL = new UserBAL();
-        //    objResult = objUserBAL.GetRole();
-        //    if (objResult != null)
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-        //    }
-        //    else
-        //    {
-        //        response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-        //    }
-        //    return response;
-        //}
+        
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpGet]
