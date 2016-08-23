@@ -90,6 +90,7 @@ namespace DummyProjectBAL
                 { "lastname", user.lastname },
                 { "userid", result.Results },
                 { "roleid", user.roleid },
+                {"description",user.RoleName },
                 { "emailid", user.emailaddress },
                 { "iat", issuedAt},
                 { "exp", expiry}
@@ -157,6 +158,7 @@ namespace DummyProjectBAL
                         {
                             UserID = objUser.userid,
                             Role = objUser.roleid,
+                            RoleName=objUser.RoleName
                             
                         },
                         Token = token
