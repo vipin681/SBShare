@@ -129,26 +129,26 @@ namespace DummyProjectBAL
             {
                 if (objUser.password == userPassword)
                 {
-                    #region Create Token region
-                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
-                    var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+                    //#region Create Token region
+                    //var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    //var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
+                    //var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
 
-                    var payload = new Dictionary<string, object>()
-                         {
-                            { "firstname", objUser.firstname },
-                            { "lastname", objUser.lastname }, 
-                            { "userid", objUser.userid },
-                            { "roleid", objUser.roleid },
-                            { "emailid", emailaddress },
-                            { "iat", issuedAt},
-                            { "exp", expiry}
+                    //var payload = new Dictionary<string, object>()
+                    //     {
+                    //        { "firstname", objUser.firstname },
+                    //        { "lastname", objUser.lastname }, 
+                    //        { "userid", objUser.userid },
+                    //        { "roleid", objUser.roleid },
+                    //        { "emailid", emailaddress },
+                    //        { "iat", issuedAt},
+                    //        { "exp", expiry}
 
-                         };
-                    var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
-                    string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+                    //     };
+                    //var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
+                    //string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
                     
-                    #endregion
+                    //#endregion
 
                     return new Result
                     {
@@ -161,7 +161,7 @@ namespace DummyProjectBAL
                             RoleName=objUser.RoleName
                             
                         },
-                        Token = token
+                        Token = ""
                     };
                 }
                 else
