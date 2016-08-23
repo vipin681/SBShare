@@ -314,12 +314,13 @@ namespace DummyProjectDAL
                 UserDetails user = new UserDetails();
                 string strQuery;
                 SqlCommand cmd;
+
                 strQuery = "Select roleid,description FROM security.Role WHERE status=1";
                 cmd = new SqlCommand(strQuery);
+                cmd.Connection = conn;
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
                
-                cmd.Connection = conn;
                 sqlad.Fill(ds);
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {

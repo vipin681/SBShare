@@ -384,10 +384,12 @@ namespace DummyProject.Controllers
             objResult = objUserBAL.GetRole();
             if (objResult != null)
             {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
             }
             else
             {
+                objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
                 response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
             return response;
