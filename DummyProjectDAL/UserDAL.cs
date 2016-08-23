@@ -306,6 +306,40 @@ namespace DummyProjectDAL
         }
         #endregion
 
+        #region GetRole
+        public Result GetRole()
+        {
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                UserDetails user = new UserDetails();
+                string strQuery;
+                SqlCommand cmd;
+                strQuery = "Select roleid,description FROM security.Role WHERE status=1";
+                cmd = new SqlCommand(strQuery);
+                SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
+                DataSet ds = new DataSet();
+               
+                cmd.Connection = conn;
+                sqlad.Fill(ds);
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    user = new UserDetails();
+
+                    return new Result
+                    {
+                      
+                        Results = ds.Tables[0],
+                    };
+                }
+                return new Result
+                {
+                    Results = null
+                };
+               
+            }
+        }
+        #endregion
+
         #region all
 
 
@@ -394,45 +428,7 @@ namespace DummyProjectDAL
                 }
             }
         }
-     
-        public Result GetRole()
-        {
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                using (SqlCommand sqlcmd = new SqlCommand())
-                {
-                    UserDetails user = new UserDetails();
-                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
-                    DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "usp_GetRole";
-                    sqlcmd.CommandType = CommandType.StoredProcedure;
-                    sqlcmd.Connection = conn;
-                    //sqlcmd.Parameters.Add("@Keyword", SqlDbType.NVarChar, 200).Value = keyword;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        user = new UserDetails();
-
-                        //user.Role = ds.Tables[0].Rows[0]["RoleName"].ToString();
-                        //user.RoleID =Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
-                        //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
-                        // user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
-                        //  user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
-                        return new Result
-                        {
-                            //Results = new
-                            //{
-                            Results = ds.Tables[0],
-                            // }
-                        };
-                    }
-                    return new Result
-                    {
-                        Results = null
-                    };
-                }
-            }
-        }
+        
         public Result GetCountryList()
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -524,8 +520,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
-
         public Result GetItemDetails()
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -556,8 +550,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
-
         //public Result GetMenuCRUDSelect(string menuID, string menuName)
         //{
         //    using (SqlConnection conn = DbHelper.CreateConnection())
@@ -658,7 +650,6 @@ namespace DummyProjectDAL
         //        }
         //    }
         //}
-
         public Result getMenubyUserRole(string UserRole)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -702,9 +693,6 @@ namespace DummyProjectDAL
                 }
             }
         }
-
-
-
         //public Result insertMenu(UserDetails user)
         //{
         //    using (SqlConnection conn = DbHelper.CreateConnection())

@@ -102,6 +102,14 @@ namespace DummyProjectBAL
         }
         #endregion
 
+        #region Get User Role List
+        public Result GetRole()
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetRole();
+        }
+        #endregion
+
         #region All
 
 
@@ -322,11 +330,7 @@ namespace DummyProjectBAL
             return userDAL.IsUserAuthorized(APIID, roleid);
         }
 
-        //public Result GetRole()
-        //{
-        //    UserDAL userDAL = new UserDAL();
-        //    return userDAL.GetRole();
-        //}
+        
         //public Result GetCountryList()
         //{
         //    UserDAL userDAL = new UserDAL();
