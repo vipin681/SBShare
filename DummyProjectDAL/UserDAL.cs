@@ -175,9 +175,40 @@ namespace DummyProjectDAL
         }
         #endregion
 
+        #region IsValidUser
+        public UserDetails IsValidUser(String emailaddress, String userPassword)
+        {
+            UserDetails objUser = null;
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                string strQuery;
+                SqlCommand cmd;
+                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword  ";
+                cmd = new SqlCommand(strQuery);
+                SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
+                DataSet ds = new DataSet();
+                cmd.Connection = conn;
+                cmd.Parameters.Add("@emailaddress", SqlDbType.NVarChar, 100).Value = emailaddress;
+                cmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
+                sqlad.Fill(ds);
 
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    objUser = new UserDetails();
+                    objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                    objUser.password = ds.Tables[0].Rows[0]["Password"].ToString();
+                    objUser.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
+                    objUser.firstname = ds.Tables[0].Rows[0]["firstname"].ToString();
+                    objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
 
-        #region all
+                }
+
+            }
+            return objUser;
+        }
+        #endregion
+
+        #region InsertUser
         public Result InsertUser(UserDetails user)
         {
             logger.Debug("Database Inserted");
@@ -223,6 +254,9 @@ namespace DummyProjectDAL
                 logger.Debug("Save Data");
             }
         }
+        #endregion
+
+        #region UpdateUser
         public Result UpdateUser(UserDetails user)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
@@ -259,17 +293,22 @@ namespace DummyProjectDAL
                 cmd.Parameters.Add("@SaltValue", SqlDbType.VarChar, 5000).Value = user.SaltValue;
 
                 cmd.ExecuteNonQuery();
-                    return new Result
-                    {
-                        // MessageId = Convert.ToInt32(sqlcmd.Parameters["@MessageID"].Value),
-                        //Status = Convert.ToBoolean(sqlcmd.Parameters["@Status"].Value),
+                return new Result
+                {
+                    // MessageId = Convert.ToInt32(sqlcmd.Parameters["@MessageID"].Value),
+                    //Status = Convert.ToBoolean(sqlcmd.Parameters["@Status"].Value),
 
-                        Results = (cmd.Parameters["@insertedSuccesfully"].Value == DBNull.Value ? 0 : (Int32)cmd.Parameters["@insertedSuccesfully"].Value)
+                    Results = (cmd.Parameters["@insertedSuccesfully"].Value == DBNull.Value ? 0 : (Int32)cmd.Parameters["@insertedSuccesfully"].Value)
 
-                    };
+                };
                 //}
             }
         }
+        #endregion
+
+        #region all
+
+
 
 
         //public Result GetUserDetailsBysearch(string searchstring)
@@ -355,36 +394,7 @@ namespace DummyProjectDAL
                 }
             }
         }
-        public UserDetails IsValidUser(String emailaddress, String userPassword)
-        {
-            UserDetails objUser = null;
-            using (SqlConnection conn = DbHelper.CreateConnection())
-            {
-                string strQuery;
-                SqlCommand cmd;
-                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword  ";
-                cmd = new SqlCommand(strQuery);
-                SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
-                DataSet ds = new DataSet();
-                cmd.Connection = conn;
-                cmd.Parameters.Add("@emailaddress", SqlDbType.NVarChar, 100).Value = emailaddress;
-                cmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
-                sqlad.Fill(ds);
-                  
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        objUser = new UserDetails();
-                        objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
-                        objUser.password = ds.Tables[0].Rows[0]["Password"].ToString();
-                        objUser.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
-                        objUser.firstname = ds.Tables[0].Rows[0]["firstname"].ToString();
-                        objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
-                       
-                    }
-                
-            }
-            return objUser;
-        }
+     
         public Result GetRole()
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
