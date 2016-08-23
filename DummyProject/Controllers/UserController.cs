@@ -134,7 +134,7 @@ namespace DummyProject.Controllers
             }
             catch (Exception ex)
             {
-                logger.ErrorException("Data Empty", e);
+                logger.ErrorException("Data Empty", ex);
 
             }
             logger.Debug("get all user by id finished");
