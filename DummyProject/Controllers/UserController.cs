@@ -110,7 +110,7 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid to search for specific user</param>
         /// <returns></returns>
         [HttpGet]
-        [Secure]
+       // [Secure]
         public HttpResponseMessage GetUserById(int ID)
         {
             logger.Debug("get all user by id started");
@@ -270,7 +270,7 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPut]
-        [Secure]
+        //[Secure]
         public HttpResponseMessage EditUserDetails(UserDetails user)
         {
             logger.Debug("Edit user started");
