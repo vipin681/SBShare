@@ -549,7 +549,74 @@ namespace DummyProjectDAL
                 }
             }
         }
+        public Result GetAuthorizeRole()
+        {
+            Result objResult = null;
+            using (SqlConnection conn = DbHelper.CreateConnection())
+            {
+                using (SqlCommand sqlcmd = new SqlCommand())
+                {
+                    UserDetails user = new UserDetails();
+                    SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+                    DataSet ds = new DataSet();
+                    sqlcmd.CommandText = "GetRole";
+                    sqlcmd.CommandType = CommandType.StoredProcedure;
+                    sqlcmd.Connection = conn;
+                    //sqlcmd.Parameters.Add("@Keyword", SqlDbType.NVarChar, 200).Value = keyword;
+                    sqlad.Fill(ds);
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                         objResult = new Result();
+                       // objUserToken = new UserToken();
+                        objResult.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
+                        objResult.description =ds.Tables[0].Rows[0]["description"].ToString();
+                    }
+                    return objResult;
+                    //if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    //{
+                    //    user = new UserDetails();
 
+                    //    //user.Role = ds.Tables[0].Rows[0]["RoleName"].ToString();
+                    //    //user.RoleID =Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
+                    //    //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+                    //    // user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+                    //    //  user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+                    //    return new Result
+                    //    {
+                    //        //Results = new
+                    //        //{
+                    //        Results = ds.Tables[0],
+                    //        // }
+                    //    };
+                    //}
+                    //return new Result
+                    //{
+                    //    Results = null
+                    //};
+                    //if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    //{
+                    //    user = new UserDetails();
+
+                    //    //user.Role = ds.Tables[0].Rows[0]["RoleName"].ToString();
+                    //    //user.RoleID =Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
+                    //    //user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+                    //    // user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+                    //    //  user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+                    //    //return new Result
+                    //    //{
+                    //    //    //Results = new
+                    //    //    //{
+                    //    //    Results = ds.Tables[0],
+                    //    //    // }
+                    //    //};
+                    //}
+                    //return new Result
+                    //{
+                    //    Results = null
+                    //};
+                }
+            }
+        }
 
         public Result GetItemDetails()
         {

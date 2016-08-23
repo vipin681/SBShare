@@ -140,6 +140,7 @@ namespace DummyProjectBAL
                             { "lastname", objUser.lastname }, 
                             { "userid", objUser.userid },
                             { "roleid", objUser.roleid },
+                             { "description",objUser.RoleName},
                             { "emailid", emailaddress },
                             { "iat", issuedAt},
                             { "exp", expiry}
@@ -342,6 +343,17 @@ namespace DummyProjectBAL
         {
             UserDAL objUserDAL = new UserDAL();
             return objUserDAL.GetUserDetailsByTokenID(tokenID);
+        }
+
+        //public UserToken GetAuthorizeRole()
+        //{
+        //    UserDAL objUserDAL = new UserDAL();
+        //    return objUserDAL.GetAuthorizeRole();
+        //}
+        public Result GetAuthorizeRole()
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetAuthorizeRole();
         }
 
         public Result GetItemDetails()

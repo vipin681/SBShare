@@ -203,10 +203,8 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPost]
-        [AllowAnonymous]
-         [Secure]
-        //[CustomAuthorize(Roles = "ivddirector  ")]
-       // [CustomAuthorize(Roles = "Yahoo.com")]
+      
+        [Secure]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
