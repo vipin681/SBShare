@@ -17,7 +17,7 @@ namespace DummyProjectDAL
     {
         Logger logger = LogManager.GetCurrentClassLogger();
         #region GetUser
-        public Result GetUserList()
+        public Result GetUserList(int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -29,6 +29,7 @@ namespace DummyProjectDAL
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
                 cmd.Connection = conn;
+                cmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                 sqlad.Fill(ds);
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
@@ -117,19 +118,20 @@ namespace DummyProjectDAL
         #endregion
 
         #region Get User Details ByID
-        public Result GetUserDetailsByID(Int32 ID)
+        public Result GetUserDetailsByID(Int32 ID,int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 UserDetails user = null;
                 string strQuery;
                 SqlCommand cmd;
-                strQuery = "Select  userid, firstname as fName,firstname + ' ' + lastname as Fullname, password,lastname as lName,emailaddress as emailId,workerid ,[security].[Users].status,[security].[Role].code as appName,[security].[Role].description as appRole FROM [security].[Users] INNER join [security].[Role]  on  [Users].roleid =[security].[Role].roleid  WHERE [security].[Users].userid = @userid  ";
+                strQuery = "Select  userid, firstname as fName,firstname + ' ' + lastname as Fullname, password,lastname as lName,emailaddress as emailId,workerid ,[security].[Users].status,[security].[Role].code as appName,[security].[Role].description as appRole FROM [security].[Users] INNER join [security].[Role]  on  [Users].roleid =[security].[Role].roleid  WHERE [security].[Users].userid = @userid AND security.Users.clientid=@clientid ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
                 cmd.Connection = conn;
                 cmd.Parameters.Add("@userid", SqlDbType.Int).Value = ID;
+                cmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                 sqlad.Fill(ds);
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
@@ -151,7 +153,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region IsUserAuthorized
-        public int IsUserAuthorized(int APIID, int roleid)
+        public int IsUserAuthorized(int APIID, int roleid,int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -159,11 +161,12 @@ namespace DummyProjectDAL
                 {
                     SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
                     DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "Select status from RoleAPIMatrix where roleid=@roleid and apiid=@apiid";
+                    sqlcmd.CommandText = "Select status from RoleAPIMatrix where roleid=@roleid and apiid=@apiid AND clientid=@clientid";
                     sqlcmd.CommandType = CommandType.Text;
                     sqlcmd.Connection = conn;
-                    sqlcmd.Parameters.Add("@roleid", SqlDbType.NVarChar, 200).Value = roleid;
-                    sqlcmd.Parameters.Add("@apiid", SqlDbType.NVarChar, 200).Value = APIID;
+                    sqlcmd.Parameters.Add("@roleid", SqlDbType.Int).Value = roleid;
+                    sqlcmd.Parameters.Add("@apiid", SqlDbType.Int).Value = APIID;
+                    sqlcmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                     sqlad.Fill(ds);
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
@@ -180,14 +183,14 @@ namespace DummyProjectDAL
         #endregion
 
         #region IsValidUser
-        public UserDetails IsValidUser(String emailaddress, String userPassword ,int clientid)
+        public UserDetails IsValidUser(String emailaddress, String userPassword, int clientid)
         {
             UserDetails objUser = null;
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 string strQuery;
                 SqlCommand cmd;
-                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword and u.clientid=@clientid  ";
+                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description,ISNULL(FirstTimeLogin_YN,0) as FirstTimeLogin_YN,ISNULL(themeid,0) as themeid  FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword and u.clientid=@clientid  ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
@@ -199,17 +202,35 @@ namespace DummyProjectDAL
 
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
+
                     objUser = new UserDetails();
                     objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
                     objUser.password = ds.Tables[0].Rows[0]["Password"].ToString();
                     objUser.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
                     objUser.firstname = ds.Tables[0].Rows[0]["firstname"].ToString();
                     objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
+                    objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                    objUser.themeid = Convert.ToInt32(ds.Tables[0].Rows[0]["themeid"]);
+                    objUser.FirstTimeLogin_YN = Convert.ToBoolean(ds.Tables[0].Rows[0]["FirstTimeLogin_YN"]);
+                    if (objUser.FirstTimeLogin_YN == false)
+                    {
+
+                        #region Update firstLogin time and flag
+                        string strQuery1;
+                        SqlCommand cmd1;
+                        strQuery1 = "update [security].[Users] set FirstTimeLogin_YN=@FirstTimeLogin_YN ,firstTimeLogin=getdate() where userid=@userid";
+                        cmd1 = new SqlCommand(strQuery1);
+                        cmd1.Connection = conn;
+                        cmd1.Parameters.Add("@userid", SqlDbType.Int).Value = objUser.userid;
+                        cmd1.Parameters.Add("@FirstTimeLogin_YN", SqlDbType.Bit).Value = true;
+                        cmd1.ExecuteNonQuery();
+                        #endregion
+
+                    }
 
                 }
-
+                return objUser;
             }
-            return objUser;
         }
         #endregion
 
@@ -343,6 +364,36 @@ namespace DummyProjectDAL
                     Results = null
                 };
 
+            }
+        }
+        #endregion
+
+        #region ChangeTheme
+        public Result ChangeTheme(int themeid, int userid)
+        {
+            try
+            {
+                using (SqlConnection conn = DbHelper.CreateConnection())
+                {
+
+                    string strQuery;
+                    SqlCommand cmd;
+
+                    strQuery = "UPDATE security.Users SET themeid=@paramthemeid   WHERE userid = @paramuserid ";
+                    cmd = new SqlCommand(strQuery);
+                    cmd.Connection = conn;
+                    cmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userid;
+                    cmd.Parameters.Add("@paramthemeid", SqlDbType.Int).Value = themeid;
+                    cmd.ExecuteNonQuery();
+                    return new Result
+                    {
+                        Results = 1
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
         #endregion

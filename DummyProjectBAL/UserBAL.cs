@@ -19,10 +19,10 @@ namespace DummyProjectBAL
     {
         Logger logger = LogManager.GetCurrentClassLogger();
         # region GetUser
-        public Result GetUserList()
+        public Result GetUserList(int clientid)
         {
             UserDAL userDAL = new UserDAL();
-            return userDAL.GetUserList();
+            return userDAL.GetUserList(clientid);
         }
         #endregion
 
@@ -80,10 +80,10 @@ namespace DummyProjectBAL
         #endregion
 
         # region GetUserDetailsByID
-        public Result GetUserDetailsByID(Int32 ID)
+        public Result GetUserDetailsByID(Int32 ID,int clientid)
         {
             UserDAL userDAL = new UserDAL();
-            return userDAL.GetUserDetailsByID(ID);
+            return userDAL.GetUserDetailsByID(ID,clientid);
         }
         #endregion
 
@@ -160,6 +160,7 @@ namespace DummyProjectBAL
                             { "userid", objUser.userid },
                             { "roleid", objUser.roleid },
                             { "emailid", emailaddress },
+                            { "clientid", clientid },
                             { "iat", issuedAt},
                             { "exp", expiry}
 
@@ -336,10 +337,10 @@ namespace DummyProjectBAL
             return epoch.AddSeconds(unixTime);
         }
 
-        public int IsUserAuthorized(int APIID, int roleid)
+        public int IsUserAuthorized(int APIID, int roleid,int clientid)
         {
             UserDAL userDAL = new UserDAL();
-            return userDAL.IsUserAuthorized(APIID, roleid);
+            return userDAL.IsUserAuthorized(APIID, roleid,clientid);
         }
 
         
