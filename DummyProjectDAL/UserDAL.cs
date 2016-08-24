@@ -348,6 +348,36 @@ namespace DummyProjectDAL
         }
         #endregion
 
+        #region ChangeTheme
+        public Result ChangeTheme(int themeid, int userid)
+        {
+            try
+            {
+                using (SqlConnection conn = DbHelper.CreateConnection())
+                {
+
+                    string strQuery;
+                    SqlCommand cmd;
+
+                    strQuery = "UPDATE security.Users SET themeid=@paramthemeid   WHERE userid = @paramuserid ";
+                    cmd = new SqlCommand(strQuery);
+                    cmd.Connection = conn;
+                    cmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userid;
+                    cmd.Parameters.Add("@paramthemeid", SqlDbType.Int).Value = themeid;
+                    cmd.ExecuteNonQuery();
+                    return new Result
+                    {
+                        Results = 1
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
         #region all
 
 
