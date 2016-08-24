@@ -17,7 +17,7 @@ namespace DummyProjectDAL
     {
         Logger logger = LogManager.GetCurrentClassLogger();
         #region GetUser
-        public Result GetUserList()
+        public Result GetUserList(int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -29,6 +29,7 @@ namespace DummyProjectDAL
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
                 cmd.Connection = conn;
+                cmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                 sqlad.Fill(ds);
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
@@ -117,19 +118,20 @@ namespace DummyProjectDAL
         #endregion
 
         #region Get User Details ByID
-        public Result GetUserDetailsByID(Int32 ID)
+        public Result GetUserDetailsByID(Int32 ID,int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 UserDetails user = null;
                 string strQuery;
                 SqlCommand cmd;
-                strQuery = "Select  userid, firstname as fName,firstname + ' ' + lastname as Fullname, password,lastname as lName,emailaddress as emailId,workerid ,[security].[Users].status,[security].[Role].code as appName,[security].[Role].description as appRole FROM [security].[Users] INNER join [security].[Role]  on  [Users].roleid =[security].[Role].roleid  WHERE [security].[Users].userid = @userid  ";
+                strQuery = "Select  userid, firstname as fName,firstname + ' ' + lastname as Fullname, password,lastname as lName,emailaddress as emailId,workerid ,[security].[Users].status,[security].[Role].code as appName,[security].[Role].description as appRole FROM [security].[Users] INNER join [security].[Role]  on  [Users].roleid =[security].[Role].roleid  WHERE [security].[Users].userid = @userid AND security.Users.clientid=@clientid ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
                 cmd.Connection = conn;
                 cmd.Parameters.Add("@userid", SqlDbType.Int).Value = ID;
+                cmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                 sqlad.Fill(ds);
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
@@ -151,7 +153,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region IsUserAuthorized
-        public int IsUserAuthorized(int APIID, int roleid)
+        public int IsUserAuthorized(int APIID, int roleid,int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -159,11 +161,12 @@ namespace DummyProjectDAL
                 {
                     SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
                     DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "Select status from RoleAPIMatrix where roleid=@roleid and apiid=@apiid";
+                    sqlcmd.CommandText = "Select status from RoleAPIMatrix where roleid=@roleid and apiid=@apiid AND clientid=@clientid";
                     sqlcmd.CommandType = CommandType.Text;
                     sqlcmd.Connection = conn;
-                    sqlcmd.Parameters.Add("@roleid", SqlDbType.NVarChar, 200).Value = roleid;
-                    sqlcmd.Parameters.Add("@apiid", SqlDbType.NVarChar, 200).Value = APIID;
+                    sqlcmd.Parameters.Add("@roleid", SqlDbType.Int).Value = roleid;
+                    sqlcmd.Parameters.Add("@apiid", SqlDbType.Int).Value = APIID;
+                    sqlcmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                     sqlad.Fill(ds);
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {

@@ -33,7 +33,7 @@ namespace DummyProject.Controllers
         /// <returns></returns>
         [HttpGet]
         [Secure]
-        public HttpResponseMessage GetUserList()
+        public HttpResponseMessage GetUserList(int clientid)
         {
 
             var re = Request;
@@ -50,7 +50,7 @@ namespace DummyProject.Controllers
             HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserList();
+            objResult = userBAL.GetUserList(clientid);
             try
             {
                 if (objResult != null)
@@ -128,13 +128,13 @@ namespace DummyProject.Controllers
         /// <returns></returns>
         [HttpGet]
         [Secure]
-        public HttpResponseMessage GetUserById(int ID)
+        public HttpResponseMessage GetUserById(int ID,int clientid)
         {
             logger.Debug("get all user by id started");
             HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserDetailsByID(ID);
+            objResult = userBAL.GetUserDetailsByID(ID,clientid);
             try
             {
                 if (objResult != null)
@@ -455,12 +455,12 @@ namespace DummyProject.Controllers
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
-        public HttpResponseMessage GetUserDetailsByID1(int ID)
+        public HttpResponseMessage GetUserDetailsByID1(int ID,int clientid)
         {
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserDetailsByID(ID);
+            objResult = userBAL.GetUserDetailsByID(ID,clientid);
             if (objResult != null)
             {
                 objResult.Status = Convert.ToString((int)HttpStatusCode.OK);

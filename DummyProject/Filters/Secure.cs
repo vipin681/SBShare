@@ -49,16 +49,17 @@ namespace DummyProject.Filters
                 //var secret = ConfigurationManager.AppSettings.Get("jwtKey");
                 var secret = ConfigurationManager.AppSettings.Get("JWTsecret");
                 int Roleid = 0;
+                int clientid = 0;
                 Thread.CurrentPrincipal = ValidateToken(
                     token,
                     secret,
-                    true,out  Roleid
+                    true,out  Roleid,out clientid
                     );
 
                 var apiname = actionContext.ControllerContext.RouteData.Values["action"];
                 var APIID = (int)((APIName)Enum.Parse(typeof(APIName), Convert.ToString(apiname)));
                 UserBAL objUserBLL = new UserBAL();
-                int status = objUserBLL.IsUserAuthorized(Convert.ToInt32(APIID), Roleid);
+                int status = objUserBLL.IsUserAuthorized(Convert.ToInt32(APIID), Roleid,clientid);
                 if (status == 0)
                 {
                     Result outResult = new Result
@@ -99,9 +100,10 @@ namespace DummyProject.Filters
      
         }
 
-        private static ClaimsPrincipal ValidateToken(string token, string secret, bool checkExpiration,out int roleid)
+        private static ClaimsPrincipal ValidateToken(string token, string secret, bool checkExpiration,out int roleid, out int clientid)
         {
             int roleid1 =0;
+            int clientid1 = 0;
             var jsonSerializer = new JavaScriptSerializer();
             var payloadJson = JsonWebToken.Decode(token, secret);
             var payloadData = jsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson);
@@ -152,7 +154,7 @@ namespace DummyProject.Filters
                             break;
                         case "roleid":
                             roleid1 = Convert.ToInt32(pair.Value);
-                            claims.Add(new Claim(ClaimTypes.Role, pair.Value.ToString(), ClaimValueTypes.String));
+                            claims.Add(new Claim(ClaimTypes.Role, pair.Value.ToString(), ClaimValueTypes.Integer));
                             break;
                         case "userid":
                             claims.Add(new Claim(ClaimTypes.UserData, pair.Value.ToString(), ClaimValueTypes.Integer));
@@ -160,14 +162,19 @@ namespace DummyProject.Filters
                         case "exp":
                             claims.Add(new Claim(ClaimTypes.Expiration, pair.Value.ToString(), ClaimValueTypes.String));
                             break;
-                        //default:
-                       //     claims.Add(new Claim(claimType, pair.Value.ToString(), ClaimValueTypes.String));
-                       //     break;
+                        case "clientid":
+                            clientid1 = Convert.ToInt32(pair.Value);
+                            claims.Add(new Claim(ClaimTypes.GroupSid, pair.Value.ToString(), ClaimValueTypes.Integer));
+                            break;
+                            //default:
+                            //     claims.Add(new Claim(claimType, pair.Value.ToString(), ClaimValueTypes.String));
+                            //     break;
                     }
                 }
 
             subject.AddClaims(claims);
             roleid = roleid1;
+            clientid = clientid1;
             return new ClaimsPrincipal(subject);
         }
 
