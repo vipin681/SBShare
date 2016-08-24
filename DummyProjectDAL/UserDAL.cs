@@ -206,10 +206,25 @@ namespace DummyProjectDAL
                     objUser.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
                     objUser.firstname = ds.Tables[0].Rows[0]["firstname"].ToString();
                     objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
+                    objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                    objUser.themeid = Convert.ToInt32(ds.Tables[0].Rows[0]["themeid"]);
+                    if (objUser.FirstTimeLogin_YN == false)
+                    {
+
+                        #region Update firstLogin time and flag
+                        string strQuery1;
+                        SqlCommand cmd1;
+                        strQuery1 = "update [security].[Users] set FirstTimeLogin_YN=@FirstTimeLogin_YN ,firstTimeLogin=getdate() where userid=@userid";
+                        cmd1 = new SqlCommand(strQuery1);
+                        cmd1.Connection = conn;
+                        cmd1.Parameters.Add("@userid", SqlDbType.Int).Value = objUser.userid;
+                        cmd1.Parameters.Add("@FirstTimeLogin_YN", SqlDbType.Bit).Value = true;
+                        cmd1.ExecuteNonQuery();
+                        #endregion
+
+                    }
 
                 }
-
-            }
             return objUser;
         }
         #endregion
