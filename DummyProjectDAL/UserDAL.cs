@@ -183,7 +183,7 @@ namespace DummyProjectDAL
             {
                 string strQuery;
                 SqlCommand cmd;
-                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description,ISNULL(FirstTimeLogin_YN,0) as FirstTimeLogin_YN,themeid FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword  ";
+                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description,ISNULL(FirstTimeLogin_YN,0) as FirstTimeLogin_YN,ISNULL(themeid,0) as themeid FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword  ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
