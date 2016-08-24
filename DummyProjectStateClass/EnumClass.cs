@@ -35,6 +35,10 @@ namespace DummyProjectStateClass
 
             [Display(Name = "RefreshToken")]
             RefreshToken = 8,
+
+            [Display(Name = "ChangeTheme")]
+            ChangeTheme = 9,
+            
         };
 
         public static T GetValueFromDescription<T>(string description)

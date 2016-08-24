@@ -157,10 +157,6 @@ namespace DummyProject.Filters
                             claims.Add(new Claim(ClaimTypes.UserData, pair.Value.ToString(), ClaimValueTypes.Integer));
                             break;
                         case "exp":
-                            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                            var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
-                            var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
-
                             claims.Add(new Claim(ClaimTypes.Expiration, pair.Value.ToString(), ClaimValueTypes.String));
                             break;
                         //default:

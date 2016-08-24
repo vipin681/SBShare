@@ -183,7 +183,7 @@ namespace DummyProjectDAL
             {
                 string strQuery;
                 SqlCommand cmd;
-                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword  ";
+                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description,ISNULL(FirstTimeLogin_YN,0) as FirstTimeLogin_YN,themeid FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword  ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
@@ -200,12 +200,33 @@ namespace DummyProjectDAL
                     objUser.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
                     objUser.firstname = ds.Tables[0].Rows[0]["firstname"].ToString();
                     objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
+                    objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
+                    objUser.themeid = Convert.ToInt32(ds.Tables[0].Rows[0]["themeid"]);
+                    if (objUser.FirstTimeLogin_YN == false)
+                    {
+                        
+                        #region Update firstLogin time and flag
+                        string strQuery1;
+                        SqlCommand cmd1;
+                        strQuery1 = "update [security].[Users] set FirstTimeLogin_YN=@FirstTimeLogin_YN ,firstTimeLogin=getdate() where userid=@userid";
+                        cmd1 = new SqlCommand(strQuery1);
+                        cmd1.Connection = conn;
+                        cmd1.Parameters.Add("@userid", SqlDbType.Int).Value = objUser.userid;
+                        cmd1.Parameters.Add("@FirstTimeLogin_YN", SqlDbType.Bit).Value = true;
+                        cmd1.ExecuteNonQuery();
+                        #endregion
+
+                    }
 
                 }
 
             }
             return objUser;
         }
+
+
+
+
         #endregion
 
         #region InsertUser
@@ -337,6 +358,36 @@ namespace DummyProjectDAL
                     Results = null
                 };
                
+            }
+        }
+        #endregion
+
+        #region ChangeTheme
+        public Result ChangeTheme(int themeid, int userid)
+        {
+            try
+            {
+                using (SqlConnection conn = DbHelper.CreateConnection())
+                {
+
+                    string strQuery;
+                    SqlCommand cmd;
+
+                    strQuery = "UPDATE security.Users SET themeid=@paramthemeid   WHERE userid = @paramuserid ";
+                    cmd = new SqlCommand(strQuery);
+                    cmd.Connection = conn;
+                    cmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userid;
+                    cmd.Parameters.Add("@paramthemeid", SqlDbType.Int).Value = themeid;
+                    cmd.ExecuteNonQuery();
+                    return new Result
+                    {
+                        Results = 1
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
         #endregion
