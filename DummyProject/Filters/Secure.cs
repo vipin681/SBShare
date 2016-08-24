@@ -21,6 +21,7 @@ namespace DummyProject.Filters
     public class Secure : AuthorizationFilterAttribute
     {
         public override void OnAuthorization(HttpActionContext actionContext)
+
         {
 
             //HttpResponseMessage errorResponse = null;

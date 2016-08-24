@@ -688,46 +688,71 @@ namespace DummyProjectDAL
         //        }
         //    }
         //}
-        public Result getMenubyUserRole(string UserRole)
+        public Role GetAuthorizeRole()
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 UserDetails user = null;
+                Role role = null;
+                Result result = null;
                 using (SqlCommand sqlcmd = new SqlCommand())
                 {
                     SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
                     DataSet ds = new DataSet();
-                    sqlcmd.CommandText = "USP_MenubyUserRole_Select";
+                    sqlcmd.CommandText = "GetRole";
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Connection = conn;
-                    sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = UserRole;
+                  //  sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = UserRole;
                     // sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = menuName;
                     sqlad.Fill(ds);
+
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
+                        role = new Role();
                         user = new UserDetails();
-                        user.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
-                        user.lastname = ds.Tables[0].Rows[0]["LastName"].ToString();
-                        user.emailaddress = ds.Tables[0].Rows[0]["emailaddress"].ToString();
-                        user.password = ds.Tables[0].Rows[0]["Password"].ToString();
-                        //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
-                        //if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
-                        //    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
-                        //if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
-                        //  user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+                        role.description= ds.Tables[0].Rows[0]["description"].ToString();
+                        role.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
 
-                        user.workerid = ds.Tables[0].Rows[0]["workerid"].ToString();
                         //return new Result
                         //{
-                        //    Results = user
+                        //    Results = new
+                        //    {
+                        //        Data = ds.Tables[0],
+                        //    }
                         //};
                     }
-                    return new Result
-                    {
-                        // Status = false,
-                        // MessageId = 1,
-                        // Results = null
-                    };
+                    //return new Result
+                    //{
+                    //    Results = null
+                    //};
+
+                    //if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    //{
+                    //    result = new Result();
+                    //    user = new UserDetails();
+                    //    result.Status =ds.Tables[0].Rows[0]["status"].ToString();
+                    //    user.description = ds.Tables[0].Rows[0]["description"].ToString();
+                    //    //user.emailaddress = ds.Tables[0].Rows[0]["emailaddress"].ToString();
+                    //    //user.password = ds.Tables[0].Rows[0]["Password"].ToString();
+                    //    //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
+                    //    //if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
+                    //    //    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
+                    //    //if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
+                    //    //  user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+
+                    //    //user.workerid = ds.Tables[0].Rows[0]["workerid"].ToString();
+                    //    //return new Result
+                    //    //{
+                    //    //    Results = user
+                    //    //};
+                    //}
+                    //return new Result
+                    //{
+                    //    // Status = false,
+                    //    // MessageId = 1,
+                    //    // Results = null
+                    //};
+                    return role;
                 }
             }
         }
@@ -761,6 +786,11 @@ namespace DummyProjectDAL
         //    }
         //}
         #endregion
+
+
+
+
+
 
     }
 }

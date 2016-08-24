@@ -15,5 +15,11 @@ namespace DummyProjectStateClass
         public int MessageId { get; set; }
         public dynamic Results { get; set; }
         public string token { get; set; }
+        public string UserID { get; set;}
+        public string RoleID { get; set; }
+        public int roleid { get; set; }
+        public bool status { get; set; }
+        public String description { get; set; }
+
     }
 }
