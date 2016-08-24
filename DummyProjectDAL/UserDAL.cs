@@ -27,24 +27,24 @@ namespace DummyProjectDAL
                 strQuery = "Select  userid, firstname as fName,firstname + ' ' + lastname as Fullname, password,lastname as lName,emailaddress as emailId,workerid ,[security].[Users].status,[security].[Role].code as appName,[security].[Role].description as appRole FROM [security].[Users] INNER join [security].[Role]  on  [Users].roleid =[security].[Role].roleid ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
-                    DataSet ds = new DataSet();
-                    cmd.Connection = conn;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                        user = new UserDetails();
-                        
-                        return new Result
-                        {
-                            Results = ds.Tables[0],
-                        };
-                    }
+                DataSet ds = new DataSet();
+                cmd.Connection = conn;
+                sqlad.Fill(ds);
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    user = new UserDetails();
+
                     return new Result
                     {
-                        errormsg = "Data Not found",
-                        Status = Convert.ToString((int)HttpStatusCode.NotFound),
-                        Results = null
+                        Results = ds.Tables[0],
                     };
+                }
+                return new Result
+                {
+                    errormsg = "Data Not found",
+                    Status = Convert.ToString((int)HttpStatusCode.NotFound),
+                    Results = null
+                };
             }
         }
         #endregion
@@ -98,13 +98,17 @@ namespace DummyProjectDAL
                     cmd.Parameters.Add("@paramnewPassword", SqlDbType.VarChar, 150).Value = CommonFunctions.MD5Encryption(userPassword.Password);
                     cmd.Parameters.Add("@parammodifiedby", SqlDbType.Int).Value = userPassword.modifiedby;
                     cmd.Parameters.Add("@parammodifieddate", SqlDbType.DateTime).Value = userPassword.modifieddate;
-                    cmd.ExecuteNonQuery();
+                    int flag = cmd.ExecuteNonQuery();
                     return new Result
                     {
-                        Results = (cmd.Parameters["@paramuserid"].Value == DBNull.Value ? 0 : (Int64)cmd.Parameters["@paramuserid"].Value)
+                        Results = flag
                     };
+
                 }
+
             }
+
+
             catch (Exception ex)
             {
                 throw ex;
@@ -120,27 +124,27 @@ namespace DummyProjectDAL
                 UserDetails user = null;
                 string strQuery;
                 SqlCommand cmd;
-                strQuery= "Select  userid, firstname as fName,firstname + ' ' + lastname as Fullname, password,lastname as lName,emailaddress as emailId,workerid ,[security].[Users].status,[security].[Role].code as appName,[security].[Role].description as appRole FROM [security].[Users] INNER join [security].[Role]  on  [Users].roleid =[security].[Role].roleid  WHERE [security].[Users].userid = @userid  ";
+                strQuery = "Select  userid, firstname as fName,firstname + ' ' + lastname as Fullname, password,lastname as lName,emailaddress as emailId,workerid ,[security].[Users].status,[security].[Role].code as appName,[security].[Role].description as appRole FROM [security].[Users] INNER join [security].[Role]  on  [Users].roleid =[security].[Role].roleid  WHERE [security].[Users].userid = @userid  ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
-                    DataSet ds = new DataSet();
-                    cmd.Connection = conn;
-                    cmd.Parameters.Add("@userid", SqlDbType.Int).Value = ID;
-                    sqlad.Fill(ds);
-                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                    {
-                      
-                        return new Result
-                        {
-                            Results = ds.Tables[0],
-                        };
-                    }
+                DataSet ds = new DataSet();
+                cmd.Connection = conn;
+                cmd.Parameters.Add("@userid", SqlDbType.Int).Value = ID;
+                sqlad.Fill(ds);
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+
                     return new Result
                     {
-                        errormsg = "Data Not found",
-                        Status = Convert.ToString((int)HttpStatusCode.NotFound),
-                        Results = null
+                        Results = ds.Tables[0],
                     };
+                }
+                return new Result
+                {
+                    errormsg = "Data Not found",
+                    Status = Convert.ToString((int)HttpStatusCode.NotFound),
+                    Results = null
+                };
                 //}
             }
         }
@@ -176,20 +180,21 @@ namespace DummyProjectDAL
         #endregion
 
         #region IsValidUser
-        public UserDetails IsValidUser(String emailaddress, String userPassword)
+        public UserDetails IsValidUser(String emailaddress, String userPassword ,int clientid)
         {
             UserDetails objUser = null;
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 string strQuery;
                 SqlCommand cmd;
-                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword  ";
+                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword and u.clientid=@clientid  ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
                 cmd.Connection = conn;
                 cmd.Parameters.Add("@emailaddress", SqlDbType.NVarChar, 100).Value = emailaddress;
                 cmd.Parameters.Add("@userPassword", SqlDbType.NVarChar, 100).Value = userPassword;
+                cmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                 sqlad.Fill(ds);
 
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
@@ -245,11 +250,12 @@ namespace DummyProjectDAL
                 cmd.Parameters.Add("@firstTimeLogin", SqlDbType.DateTime).Value = user.firstTimeLogin;
                 cmd.Parameters.Add("@createdby", SqlDbType.Int).Value = user.createdby;
 
-                cmd.ExecuteNonQuery();
+             int flag=   cmd.ExecuteNonQuery();
                 return new Result
                 {
 
-                    Results = (cmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int32)cmd.Parameters["@UserID"].Value)
+                    Results = flag
+                    //(cmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int32)cmd.Parameters["@UserID"].Value)
                 };
                 logger.Debug("Save Data");
             }
@@ -320,7 +326,7 @@ namespace DummyProjectDAL
                 cmd.Connection = conn;
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-               
+
                 sqlad.Fill(ds);
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
@@ -328,7 +334,7 @@ namespace DummyProjectDAL
 
                     return new Result
                     {
-                      
+
                         Results = ds.Tables[0],
                     };
                 }
@@ -336,7 +342,7 @@ namespace DummyProjectDAL
                 {
                     Results = null
                 };
-               
+
             }
         }
         #endregion
@@ -429,7 +435,7 @@ namespace DummyProjectDAL
                 }
             }
         }
-        
+
         public Result GetCountryList()
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
