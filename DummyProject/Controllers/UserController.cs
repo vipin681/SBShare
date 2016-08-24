@@ -32,7 +32,7 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Secure]
+       // [Secure]
         public HttpResponseMessage GetUserList()
         {
             logger.Debug("get all users started");
@@ -74,7 +74,7 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
         /// <returns></returns>
         [HttpPost]
-        [Secure]
+       // [Secure]
         public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
             logger.Info("Started");
@@ -88,7 +88,14 @@ namespace DummyProject.Controllers
             {
                 logger.Debug("BLL started");
                 objResult = userBLL.UpdateUserPassword(userPassword);
-                response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
+                if (objResult.Results == 1)
+                {
+                    response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.BadRequest, "Something went wrong");
+                }
                 return response;
             }
             catch (Exception ex)
@@ -134,7 +141,7 @@ namespace DummyProject.Controllers
             }
             catch (Exception ex)
             {
-                logger.ErrorException("Data Empty", e);
+                logger.ErrorException("Data Empty", ex);
 
             }
             logger.Debug("get all user by id finished");
@@ -326,12 +333,12 @@ namespace DummyProject.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public HttpResponseMessage CheckLogin(string emailaddress, string Password)
+        public HttpResponseMessage CheckLogin(string emailaddress, string Password,int clientid)
         {
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
-            objResult = objUserBLL.IsValidUser(emailaddress, Password);
+            objResult = objUserBLL.IsValidUser(emailaddress, Password,clientid);
             if (objResult != null)
             {
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);

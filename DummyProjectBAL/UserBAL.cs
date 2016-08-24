@@ -44,6 +44,17 @@ namespace DummyProjectBAL
         }
         #endregion
 
+        #region ChangeTheme
+        public Result ChangeTheme(int themeid, int userid)
+        {
+            UserDAL userDAL = new UserDAL();
+            Result result = userDAL.ChangeTheme(themeid,userid);
+            return result;
+
+        }
+        #endregion
+        
+
         #region Insert\Update user
 
         public Result InsertUser(UserDetails user)
@@ -53,7 +64,7 @@ namespace DummyProjectBAL
             logger.Debug("DAl Started");
             user.password = GetHashedValue(user.password, user.SaltValue);
             Result result = userDAL.InsertUser(user);
-            result.Token = CreateToken(user, result);
+         //   result.Token = CreateToken(user, result);
             return result;
         }
         public Result UpdateUser(UserDetails user)
@@ -127,36 +138,36 @@ namespace DummyProjectBAL
             return userDAL.GetUserListByID(keyword);
         }
 
-        public Result IsValidUser(String emailaddress, String userPassword)
+        public Result IsValidUser(String emailaddress, String userPassword,int clientid)
         {
             UserDAL userDAL = new UserDAL();
 
             UserDetails objUser = null;
-            objUser = userDAL.IsValidUser(emailaddress, userPassword);
+            objUser = userDAL.IsValidUser(emailaddress, userPassword,clientid);
             if (objUser != null)
             {
                 if (objUser.password == userPassword)
                 {
-                    //#region Create Token region
-                    //var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    //var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
-                    //var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+                    #region Create Token region
+                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var expiry = Math.Round((DateTime.UtcNow.AddMinutes(5) - unixEpoch).TotalSeconds);
+                    var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
 
-                    //var payload = new Dictionary<string, object>()
-                    //     {
-                    //        { "firstname", objUser.firstname },
-                    //        { "lastname", objUser.lastname }, 
-                    //        { "userid", objUser.userid },
-                    //        { "roleid", objUser.roleid },
-                    //        { "emailid", emailaddress },
-                    //        { "iat", issuedAt},
-                    //        { "exp", expiry}
+                    var payload = new Dictionary<string, object>()
+                         {
+                            { "firstname", objUser.firstname },
+                            { "lastname", objUser.lastname ==null ? "" :  objUser.lastname}, 
+                            { "userid", objUser.userid },
+                            { "roleid", objUser.roleid },
+                            { "emailid", emailaddress },
+                            { "iat", issuedAt},
+                            { "exp", expiry}
 
-                    //     };
-                    //var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
-                    //string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+                         };
+                    var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
+                    string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
                     
-                    //#endregion
+                    #endregion
 
                     return new Result
                     {
@@ -166,10 +177,11 @@ namespace DummyProjectBAL
                         {
                             UserID = objUser.userid,
                             Role = objUser.roleid,
-                            RoleName=objUser.RoleName
-                            
+                            RoleName=objUser.RoleName,
+                            themeid= objUser.themeid
+
                         },
-                        Token = ""
+                        Token = token
                     };
                 }
                 else
@@ -271,7 +283,7 @@ namespace DummyProjectBAL
 
                 #region Create Token region
                 var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
+                var expiry = Math.Round((DateTime.UtcNow.AddMinutes(5) - unixEpoch).TotalSeconds);
                 var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
 
                 var payload = new Dictionary<string, object>()

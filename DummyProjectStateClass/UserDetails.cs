@@ -31,6 +31,9 @@ namespace DummyProjectStateClass
         public bool acceptedTerms { get; set; }
         public DateTime firstTimeLogin { get; set; }
         public String SaltValue { get; set; }
+        public bool FirstTimeLogin_YN { get; set; }
+        public int themeid { get; set; }
+
 
 
 
