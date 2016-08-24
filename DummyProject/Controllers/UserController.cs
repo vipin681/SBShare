@@ -388,7 +388,7 @@ namespace DummyProject.Controllers
             //  Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL objUserBAL = new UserBAL();
             objResult = objUserBAL.GetRole();
-            if (objResult != null)
+            if (objResult != null & objResult.Results != null)
             {
                 objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
