@@ -8,13 +8,14 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using DummyProjectStateClass;
 using DummyProjectBAL;
-using DummyProject.CustomFilters;
+//using DummyProject.CustomFilters;
 using System.Net.Http.Headers;
 using System.Data.SqlClient;
 using DummyProject.Filters;
 using NLog;
 using System.Web.Http.Description;
 using DummyProject;
+using DummyProject.Models;
 
 namespace DummyProject.Controllers
 {
@@ -22,7 +23,7 @@ namespace DummyProject.Controllers
     /// APIs for Crud operation on user and Login page
     /// </summary>
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
-     public class UserController : ApiController
+    public class UserController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         Exception e = new Exception();
@@ -32,7 +33,7 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-       // [Secure]
+        // [Secure]
         public HttpResponseMessage GetUserList()
         {
             logger.Debug("get all users started");
@@ -57,7 +58,7 @@ namespace DummyProject.Controllers
             }
             catch (Exception ex)
             {
-             
+
                 logger.ErrorException("Data Empty", ex);
 
             }
@@ -74,7 +75,7 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
         /// <returns></returns>
         [HttpPost]
-       // [Secure]
+        // [Secure]
         public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
             logger.Info("Started");
@@ -204,10 +205,8 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPost]
-      
-      //  [Secure]
-      [RoleDetails(Roles ="Admin")]
-             public HttpResponseMessage SaveUserDetails(UserDetails user)
+        [Secure]
+        public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
             //logger.Debug("Submit user started");
@@ -215,7 +214,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-           // Int64 userID = Int64.Parse(User.Identity.Name);
+            // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
 
             // user.InsertedBy = ID;
@@ -333,12 +332,12 @@ namespace DummyProject.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public HttpResponseMessage CheckLogin(string emailaddress, string Password,int clientid)
+        public HttpResponseMessage CheckLogin(string emailaddress, string Password, int clientid)
         {
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
-            objResult = objUserBLL.IsValidUser(emailaddress, Password,clientid);
+            objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid);
             if (objResult != null)
             {
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
@@ -452,7 +451,7 @@ namespace DummyProject.Controllers
 
 
 
-        
+
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpGet]
@@ -534,7 +533,7 @@ namespace DummyProject.Controllers
         //    return response;
         //}
 
-      
+
 
 
 

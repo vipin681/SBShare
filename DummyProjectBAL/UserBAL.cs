@@ -45,13 +45,13 @@ namespace DummyProjectBAL
         #endregion
 
         #region ChangeTheme
-        public Result ChangeTheme(int themeid, int userid)
-        {
-            UserDAL userDAL = new UserDAL();
-            Result result = userDAL.ChangeTheme(themeid,userid);
-            return result;
+        //public Result ChangeTheme(int themeid, int userid)
+        //{
+        //    UserDAL userDAL = new UserDAL();
+        //    Result result = userDAL.ChangeTheme(themeid,userid);
+        //    return result;
 
-        }
+        //}
         #endregion
         
 

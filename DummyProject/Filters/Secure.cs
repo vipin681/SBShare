@@ -22,7 +22,7 @@ namespace DummyProject.Filters
     {
         public override void OnAuthorization(HttpActionContext actionContext)
 
-        {
+         {
 
             //HttpResponseMessage errorResponse = null;
             var request = actionContext.Request;
