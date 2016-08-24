@@ -35,6 +35,17 @@ namespace DummyProject.Controllers
         [Secure]
         public HttpResponseMessage GetUserList()
         {
+
+            var re = Request;
+            var headers = re.Headers;
+
+            if (headers.Contains("Custom"))
+            {
+                string token = headers.GetValues("Custom").First();
+            }
+
+
+
             logger.Debug("get all users started");
             HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
@@ -338,7 +349,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
             objResult = objUserBLL.IsValidUser(emailaddress, Password,clientid);
-            if (objResult != null)
+            if (objResult != null && objResult.Results != null)
             {
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
             }

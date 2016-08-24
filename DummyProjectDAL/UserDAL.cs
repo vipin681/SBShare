@@ -180,14 +180,14 @@ namespace DummyProjectDAL
         #endregion
 
         #region IsValidUser
-        public UserDetails IsValidUser(String emailaddress, String userPassword ,int clientid)
+        public UserDetails IsValidUser(String emailaddress, String userPassword, int clientid)
         {
             UserDetails objUser = null;
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 string strQuery;
                 SqlCommand cmd;
-                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword and u.clientid=@clientid  ";
+                strQuery = " SELECT  firstname,lastname, u.userid, [Password], u.roleid,role.description,ISNULL(FirstTimeLogin_YN,0) as FirstTimeLogin_YN,ISNULL(themeid,0) as themeid  FROM security.Users u with (nolock) INNER JOIN [security].[Role] role with (nolock) on role.roleid = u.roleid  WHERE emailaddress=@emailaddress and Password=@userPassword and u.clientid=@clientid  ";
                 cmd = new SqlCommand(strQuery);
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
@@ -208,6 +208,7 @@ namespace DummyProjectDAL
                     objUser.lastname = ds.Tables[0].Rows[0]["lastname"].ToString();
                     objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
                     objUser.themeid = Convert.ToInt32(ds.Tables[0].Rows[0]["themeid"]);
+                    objUser.FirstTimeLogin_YN = Convert.ToBoolean(ds.Tables[0].Rows[0]["FirstTimeLogin_YN"]);
                     if (objUser.FirstTimeLogin_YN == false)
                     {
 
@@ -225,7 +226,8 @@ namespace DummyProjectDAL
                     }
 
                 }
-            return objUser;
+                return objUser;
+            }
         }
         #endregion
 
