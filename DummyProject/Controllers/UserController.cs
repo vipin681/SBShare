@@ -395,7 +395,7 @@ namespace DummyProject.Controllers
 
         #region Change Theme 
         /// <summary>
-        /// Update Password
+        /// Update Theme
         /// </summary>
         /// <param name="themeid">
         /// Enter Theme Id to change</param>

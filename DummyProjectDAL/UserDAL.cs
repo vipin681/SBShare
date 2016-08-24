@@ -194,6 +194,7 @@ namespace DummyProjectDAL
 
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
+
                     objUser = new UserDetails();
                     objUser.userid = Convert.ToInt32(ds.Tables[0].Rows[0]["userid"].ToString());
                     objUser.password = ds.Tables[0].Rows[0]["Password"].ToString();
