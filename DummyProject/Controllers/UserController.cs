@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web;
+//using System.Web;
 using System.Web.Http.Cors;
 using DummyProjectStateClass;
 using DummyProjectBAL;
@@ -14,7 +14,7 @@ using System.Data.SqlClient;
 using DummyProject.Filters;
 using NLog;
 using System.Web.Http.Description;
-
+using DummyProject;
 
 namespace DummyProject.Controllers
 {
@@ -197,9 +197,10 @@ namespace DummyProject.Controllers
         /// role should be present role eg.1</param>
         /// <returns>A value</returns>
         [HttpPost]
-        [AllowAnonymous]
+      
       //  [Secure]
-        public HttpResponseMessage SaveUserDetails(UserDetails user)
+      [RoleDetails(Roles ="Admin")]
+             public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
             //logger.Debug("Submit user started");
@@ -526,24 +527,7 @@ namespace DummyProject.Controllers
         //    return response;
         //}
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet]
-        public HttpResponseMessage getMenubyUserRole(string UserRole)
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            UserBAL userBAL = new UserBAL();
-            objResult = userBAL.getMenubyUserRole(UserRole);
-            if (objResult != null)
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-            }
-            else
-            {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
-            }
-            return response;
-        }
+      
 
 
 

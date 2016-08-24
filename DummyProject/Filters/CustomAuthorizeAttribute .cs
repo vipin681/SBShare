@@ -12,100 +12,146 @@ using System.Threading;
 using DummyProjectStateClass;
 using System.Net;
 using System.Net.Http;
-
-namespace DummyProject.Filters
+using System.Web.Security;
+using System.Diagnostics;
+namespace System.Web.Mvc
 {
-    public class CustomAuthorizeAttribute: System.Web.Http.AuthorizeAttribute
+   
+    public class CustomAuthorizeAttribute:AuthorizeAttribute
     {
+        public string UserRole { get; set; }
 
-        public override void OnAuthorization(HttpActionContext actionContext)
+        protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
-            //var authorizeHeader = actionContext.Request.Headers.Authorization;
-            //if (authorizeHeader != null && String.IsNullOrEmpty(authorizeHeader.Parameter) == false)
-            //{
-                UserBAL objUserBLL = new UserBAL();
-               // UserBLL objUserBLL = new UserBLL();
-           
-                var role = objUserBLL.GetAuthorizeRole();
-                if (role != null)
-                {
-                    var principal = new GenericPrincipal((new GenericIdentity(role.description.ToString())),
-                                                                    (new[] { role.roleid.ToString() }));
-                
+            UserBAL obj = new UserBAL();
+            var role = obj.GetAuthorizeRole();
+            string CurrentUserRole = role.description;
+            //       // UserBLL objUserBLL = new UserBLL();
 
-
-                    Thread.CurrentPrincipal = principal;
-                    if (HttpContext.Current != null)
-                        HttpContext.Current.User = principal;
-                    return;
-                }
-           // }
-            Result outResult = new Result
-            {
-                status = false,
-                MessageId = -1
-            };
-            actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, outResult);
-
-            //try
-            //{
-
-            //    UserBAL objUserBLL = new UserBAL();
-            //  var status = objUserBLL.GetAuthorizeRole();
-
-
-
-            //var principal = new GenericPrincipal((new GenericIdentity(existingToken.UserID.ToString())),
-            //                                                                   (new[] { existingToken.RoleID.ToString() }));
-            //Thread.CurrentPrincipal = principal;
-            //if (HttpContext.Current != null)
-            //    HttpContext.Current.User = principal;
-            //return;
-
-
-
-
-            //    if (status !=null)
-            //    {
-            //        Result outResult = new Result
+            //        var role = objUserBLL.GetAuthorizeRole();
+            //        if (role != null)
             //        {
-            //            Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
-            //            MessageId = 0,
-            //            errormsg = "Role don't have access to this api"
-            //        };
-            //        actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
-            //        return;
-            //    }
+            if (this.UserRole.Contains(CurrentUserRole))
+            {
 
-            //    if (HttpContext.Current != null)
-            //    {
-            //        HttpContext.Current.User = Thread.CurrentPrincipal;
-            //    }
-            //}
-            //catch (SignatureVerificationException ex)
-            //{
-            //    Result outResult = new Result
-            //    {
-            //        Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
-            //        MessageId = -1,
-            //        errormsg = ex.Message
-            //    };
-            //    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
-            //}
-            //catch (Exception ex)
-            //{
-            //    Result outResult = new Result
-            //    {
-            //        Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
-            //        MessageId = -1,
-            //        errormsg = ex.Message
-            //    };
-            //    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
-            //}
-
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            return base.AuthorizeCore(httpContext);
         }
 
-      
+        //public override bool AuthorizeCore(HttpContextBase httpContext)
+        //{
+        //    var isAuthorized = base.AuthorizeCore(httpContext);
+        //    if (!isAuthorized)
+        //    {
+
+        //        return false;
+        //    }
+        //    string CurrentUserRole = "Admin";
+        //    if (this.UserRole.Contains(CurrentUserRole))
+        //    {
+
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        return false; 
+        //    }
+
+
+        //}
+        //public override void OnAuthorization(HttpActionContext actionContext)
+        //{
+        //    //var authorizeHeader = actionContext.Request.Headers.Authorization;
+        //    //if (authorizeHeader != null && String.IsNullOrEmpty(authorizeHeader.Parameter) == false)
+        //    //{
+        //        UserBAL objUserBLL = new UserBAL();
+        //       // UserBLL objUserBLL = new UserBLL();
+
+        //        var role = objUserBLL.GetAuthorizeRole();
+        //        if (role != null)
+        //        {
+        //            var principal = new GenericPrincipal((new GenericIdentity(role.description.ToString())),
+        //                                                            (new[] { role.roleid.ToString() }));
+
+
+
+        //            Thread.CurrentPrincipal = principal;
+        //            if (HttpContext.Current != null)
+        //                HttpContext.Current.User = principal;
+        //            return;
+        //        }
+        //   // }
+        //    Result outResult = new Result
+        //    {
+        //        status = false,
+        //        MessageId = -1
+        //    };
+        //    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, outResult);
+
+        //    //try
+        //    //{
+
+        //    //    UserBAL objUserBLL = new UserBAL();
+        //    //  var status = objUserBLL.GetAuthorizeRole();
+
+
+
+        //    //var principal = new GenericPrincipal((new GenericIdentity(existingToken.UserID.ToString())),
+        //    //                                                                   (new[] { existingToken.RoleID.ToString() }));
+        //    //Thread.CurrentPrincipal = principal;
+        //    //if (HttpContext.Current != null)
+        //    //    HttpContext.Current.User = principal;
+        //    //return;
+
+
+
+
+        //    //    if (status !=null)
+        //    //    {
+        //    //        Result outResult = new Result
+        //    //        {
+        //    //            Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
+        //    //            MessageId = 0,
+        //    //            errormsg = "Role don't have access to this api"
+        //    //        };
+        //    //        actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
+        //    //        return;
+        //    //    }
+
+        //    //    if (HttpContext.Current != null)
+        //    //    {
+        //    //        HttpContext.Current.User = Thread.CurrentPrincipal;
+        //    //    }
+        //    //}
+        //    //catch (SignatureVerificationException ex)
+        //    //{
+        //    //    Result outResult = new Result
+        //    //    {
+        //    //        Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
+        //    //        MessageId = -1,
+        //    //        errormsg = ex.Message
+        //    //    };
+        //    //    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    Result outResult = new Result
+        //    //    {
+        //    //        Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
+        //    //        MessageId = -1,
+        //    //        errormsg = ex.Message
+        //    //    };
+        //    //    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
+        //    //}
+
+        //}
+
+
 
 
 

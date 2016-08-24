@@ -371,13 +371,7 @@ namespace DummyProjectBAL
         //    return userDAL.getUserRoleDetails(UserRole);
         //}
 
-        public Result getMenubyUserRole(string UserRole)
-        {
-            UserDAL userDAL = new UserDAL();
-            if (UserRole == null)
-                UserRole = "";
-            return userDAL.getMenubyUserRole(UserRole);
-        }
+  
 
         //public Result insertMenu(UserDetails user)
         //{
@@ -459,7 +453,11 @@ namespace DummyProjectBAL
         }
 
         #endregion
-
+        public Role GetAuthorizeRole()
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.GetAuthorizeRole();
+        }
 
 
     }
