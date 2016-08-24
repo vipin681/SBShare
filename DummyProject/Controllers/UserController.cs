@@ -32,7 +32,7 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Secure]
+       // [Secure]
         public HttpResponseMessage GetUserList()
         {
             logger.Debug("get all users started");
@@ -74,7 +74,7 @@ namespace DummyProject.Controllers
         /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
         /// <returns></returns>
         [HttpPost]
-        [Secure]
+       // [Secure]
         public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
             logger.Info("Started");
@@ -88,12 +88,21 @@ namespace DummyProject.Controllers
             {
                 logger.Debug("BLL started");
                 objResult = userBLL.UpdateUserPassword(userPassword);
-                response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
+                if (objResult.Results == 1)
+                {
+                    response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.BadRequest, "Something went wrong");
+                }
+                return response;
             }
             catch (Exception ex)
             {
                 logger.ErrorException("Data Empty", ex);
             }
+
             logger.Debug("update user finished");
             return response;
         }
@@ -323,12 +332,12 @@ namespace DummyProject.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public HttpResponseMessage CheckLogin(string emailaddress, string Password)
+        public HttpResponseMessage CheckLogin(string emailaddress, string Password,int clientid)
         {
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
-            objResult = objUserBLL.IsValidUser(emailaddress, Password);
+            objResult = objUserBLL.IsValidUser(emailaddress, Password,clientid);
             if (objResult != null)
             {
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
@@ -389,44 +398,6 @@ namespace DummyProject.Controllers
                 objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
                 response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
-            return response;
-        }
-        #endregion
-
-        #region Change Theme 
-        /// <summary>
-        /// Update Theme
-        /// </summary>
-        /// <param name="themeid">
-        /// Enter Theme Id to change</param>
-        /// /// <param name="userid">
-        /// Enter userid for specific user</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Secure]
-        public HttpResponseMessage ChangeTheme(int themeid,int userid)
-        {
-            logger.Info("Change Theme API Started");
-            logger.Debug("Change Theme API started");
-            HttpResponseMessage response = new HttpResponseMessage(); ;
-            Result objResult = null;
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            UserBAL userBLL = new UserBAL();
-            try
-            {
-                logger.Debug(" Change Theme BLL started");
-                objResult = userBLL.ChangeTheme(themeid,userid);
-                logger.Debug(" Change Theme BLL finished");
-                response = Request.CreateResponse(HttpStatusCode.OK, "Theme successfully");
-             }
-            catch (Exception ex)
-            {
-                logger.ErrorException("Data Empty", ex);
-            }
-
-            logger.Debug("Change Theme API finished");
-            logger.Info("Change Theme API finished");
             return response;
         }
         #endregion

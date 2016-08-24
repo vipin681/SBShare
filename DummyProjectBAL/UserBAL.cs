@@ -138,12 +138,12 @@ namespace DummyProjectBAL
             return userDAL.GetUserListByID(keyword);
         }
 
-        public Result IsValidUser(String emailaddress, String userPassword)
+        public Result IsValidUser(String emailaddress, String userPassword,int clientid)
         {
             UserDAL userDAL = new UserDAL();
 
             UserDetails objUser = null;
-            objUser = userDAL.IsValidUser(emailaddress, userPassword);
+            objUser = userDAL.IsValidUser(emailaddress, userPassword,clientid);
             if (objUser != null)
             {
                 if (objUser.password == userPassword)
