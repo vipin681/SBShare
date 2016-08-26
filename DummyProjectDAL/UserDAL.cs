@@ -9,7 +9,8 @@ using System.Data;
 using System.Net;
 using DummyProjectDAL;
 using NLog;
-
+using RedisConnectionTest;
+using Newtonsoft.Json;
 
 namespace DummyProjectDAL
 {
@@ -118,7 +119,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region Get User Details ByID
-        public Result GetUserDetailsByID(Int32 ID,int clientid)
+        public Result GetUserDetailsByID(Int32 ID, int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -153,7 +154,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region IsUserAuthorized
-        public int IsUserAuthorized(int APIID, int roleid,int clientid)
+        public int IsUserAuthorized(int APIID, int roleid, int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -271,7 +272,7 @@ namespace DummyProjectDAL
                 cmd.Parameters.Add("@firstTimeLogin", SqlDbType.DateTime).Value = user.firstTimeLogin;
                 cmd.Parameters.Add("@createdby", SqlDbType.Int).Value = user.createdby;
 
-             int flag=   cmd.ExecuteNonQuery();
+                int flag = cmd.ExecuteNonQuery();
                 return new Result
                 {
 
@@ -397,6 +398,44 @@ namespace DummyProjectDAL
             }
         }
         #endregion
+
+        public string ReadData()
+        {
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+
+            var keys = cache..SearchKeys("10");
+
+            return cache.StringGet("10*");
+            // var devicesCount = 10000;
+            //for (int i = 0; i < devicesCount; i++)
+            //{
+            //    var value = cache.StringGet($"Device_Status:{i}");
+            //    Console.WriteLine($"Valor={value}");
+            //}
+        }
+        public void writeData(dynamic data)
+        {
+            List<UserDetails> emp = new List<UserDetails>();
+            DataTable dt = data as DataTable;
+            emp = (from DataRow row in dt.Rows
+                    select new UserDetails
+                   {
+                       userid = Convert.ToInt32(row["userid"]),
+                       firstname = Convert.ToString(row["fName"]),
+                       lastname = Convert.ToString(row["lName"]),
+                       password = Convert.ToString(row["password"]),
+                       fullname = Convert.ToString(row["Fullname"]),
+                       emailaddress = Convert.ToString(row["emailId"]),
+                       workerid = Convert.ToString(row["workerid"]),
+                       status = Convert.ToBoolean(row["status"]),
+                    }).ToList();
+            
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            foreach (var eachemp in emp)
+            {
+                cache.StringSet(eachemp.userid + "_" + eachemp.fullname, JsonConvert.SerializeObject(eachemp));
+            }
+        }
 
         #region all
 
@@ -576,7 +615,7 @@ namespace DummyProjectDAL
                     sqlcmd.CommandText = "GetRole";
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Connection = conn;
-                  //  sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = UserRole;
+                    //  sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = UserRole;
                     // sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = menuName;
                     sqlad.Fill(ds);
 
@@ -584,7 +623,7 @@ namespace DummyProjectDAL
                     {
                         role = new Role();
                         user = new UserDetails();
-                        role.description= ds.Tables[0].Rows[0]["description"].ToString();
+                        role.description = ds.Tables[0].Rows[0]["description"].ToString();
                         role.roleid = Convert.ToInt32(ds.Tables[0].Rows[0]["roleid"]);
 
                         //return new Result

@@ -22,7 +22,7 @@ namespace DummyProject.Controllers
     /// APIs for Crud operation on user and Login page
     /// </summary>
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
-     public class UserController : ApiController
+    public class UserController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         Exception e = new Exception();
@@ -32,7 +32,7 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Secure]
+        //[Secure]
         public HttpResponseMessage GetUserList(int clientid)
         {
 
@@ -48,30 +48,47 @@ namespace DummyProject.Controllers
 
             logger.Debug("get all users started");
             HttpResponseMessage response = new HttpResponseMessage();
-            Result objResult = null;
+            Result objResult = new Result();
             UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserList(clientid);
+        
+
             try
             {
-                if (objResult != null)
+                objResult.Results = userBAL.checkcache();
+                //objResult.Results=
+                if (objResult == null || objResult.Results == "" || objResult.Results == null)
                 {
-                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                    objResult.errormsg = "";
-                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    objResult = userBAL.GetUserList(clientid);
+                    userBAL.setcache(objResult.Results);
+                    if (objResult != null || objResult.Results != "")
+                    {
+                        objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                        objResult.errormsg = "";
+                        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    }
+                    else
+                    {
+                        objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                        objResult.errormsg = "Data Empty!";
+                        response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                    }
                 }
                 else
                 {
-                    objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-                    objResult.errormsg = "Data Empty!";
-                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                        objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                        objResult.errormsg = "";
+                        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    
                 }
             }
+
             catch (Exception ex)
             {
-             
-                logger.ErrorException("Data Empty", ex);
 
+                logger.ErrorException("Data Empty", ex);
+                
             }
+
             logger.Debug("get all users finished");
             return response;
         }
@@ -128,13 +145,13 @@ namespace DummyProject.Controllers
         /// <returns></returns>
         [HttpGet]
         [Secure]
-        public HttpResponseMessage GetUserById(int ID,int clientid)
+        public HttpResponseMessage GetUserById(int ID, int clientid)
         {
             logger.Debug("get all user by id started");
             HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserDetailsByID(ID,clientid);
+            objResult = userBAL.GetUserDetailsByID(ID, clientid);
             try
             {
                 if (objResult != null)
@@ -216,7 +233,7 @@ namespace DummyProject.Controllers
         /// <returns>A value</returns>
         [HttpPost]
         [AllowAnonymous]
-      //  [Secure]
+        //  [Secure]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
@@ -225,7 +242,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-           // Int64 userID = Int64.Parse(User.Identity.Name);
+            // Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL userBLL = new UserBAL();
 
             // user.InsertedBy = ID;
@@ -343,12 +360,12 @@ namespace DummyProject.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public HttpResponseMessage CheckLogin(string emailaddress, string Password,int clientid)
+        public HttpResponseMessage CheckLogin(string emailaddress, string Password, int clientid)
         {
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
-            objResult = objUserBLL.IsValidUser(emailaddress, Password,clientid);
+            objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid);
             if (objResult != null && objResult.Results != null)
             {
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);
@@ -451,16 +468,33 @@ namespace DummyProject.Controllers
         }
         #endregion
 
+        [HttpGet]
+        //[Secure]
+        public void setcache(string str)
+        {
+            UserBAL userBAL1 = new UserBAL();
+            userBAL1.setcache(str);
+        }
+
+        [HttpGet]
+        //[Secure]
+        public string getcache(string str)
+        {
+            UserBAL userBAL1 = new UserBAL();
+            return userBAL1.checkcache();
+
+        }
+
         #region all
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
-        public HttpResponseMessage GetUserDetailsByID1(int ID,int clientid)
+        public HttpResponseMessage GetUserDetailsByID1(int ID, int clientid)
         {
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
-            objResult = userBAL.GetUserDetailsByID(ID,clientid);
+            objResult = userBAL.GetUserDetailsByID(ID, clientid);
             if (objResult != null)
             {
                 objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
@@ -500,7 +534,7 @@ namespace DummyProject.Controllers
 
 
 
-        
+
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpGet]
@@ -582,7 +616,7 @@ namespace DummyProject.Controllers
         //    return response;
         //}
 
-      
+
 
 
 
