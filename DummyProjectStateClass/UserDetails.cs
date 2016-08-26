@@ -11,6 +11,7 @@ namespace DummyProjectStateClass
         public Int32 userid { get; set; }
         public string emailaddress { get; set; }
         public String firstname { get; set; }
+        public String fullname { get; set; }
         public bool status { get; set; }
         public String description { get; set; }
         public String lastname { get; set; }

@@ -472,6 +472,16 @@ namespace DummyProjectBAL
             return userDAL.GetAuthorizeRole();
         }
 
+        public string checkcache()
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.ReadData();
+        }
+        public void setcache(dynamic data)
+        {
+            UserDAL userDAL = new UserDAL();
+            userDAL.writeData(data);
+        }
 
     }
 }
