@@ -403,7 +403,7 @@ namespace DummyProjectDAL
         {
             var cache = RedisConnectorHelper.Connection.GetDatabase();
 
-            var keys = cache..SearchKeys("10");
+            var keys = cache.SearchKeys("10");
 
             return cache.StringGet("10*");
             // var devicesCount = 10000;
