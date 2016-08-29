@@ -54,6 +54,7 @@ namespace DummyProject.Filters
                 var Role = existingToken.description;
                 var principal = new GenericPrincipal((new GenericIdentity(existingToken.roleid.ToString())),
                                                                 (new[] { existingToken.description.ToString() }));
+             
                 Thread.CurrentPrincipal = principal;
                 if (HttpContext.Current != null)
                     HttpContext.Current.User = principal;
@@ -68,7 +69,7 @@ namespace DummyProject.Filters
             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, outResult);
         }
 
-    
+   
 
 
         

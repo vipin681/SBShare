@@ -287,9 +287,11 @@
     <Compile Include="Controllers\CustomRole.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\LineChartController.cs" />
+    <Compile Include="Controllers\RedisConnectorHelper.cs" />
     <Compile Include="Controllers\SaveDataController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Filters\CustomAuthorizeAttribute .cs" />
+    <Compile Include="Filters\ExceptionHandling.cs" />
     <Compile Include="Filters\RoleDetails.cs" />
     <Compile Include="Filters\Secure.cs" />
     <Compile Include="Global.asax.cs">

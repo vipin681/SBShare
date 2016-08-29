@@ -16,6 +16,7 @@ namespace DummyProjectDAL
 {
     public class UserDAL
     {
+
         Logger logger = LogManager.GetCurrentClassLogger();
         #region GetUser
         public Result GetUserList(int clientid)
@@ -402,10 +403,54 @@ namespace DummyProjectDAL
         public string ReadData()
         {
             var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var m = RedisConnectorHelper.Connection;
 
-            var keys = cache.SearchKeys("10");
 
-            return cache.StringGet("10*");
+            // var t = m.GetServer("localhost").Keys();
+
+        var t=m.GetServer("localhost", 6379);
+
+            // var u=   t.Keys(pattern: "1004_string string");
+        // var Data=t.Keys();
+            foreach (var key in t.Keys())
+            {
+
+                Console.WriteLine(key);
+            }
+            foreach (var key in t.Keys(pattern: "1004_string string"))
+            {
+
+                Console.WriteLine(key);
+            }
+
+            //   var Data=t.Keys();
+            //var My=t.Keys(0);
+
+            //var test=cache.SetScan("Stephanie Mendoza");
+
+            //var keys = cache.SearchKeys("10");
+            //var Keys=cache.HashKeys("Amy");
+            //var keys=   cache.se
+
+            //return cache.StringGet("Stephanie Mendoza");
+          return   cache.StringGet("1000_Ruth Mendoza");
+           // return cache.StringGetSet("1004_string string");
+            
+            // return stored;
+
+            //using (var redis = new RedisClient(host))
+            //{
+            //    var keys = redis.Keys("Amy");
+            //    if (keys.Length > 0)
+            //    {
+            //      //  listView1.Clear();
+            //        foreach (var key in keys)
+            //        {
+            //          //  listView1.Items.Add(key);
+            //        }
+            //    }
+            //}
+
             // var devicesCount = 10000;
             //for (int i = 0; i < devicesCount; i++)
             //{
@@ -413,12 +458,13 @@ namespace DummyProjectDAL
             //    Console.WriteLine($"Valor={value}");
             //}
         }
+
         public void writeData(dynamic data)
         {
             List<UserDetails> emp = new List<UserDetails>();
             DataTable dt = data as DataTable;
             emp = (from DataRow row in dt.Rows
-                    select new UserDetails
+                   select new UserDetails
                    {
                        userid = Convert.ToInt32(row["userid"]),
                        firstname = Convert.ToString(row["fName"]),
@@ -428,8 +474,8 @@ namespace DummyProjectDAL
                        emailaddress = Convert.ToString(row["emailId"]),
                        workerid = Convert.ToString(row["workerid"]),
                        status = Convert.ToBoolean(row["status"]),
-                    }).ToList();
-            
+                   }).ToList();
+
             var cache = RedisConnectorHelper.Connection.GetDatabase();
             foreach (var eachemp in emp)
             {
@@ -442,7 +488,7 @@ namespace DummyProjectDAL
 
 
 
-        
+
 
 
 
@@ -600,7 +646,7 @@ namespace DummyProjectDAL
                 }
             }
         }
-        
+
         public Role GetAuthorizeRole()
         {
             using (SqlConnection conn = DbHelper.CreateConnection())

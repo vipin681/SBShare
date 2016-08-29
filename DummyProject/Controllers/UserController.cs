@@ -15,6 +15,8 @@ using DummyProject.Filters;
 using NLog;
 using System.Web.Http.Description;
 using DummyProject;
+using System.Web;
+using Microsoft.AspNet.Identity;
 
 namespace DummyProject.Controllers
 {
@@ -85,7 +87,7 @@ namespace DummyProject.Controllers
             catch (Exception ex)
             {
 
-                logger.ErrorException("Data Empty", ex);
+                logger.Debug("Data Empty:"+ ex.StackTrace.ToString());
                 
             }
 
@@ -622,5 +624,38 @@ namespace DummyProject.Controllers
 
 
         #endregion
+
+
+
+
+
+
+        ///// <summary>
+        ///// Logout 
+        ///// </summary>
+        ///// <returns></returns>
+
+        //public HttpResponseMessage Logout()
+        //{
+        //    //try
+        //    //{
+        //    //    if (User.Identity.IsAuthenticated)
+        //    //    {
+        //    //        WebSecurity.Logout();
+        //    //        return Request.CreateResponse(HttpStatusCode.OK, "logged out successfully.");
+        //    //    }
+        //    //    return Request.CreateResponse(HttpStatusCode.Conflict, "already done.");
+        //    //}
+        //    //catch (Exception e)
+        //    //{
+        //    //    return Request.CreateResponse(HttpStatusCode.InternalServerError, e);
+        //    //}
+
+        //    var authentication = HttpContext.Current.GetOwinContext().Authentication;
+        //    authentication.SignOut(DefaultAuthenticationTypes.ExternalBearer);
+
+        //    return new HttpResponseMessage(HttpStatusCode.OK);
+        //}
+
     }
 }
