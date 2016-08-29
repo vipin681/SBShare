@@ -11,6 +11,7 @@ using DummyProjectDAL;
 using NLog;
 using RedisConnectionTest;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace DummyProjectDAL
 {
@@ -402,16 +403,40 @@ namespace DummyProjectDAL
         public string ReadData()
         {
             var cache = RedisConnectorHelper.Connection.GetDatabase();
+            StringBuilder sb = new StringBuilder();
+            //var keys = cache.HashScan("1002*");
 
-            var keys = cache..SearchKeys("10");
+            // Create connectionMultiplexer. Creating connectionMultiplexer is costly so it is recommended to store and reuse it.
+            var connectionMultiplexer = ConnectionMultiplexer.Connect("localhost,abortConnect=false"); // replace localhost with your redis db address
 
-            return cache.StringGet("10*");
+            // You can either create a RedisType by using RedisTypeFactory or by instantiating the desired type directly. 
+            var redisTypeFactory = new RedisTypeFactory(connectionMultiplexer);
+
+            var redisDictionary = redisTypeFactory.GetDictionary<int, UserDetails>("UserDetailsList");
+            int i = 0;
+           
+            // Iterate through dictionary
+            foreach (var person in redisDictionary)
+            {
+
+                i = i + 1;
+                sb.Append(JsonConvert.SerializeObject(person));
+                if (i < 10)
+                {
+                    break;
+                }
+            }
+            return sb.ToString();
+            //return cache.StringGet("10*");
             // var devicesCount = 10000;
-            //for (int i = 0; i < devicesCount; i++)
+            //for (int i = 0; i < 1000; i++)
             //{
-            //    var value = cache.StringGet($"Device_Status:{i}");
-            //    Console.WriteLine($"Valor={value}");
+            //    var value = cache.StringGet("emp_" + i.ToString());
+
+            //    sb.Append(",");
+            //    sb.Append(value);
             //}
+            //return sb.ToString();
         }
         public void writeData(dynamic data)
         {
@@ -428,14 +453,42 @@ namespace DummyProjectDAL
                        emailaddress = Convert.ToString(row["emailId"]),
                        workerid = Convert.ToString(row["workerid"]),
                        status = Convert.ToBoolean(row["status"]),
+                       clientid = Convert.ToInt32(row["CLIENTID"])
                     }).ToList();
             
             var cache = RedisConnectorHelper.Connection.GetDatabase();
+
             foreach (var eachemp in emp)
             {
-                cache.StringSet(eachemp.userid + "_" + eachemp.fullname, JsonConvert.SerializeObject(eachemp));
+                cache.StringSet(Convert.ToString(eachemp.clientid) + "_" + Convert.ToString(eachemp.userid), JsonConvert.SerializeObject(eachemp));
             }
         }
+
+
+        public void CreateUserProfileCache(Result data)
+        {
+
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            cache.StringSet(Convert.ToString(data.clientid) + "_" + Convert.ToString(data.emailaddress), JsonConvert.SerializeObject(data));
+        }
+
+        public bool CheckinUserProfileCache(string clientid, string emailid,string password)
+        {
+
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(clientid + "_" + emailid);
+            return value.HasValue;
+        }
+
+        public Result ReturnUserProfileCache(string clientid, string emailid, string password)
+        {
+            Result finalresult = null;
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(clientid + "_" + emailid);
+            finalresult = (dynamic)value;
+            return finalresult;
+        }
+
 
         #region all
 

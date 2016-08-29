@@ -261,11 +261,17 @@
   <ItemGroup>
     <Compile Include="BaseClass.cs" />
     <Compile Include="Books.cs" />
+    <Compile Include="Collections\RedisDictionary.cs" />
+    <Compile Include="Collections\RedisList.cs" />
+    <Compile Include="Collections\RedisSet.cs" />
     <Compile Include="Country.cs" />
     <Compile Include="EnumClass.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IRedisTypeFactory.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Product.cs" />
     <Compile Include="RedisConnectorHelper.cs" />
+    <Compile Include="RedisTypeFactory.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Role.cs" />
     <Compile Include="StudentModel.cs" />

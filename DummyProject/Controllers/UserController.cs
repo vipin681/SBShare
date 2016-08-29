@@ -15,6 +15,9 @@ using DummyProject.Filters;
 using NLog;
 using System.Web.Http.Description;
 using DummyProject;
+using StackExchange.Redis;
+using System.Text;
+using RedisConnectionTest;
 
 namespace DummyProject.Controllers
 {
@@ -35,6 +38,19 @@ namespace DummyProject.Controllers
         //[Secure]
         public HttpResponseMessage GetUserList(int clientid)
         {
+
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            StringBuilder sb = new StringBuilder();
+            //var keys = cache.HashScan("1002*");
+
+            // Create connectionMultiplexer. Creating connectionMultiplexer is costly so it is recommended to store and reuse it.
+            var connectionMultiplexer = ConnectionMultiplexer.Connect("localhost,abortConnect=false"); // replace localhost with your redis db address
+
+            // You can either create a RedisType by using RedisTypeFactory or by instantiating the desired type directly. 
+            var redisTypeFactory = new RedisTypeFactory(connectionMultiplexer);
+
+            var redisDictionary = redisTypeFactory.GetDictionary<int, UserDetails>("UserDetailsList");
+
 
             var re = Request;
             var headers = re.Headers;
@@ -253,7 +269,7 @@ namespace DummyProject.Controllers
                     var level = LogLevel.Debug;
                     logger.Log(level, "BLL started");
                     objResult = userBLL.InsertUser(user);
-                    objResult.token.ToString();
+                  //  objResult.token.ToString();
 
 
                 }
@@ -365,14 +381,27 @@ namespace DummyProject.Controllers
             HttpResponseMessage response;
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
-            objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid);
-            if (objResult != null && objResult.Results != null)
+            string token = "";
+
+            if (!objUserBLL.CheckinUserProfileCache(Convert.ToString(clientid), emailaddress, Password))
             {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
+                objUserBLL.CreateUserProfileCache(objResult);
+                if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
+                {
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    response.Headers.Add("Authorization", token);
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                }
             }
             else
             {
-                response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
+                objResult = objUserBLL.ReturnUserProfileCache(Convert.ToString(clientid), emailaddress, Password);
+                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                response.Headers.Add("Authorization", token);
             }
             return response;
         }
