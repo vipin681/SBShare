@@ -34,6 +34,7 @@ namespace DummyProjectStateClass
         public String SaltValue { get; set; }
         public bool FirstTimeLogin_YN { get; set; }
         public int themeid { get; set; }
+        public int clientid { get; set; }
 
 
 

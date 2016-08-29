@@ -22,5 +22,8 @@ namespace RedisConnectionTest
                 return lazyConnection.Value;
             }
         }
+
+       
+       
     }
 }

@@ -43,18 +43,17 @@ namespace DummyProjectBAL
 
         }
         #endregion
-
+        
         #region ChangeTheme
         public Result ChangeTheme(int themeid, int userid)
         {
             UserDAL userDAL = new UserDAL();
-            Result result = userDAL.ChangeTheme(themeid, userid);
+            Result result = userDAL.ChangeTheme(themeid,userid);
             return result;
 
         }
         #endregion
-
-
+        
         #region Insert\Update user
 
         public Result InsertUser(UserDetails user)
@@ -86,7 +85,6 @@ namespace DummyProjectBAL
             return userDAL.GetUserDetailsByID(ID,clientid);
         }
         #endregion
-
 
         #region Create Token region
         public string CreateToken(UserDetails user,Result result)
@@ -138,10 +136,10 @@ namespace DummyProjectBAL
             return userDAL.GetUserListByID(keyword);
         }
 
-        public Result IsValidUser(String emailaddress, String userPassword,int clientid)
+        public Result IsValidUser(String emailaddress, String userPassword,int clientid,out string token)
         {
+            string token1 = "";
             UserDAL userDAL = new UserDAL();
-
             UserDetails objUser = null;
             objUser = userDAL.IsValidUser(emailaddress, userPassword,clientid);
             if (objUser != null)
@@ -152,6 +150,8 @@ namespace DummyProjectBAL
                     var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                     var expiry = Math.Round((DateTime.UtcNow.AddMinutes(5) - unixEpoch).TotalSeconds);
                     var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+
+
 
                     var payload = new Dictionary<string, object>()
                          {
@@ -166,44 +166,52 @@ namespace DummyProjectBAL
 
                          };
                     var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
-                    string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
-                    
+                    token1 = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+
                     #endregion
 
+                    token = token1;
                     return new Result
                     {
                         Status = Convert.ToString((int)HttpStatusCode.OK),
                         errormsg = "",
-                        Results = new
-                        {
-                            UserID = objUser.userid,
-                            Role = objUser.roleid,
-                            RoleName=objUser.RoleName,
-                            themeid= objUser.themeid
+                        UserID = objUser.userid,
+                        roleid = objUser.roleid,
+                        RoleName = objUser.RoleName,
+                        firstname= objUser.firstname,
+                        lastname = objUser.lastname == null ? "" : objUser.lastname,
+                        emailaddress = emailaddress,
+                        clientid = clientid,
+                        issuedat = DateTime.Now,
+                        expirydate = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])),
+                        token = token1,
+                        encryptedpassword= userPassword
 
-                        },
-                        Token = token
                     };
                 }
                 else
                 {
+                    token = token1;
                     return new Result
                     {
                         Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
                         MessageId = 11,
-                        Results = null
+                    
                     };
                 }
             }
             else
             {
+                token = token1;
                 return new Result
                 {
+
                     Status = Convert.ToString((int)HttpStatusCode.NotFound),
                     MessageId = 12,
-                    Results = null
+                    
                 };
             }
+           
         }
 
         public Result RefreshToken(String oldtoken)
@@ -310,7 +318,7 @@ namespace DummyProjectBAL
                         Role = roleid,
 
                     },
-                    Token = token
+                    //Token = token
                 };
             }
             catch (Exception ex)
@@ -324,7 +332,7 @@ namespace DummyProjectBAL
                         
 
                     },
-                    Token = token
+                 //   Token = token
                 };
             }
                     #endregion
@@ -475,13 +483,37 @@ namespace DummyProjectBAL
         public string checkcache()
         {
             UserDAL userDAL = new UserDAL();
-            return userDAL.ReadData();
+            string finalstr = userDAL.ReadData();
+            finalstr = finalstr.Substring(2, finalstr.Length - 2);
+            return finalstr;
         }
         public void setcache(dynamic data)
         {
             UserDAL userDAL = new UserDAL();
             userDAL.writeData(data);
         }
+        public void CreateUserProfileCache(dynamic data)
+        {
+            UserDAL userDAL = new UserDAL();
+            userDAL.CreateUserProfileCache(data);
+        }
+       
+        public bool CheckinUserProfileCache(string clientid, string emailid, string password)
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.CheckinUserProfileCache(clientid, emailid, password);
+        }
+        public Result ReturnUserProfileCache(string clientid, string emailid, string password)
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.ReturnUserProfileCache(clientid, emailid, password);
+        }
+        public Result ReturnUserProfileCache_ClientEmailid(string clientid, string emailid)
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.ReturnUserProfileCache_ClientEmailid(clientid, emailid);
+        }
+
 
     }
 }

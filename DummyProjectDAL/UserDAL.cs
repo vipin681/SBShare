@@ -11,12 +11,12 @@ using DummyProjectDAL;
 using NLog;
 using RedisConnectionTest;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace DummyProjectDAL
 {
     public class UserDAL
     {
-
         Logger logger = LogManager.GetCurrentClassLogger();
         #region GetUser
         public Result GetUserList(int clientid)
@@ -403,62 +403,41 @@ namespace DummyProjectDAL
         public string ReadData()
         {
             var cache = RedisConnectorHelper.Connection.GetDatabase();
-            var m = RedisConnectorHelper.Connection;
+            StringBuilder sb = new StringBuilder();
+            //var keys = cache.HashScan("1002*");
 
+            // Create connectionMultiplexer. Creating connectionMultiplexer is costly so it is recommended to store and reuse it.
+            var connectionMultiplexer = ConnectionMultiplexer.Connect("localhost,abortConnect=false"); // replace localhost with your redis db address
 
-            // var t = m.GetServer("localhost").Keys();
+            // You can either create a RedisType by using RedisTypeFactory or by instantiating the desired type directly. 
+            var redisTypeFactory = new RedisTypeFactory(connectionMultiplexer);
 
-        var t=m.GetServer("localhost", 6379);
+            var redisDictionary = redisTypeFactory.GetDictionary<int, UserDetails>("UserDetailsList");
+            int i = 0;
 
-            // var u=   t.Keys(pattern: "1004_string string");
-        // var Data=t.Keys();
-            foreach (var key in t.Keys())
+            // Iterate through dictionary
+            foreach (var person in redisDictionary)
             {
 
-                Console.WriteLine(key);
+                i = i + 1;
+                sb.Append(JsonConvert.SerializeObject(person));
+                if (i < 10)
+                {
+                    break;
+                }
             }
-            foreach (var key in t.Keys(pattern: "1004_string string"))
-            {
-
-                Console.WriteLine(key);
-            }
-
-            //   var Data=t.Keys();
-            //var My=t.Keys(0);
-
-            //var test=cache.SetScan("Stephanie Mendoza");
-
-            //var keys = cache.SearchKeys("10");
-            //var Keys=cache.HashKeys("Amy");
-            //var keys=   cache.se
-
-            //return cache.StringGet("Stephanie Mendoza");
-          return   cache.StringGet("1000_Ruth Mendoza");
-           // return cache.StringGetSet("1004_string string");
-            
-            // return stored;
-
-            //using (var redis = new RedisClient(host))
-            //{
-            //    var keys = redis.Keys("Amy");
-            //    if (keys.Length > 0)
-            //    {
-            //      //  listView1.Clear();
-            //        foreach (var key in keys)
-            //        {
-            //          //  listView1.Items.Add(key);
-            //        }
-            //    }
-            //}
-
+            return sb.ToString();
+            //return cache.StringGet("10*");
             // var devicesCount = 10000;
-            //for (int i = 0; i < devicesCount; i++)
+            //for (int i = 0; i < 1000; i++)
             //{
-            //    var value = cache.StringGet($"Device_Status:{i}");
-            //    Console.WriteLine($"Valor={value}");
-            //}
-        }
+            //    var value = cache.StringGet("emp_" + i.ToString());
 
+            //    sb.Append(",");
+            //    sb.Append(value);
+            //}
+            //return sb.ToString();
+        }
         public void writeData(dynamic data)
         {
             List<UserDetails> emp = new List<UserDetails>();
@@ -474,21 +453,147 @@ namespace DummyProjectDAL
                        emailaddress = Convert.ToString(row["emailId"]),
                        workerid = Convert.ToString(row["workerid"]),
                        status = Convert.ToBoolean(row["status"]),
+                       clientid = Convert.ToInt32(row["CLIENTID"])
                    }).ToList();
 
             var cache = RedisConnectorHelper.Connection.GetDatabase();
+
             foreach (var eachemp in emp)
             {
-                cache.StringSet(eachemp.userid + "_" + eachemp.fullname, JsonConvert.SerializeObject(eachemp));
+                cache.StringSet(Convert.ToString(eachemp.clientid) + "_" + Convert.ToString(eachemp.userid), JsonConvert.SerializeObject(eachemp));
             }
         }
+
+
+        public void CreateUserProfileCache(Result data)
+        {
+
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            cache.StringSet(Convert.ToString(data.clientid) + "_" + Convert.ToString(data.emailaddress), JsonConvert.SerializeObject(data));
+        }
+
+        public bool CheckinUserProfileCache(string clientid, string emailid, string password)
+        {
+
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.KeyExists(clientid + "_" + emailid);
+            return value;
+        }
+
+        public Result ReturnUserProfileCache(string clientid, string emailid, string password)
+        {
+            Result finalresult = new Result();
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(clientid + "_" + emailid);
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+
+            if (password == Convert.ToString(obj.encryptedpassword))
+            {
+                finalresult.firstname = Convert.ToString(obj.firstname);
+                finalresult.lastname = Convert.ToString(obj.lastname);
+                finalresult.UserID = Convert.ToInt32(obj.UserID);
+                finalresult.RoleID = Convert.ToString(obj.RoleID);
+                finalresult.emailaddress = Convert.ToString(obj.emailaddress);
+                DateTime dt = Convert.ToDateTime(obj.issuedat);
+                dt = dt.AddMinutes(5);
+                finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
+                finalresult.expirydate = dt;
+                finalresult.clientid = Convert.ToInt32(obj.clientid);
+                finalresult.token = Convert.ToString(obj.token);
+                finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+                finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
+            }
+            else
+            {
+
+            }
+
+
+            return finalresult;
+        }
+
+        public Result ReturnUserProfileCache_ClientEmailid(string clientid, string emailid)
+        {
+            Result finalresult = new Result();
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(clientid + "_" + emailid);
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+
+            finalresult.firstname = Convert.ToString(obj.firstname);
+            finalresult.lastname = Convert.ToString(obj.lastname);
+            finalresult.UserID = Convert.ToInt32(obj.UserID);
+            finalresult.RoleID = Convert.ToString(obj.RoleID);
+            finalresult.emailaddress = Convert.ToString(obj.emailaddress);
+            DateTime dt = Convert.ToDateTime(obj.issuedat);
+            dt = dt.AddMinutes(5);
+            finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
+            finalresult.expirydate = dt;
+            finalresult.clientid = Convert.ToInt32(obj.clientid);
+            finalresult.token = Convert.ToString(obj.token);
+            finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+            finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
+
+            return finalresult;
+        }
+
+
+
 
         #region all
 
 
 
 
+        //public Result GetUserDetailsBysearch(string searchstring)
+        //{
+        //    using (SqlConnection conn = DbHelper.CreateConnection())
+        //    {
+        //        UserDetails user = null;
+        //        using (SqlCommand sqlcmd = new SqlCommand())
+        //        {
+        //            SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+        //            DataSet ds = new DataSet();
+        //            sqlcmd.CommandText = "usp_GetUserDetailsBysearch";
+        //            sqlcmd.CommandType = CommandType.StoredProcedure;
+        //            sqlcmd.Connection = conn;
+        //            sqlcmd.Parameters.Add("@searchstring", SqlDbType.NVarChar, 50).Value = searchstring;
+        //            sqlad.Fill(ds);
+        //            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //            {
+        //                user = new UserDetails();
+        //                user.ID = Convert.ToInt64(ds.Tables[0].Rows[0]["ID"].ToString());
+        //                user.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
+        //                user.LastName = ds.Tables[0].Rows[0]["LastName"].ToString();
+        //                user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+        //                user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+        //                user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+        //                //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
+        //                if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
+        //                    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
+        //                if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
+        //                    user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+        //                if (ds.Tables[0].Rows[0]["RoleID"] != DBNull.Value)
+        //                    user.role.RoleID = Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
 
+        //                if (ds.Tables[0].Rows[0]["RoleName"] != DBNull.Value)
+        //                    user.role.RoleName = ds.Tables[0].Rows[0]["RoleName"].ToString();
+        //                user.WorkerID = ds.Tables[0].Rows[0]["WorkerID"].ToString();
+        //                //return new Result
+        //                //{
+        //                //    Results = user
+        //                //};
+        //            }
+        //            return new Result
+        //            {
+        //                // Status = false,
+        //                // MessageId = 1,
+        //                // Results = null
+        //            };
+        //        }
+        //    }
+        //}
 
 
 
@@ -646,7 +751,106 @@ namespace DummyProjectDAL
                 }
             }
         }
+        //public Result GetMenuCRUDSelect(string menuID, string menuName)
+        //{
+        //    using (SqlConnection conn = DbHelper.CreateConnection())
+        //    {
+        //        UserDetails user = null;
+        //        using (SqlCommand sqlcmd = new SqlCommand())
+        //        {
+        //            SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+        //            DataSet ds = new DataSet();
+        //            sqlcmd.CommandText = "usp_GetUserDetailsByID";
+        //            sqlcmd.CommandType = CommandType.StoredProcedure;
+        //            sqlcmd.Connection = conn;
+        //            sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = menuID;
+        //            sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = menuName;
+        //            sqlad.Fill(ds);
+        //            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //            {
+        //                user = new UserDetails();
+        //                user.ID = Convert.ToInt64(ds.Tables[0].Rows[0]["ID"].ToString());
+        //                user.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
+        //                user.LastName = ds.Tables[0].Rows[0]["LastName"].ToString();
+        //                user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+        //                user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+        //                user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+        //                //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
+        //                if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
+        //                    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
+        //                if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
+        //                    user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+        //                if (ds.Tables[0].Rows[0]["RoleID"] != DBNull.Value)
+        //                    user.role.RoleID = Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
 
+        //                if (ds.Tables[0].Rows[0]["RoleName"] != DBNull.Value)
+        //                    user.role.RoleName = ds.Tables[0].Rows[0]["RoleName"].ToString();
+        //                user.WorkerID = ds.Tables[0].Rows[0]["WorkerID"].ToString();
+        //                //return new Result
+        //                //{
+        //                //    Results = user
+        //                //};
+        //            }
+        //            return new Result
+        //            {
+        //                // Status = false,
+        //                // MessageId = 1,
+        //                // Results = null
+        //            };
+        //        }
+        //    }
+        //}
+
+
+        //public Result getUserRoleDetails(string UserRole)
+        //{
+        //    using (SqlConnection conn = DbHelper.CreateConnection())
+        //    {
+        //        UserDetails user = null;
+        //        using (SqlCommand sqlcmd = new SqlCommand())
+        //        {
+        //            SqlDataAdapter sqlad = new SqlDataAdapter(sqlcmd);
+        //            DataSet ds = new DataSet();
+        //            sqlcmd.CommandText = "usp_GetUserDetailsByID";
+        //            sqlcmd.CommandType = CommandType.StoredProcedure;
+        //            sqlcmd.Connection = conn;
+        //            sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = UserRole;
+        //           // sqlcmd.Parameters.Add("@ID", SqlDbType.BigInt).Value = menuName;
+        //            sqlad.Fill(ds);
+        //            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //            {
+        //                user = new UserDetails();
+        //                user.ID = Convert.ToInt64(ds.Tables[0].Rows[0]["ID"].ToString());
+        //                user.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
+        //                user.LastName = ds.Tables[0].Rows[0]["LastName"].ToString();
+        //                user.Phone = ds.Tables[0].Rows[0]["Phone"].ToString();
+        //                user.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+        //                user.Password = ds.Tables[0].Rows[0]["Password"].ToString();
+        //                //(sqlcmd.Parameters["@UserID"].Value == DBNull.Value ? 0 : (Int64)sqlcmd.Parameters["@UserID"].Value)
+        //                if (ds.Tables[0].Rows[0]["CountryID"] != DBNull.Value)
+        //                    user.country.CountryID = Convert.ToInt32(ds.Tables[0].Rows[0]["CountryID"].ToString());
+        //                if (ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
+        //                    user.country.CountryName = ds.Tables[0].Rows[0]["CountryName"].ToString();
+        //                if (ds.Tables[0].Rows[0]["RoleID"] != DBNull.Value)
+        //                    user.role.RoleID = Convert.ToInt32(ds.Tables[0].Rows[0]["RoleID"].ToString());
+
+        //                if (ds.Tables[0].Rows[0]["RoleName"] != DBNull.Value)
+        //                    user.role.RoleName = ds.Tables[0].Rows[0]["RoleName"].ToString();
+        //                user.WorkerID = ds.Tables[0].Rows[0]["WorkerID"].ToString();
+        //                //return new Result
+        //                //{
+        //                //    Results = user
+        //                //};
+        //            }
+        //            return new Result
+        //            {
+        //                // Status = false,
+        //                // MessageId = 1,
+        //                // Results = null
+        //            };
+        //        }
+        //    }
+        //}
         public Role GetAuthorizeRole()
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
