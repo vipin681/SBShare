@@ -62,7 +62,7 @@ namespace DummyProject.Filters
             //   }
             Result outResult = new Result
             {
-                status = false,
+                //status = false,
                 MessageId = -1
             };
             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK, outResult);

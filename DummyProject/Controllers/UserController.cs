@@ -389,6 +389,8 @@ namespace DummyProject.Controllers
                 objUserBLL.CreateUserProfileCache(objResult);
                 if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
                 {
+                    objResult.token = "";
+                    objResult.encryptedpassword = "";
                     response = Request.CreateResponse(HttpStatusCode.OK, objResult);
                     response.Headers.Add("Authorization", token);
                 }
@@ -400,8 +402,19 @@ namespace DummyProject.Controllers
             else
             {
                 objResult = objUserBLL.ReturnUserProfileCache(Convert.ToString(clientid), emailaddress, Password);
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-                response.Headers.Add("Authorization", token);
+                if (objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
+                {
+                    objUserBLL.CreateUserProfileCache(objResult);
+                    token = objResult.token;
+                    objResult.token = "";
+                    objResult.encryptedpassword = "";
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    response.Headers.Add("Authorization", token);
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.Unauthorized, "Invalid credentials");
+                }
             }
             return response;
         }

@@ -414,7 +414,7 @@ namespace DummyProjectDAL
 
             var redisDictionary = redisTypeFactory.GetDictionary<int, UserDetails>("UserDetailsList");
             int i = 0;
-           
+
             // Iterate through dictionary
             foreach (var person in redisDictionary)
             {
@@ -443,7 +443,7 @@ namespace DummyProjectDAL
             List<UserDetails> emp = new List<UserDetails>();
             DataTable dt = data as DataTable;
             emp = (from DataRow row in dt.Rows
-                    select new UserDetails
+                   select new UserDetails
                    {
                        userid = Convert.ToInt32(row["userid"]),
                        firstname = Convert.ToString(row["fName"]),
@@ -454,8 +454,8 @@ namespace DummyProjectDAL
                        workerid = Convert.ToString(row["workerid"]),
                        status = Convert.ToBoolean(row["status"]),
                        clientid = Convert.ToInt32(row["CLIENTID"])
-                    }).ToList();
-            
+                   }).ToList();
+
             var cache = RedisConnectorHelper.Connection.GetDatabase();
 
             foreach (var eachemp in emp)
@@ -472,22 +472,73 @@ namespace DummyProjectDAL
             cache.StringSet(Convert.ToString(data.clientid) + "_" + Convert.ToString(data.emailaddress), JsonConvert.SerializeObject(data));
         }
 
-        public bool CheckinUserProfileCache(string clientid, string emailid,string password)
+        public bool CheckinUserProfileCache(string clientid, string emailid, string password)
         {
 
             var cache = RedisConnectorHelper.Connection.GetDatabase();
-            var value = cache.StringGet(clientid + "_" + emailid);
-            return value.HasValue;
+            var value = cache.KeyExists(clientid + "_" + emailid);
+            return value;
         }
 
         public Result ReturnUserProfileCache(string clientid, string emailid, string password)
         {
-            Result finalresult = null;
+            Result finalresult = new Result();
             var cache = RedisConnectorHelper.Connection.GetDatabase();
             var value = cache.StringGet(clientid + "_" + emailid);
-            finalresult = (dynamic)value;
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+
+            if (password == Convert.ToString(obj.encryptedpassword))
+            {
+                finalresult.firstname = Convert.ToString(obj.firstname);
+                finalresult.lastname = Convert.ToString(obj.lastname);
+                finalresult.UserID = Convert.ToInt32(obj.UserID);
+                finalresult.RoleID = Convert.ToString(obj.RoleID);
+                finalresult.emailaddress = Convert.ToString(obj.emailaddress);
+                DateTime dt = Convert.ToDateTime(obj.issuedat);
+                dt = dt.AddMinutes(5);
+                finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
+                finalresult.expirydate = dt;
+                finalresult.clientid = Convert.ToInt32(obj.clientid);
+                finalresult.token = Convert.ToString(obj.token);
+                finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+                finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
+            }
+            else
+            {
+
+            }
+
+
             return finalresult;
         }
+
+        public Result ReturnUserProfileCache_ClientEmailid(string clientid, string emailid)
+        {
+            Result finalresult = new Result();
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(clientid + "_" + emailid);
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+
+            finalresult.firstname = Convert.ToString(obj.firstname);
+            finalresult.lastname = Convert.ToString(obj.lastname);
+            finalresult.UserID = Convert.ToInt32(obj.UserID);
+            finalresult.RoleID = Convert.ToString(obj.RoleID);
+            finalresult.emailaddress = Convert.ToString(obj.emailaddress);
+            DateTime dt = Convert.ToDateTime(obj.issuedat);
+            dt = dt.AddMinutes(5);
+            finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
+            finalresult.expirydate = dt;
+            finalresult.clientid = Convert.ToInt32(obj.clientid);
+            finalresult.token = Convert.ToString(obj.token);
+            finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+            finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
+
+            return finalresult;
+        }
+
+
 
 
         #region all

@@ -17,7 +17,7 @@ namespace DummyProjectStateClass
         public int UserID { get; set;}
         public string RoleID { get; set; }
         public int roleid { get; set; }
-        public bool status { get; set; }
+       // public bool status { get; set; }
         public String description { get; set; }
         public string emailaddress { get; set; }
         public string firstname { get; set; }
@@ -25,6 +25,7 @@ namespace DummyProjectStateClass
         public int clientid { get; set; }
         public DateTime issuedat { get; set; }
         public DateTime expirydate { get; set; }
-        
+        public string token { get; set; }
+        public string encryptedpassword { get; set; }
     }
 }

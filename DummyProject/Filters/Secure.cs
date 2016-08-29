@@ -42,12 +42,37 @@ namespace DummyProject.Filters
                         MessageId = -1
                     };
                     actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
+                    return;
                 }
+
                 var bearerToken = authHeaderValues.ElementAt(0);
                 var token = bearerToken.StartsWith("Bearer ") ? bearerToken.Substring(7) : bearerToken;
-
-                //var secret = ConfigurationManager.AppSettings.Get("jwtKey");
                 var secret = ConfigurationManager.AppSettings.Get("JWTsecret");
+                Result objResult = null;
+                UserBAL objUserBLL = new UserBAL();
+
+                var jsonSerializer = new JavaScriptSerializer();
+                var payloadJson = JsonWebToken.Decode(token, secret);
+                var payloadData = jsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson);
+                object emailid;
+                object clientidvar;
+                if (payloadData != null && (payloadData.TryGetValue("emailid", out emailid) && payloadData.TryGetValue("clientid", out clientidvar)))
+                {
+                    objResult = objUserBLL.ReturnUserProfileCache_ClientEmailid(Convert.ToString(clientidvar), Convert.ToString(emailid));
+                    if (objResult.expirydate > DateTime.Now)
+                    {
+                        Result outResult = new Result
+                        {
+                            Status = Convert.ToString((int)HttpStatusCode.Unauthorized),
+                            MessageId = 0,
+                            errormsg = "Token Expired.Please Login again"
+                        };
+                        actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
+                        return;
+                    }
+
+                }
+               
                 int Roleid = 0;
                 int clientid = 0;
                 Thread.CurrentPrincipal = ValidateToken(
@@ -58,7 +83,7 @@ namespace DummyProject.Filters
 
                 var apiname = actionContext.ControllerContext.RouteData.Values["action"];
                 var APIID = (int)((APIName)Enum.Parse(typeof(APIName), Convert.ToString(apiname)));
-                UserBAL objUserBLL = new UserBAL();
+               
                 int status = objUserBLL.IsUserAuthorized(Convert.ToInt32(APIID), Roleid,clientid);
                 if (status == 0)
                 {
@@ -108,22 +133,11 @@ namespace DummyProject.Filters
             var payloadJson = JsonWebToken.Decode(token, secret);
             var payloadData = jsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson);
 
+           
+            
 
-            object exp;
-            if (payloadData != null && (checkExpiration && payloadData.TryGetValue("exp", out exp)))
-            {
-                var validTo = FromUnixTime(long.Parse(exp.ToString()));
-                if (DateTime.Compare(validTo, DateTime.UtcNow) <= 0)
-                {
-                    throw new Exception(
-                        string.Format("Token is expired. Expiration: '{0}'. Current: '{1}'", validTo, DateTime.UtcNow));
-                }
-            }
-
-
-
+          
             var subject = new ClaimsIdentity("Federation", ClaimTypes.Name, ClaimTypes.Role);
-
             var claims = new List<Claim>();
 
             if (payloadData != null)

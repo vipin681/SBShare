@@ -147,8 +147,11 @@ namespace DummyProjectBAL
                 if (objUser.password == userPassword)
                 {
                     #region Create Token region
-                    DateTime issuedOn = DateTime.Now;
-                    DateTime expiredOn = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var expiry = Math.Round((DateTime.UtcNow.AddMinutes(5) - unixEpoch).TotalSeconds);
+                    var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+
+
 
                     var payload = new Dictionary<string, object>()
                          {
@@ -158,8 +161,8 @@ namespace DummyProjectBAL
                             { "roleid", objUser.roleid },
                             { "emailid", emailaddress },
                             { "clientid", clientid },
-                            { "iat", issuedOn},
-                            { "exp", expiredOn}
+                            { "iat", issuedAt},
+                            { "exp", expiry}
 
                          };
                     var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
@@ -179,9 +182,11 @@ namespace DummyProjectBAL
                         lastname = objUser.lastname == null ? "" : objUser.lastname,
                         emailaddress = emailaddress,
                         clientid = clientid,
-                        issuedat = issuedOn,
-                        expirydate = expiredOn
-                      
+                        issuedat = DateTime.Now,
+                        expirydate = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])),
+                        token = token1,
+                        encryptedpassword= userPassword
+
                     };
                 }
                 else
@@ -492,7 +497,7 @@ namespace DummyProjectBAL
             UserDAL userDAL = new UserDAL();
             userDAL.CreateUserProfileCache(data);
         }
-
+       
         public bool CheckinUserProfileCache(string clientid, string emailid, string password)
         {
             UserDAL userDAL = new UserDAL();
@@ -503,7 +508,12 @@ namespace DummyProjectBAL
             UserDAL userDAL = new UserDAL();
             return userDAL.ReturnUserProfileCache(clientid, emailid, password);
         }
-        
+        public Result ReturnUserProfileCache_ClientEmailid(string clientid, string emailid)
+        {
+            UserDAL userDAL = new UserDAL();
+            return userDAL.ReturnUserProfileCache_ClientEmailid(clientid, emailid);
+        }
+
 
     }
 }
