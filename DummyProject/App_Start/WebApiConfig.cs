@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using DummyProject.CustomFilters;
+//using DummyProject.CustomFilters;
 namespace DummyProject
 {
     public static class WebApiConfig
@@ -16,8 +16,8 @@ namespace DummyProject
                 routeTemplate: "api/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-            config.Filters.Add(new OnExceptionHandler());
-            config.Filters.Add(new DummyProject.CustomFilters.NotImplExceptionFilterAttribute());
+            //config.Filters.Add(new OnExceptionHandler());
+            //config.Filters.Add(new DummyProject.CustomFilters.NotImplExceptionFilterAttribute());
 
 
         }

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+//using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using DummyProjectStateClass;
-using DummyProjectBAL;
+//using DummyProjectStateClass;
+//using DummyProjectBAL;
 
 namespace System.Web.Mvc
 {
@@ -13,14 +13,13 @@ namespace System.Web.Mvc
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
 
-            UserBAL obj = new UserBAL();
-        var role=obj.GetAuthorizeRole();
-            string CurrentUserRole = role.description;
-            //       // UserBLL objUserBLL = new UserBLL();
+            var isAuthorized = base.AuthorizeCore(httpContext);
+            if (!isAuthorized)
+            {
 
-            //        var role = objUserBLL.GetAuthorizeRole();
-            //        if (role != null)
-            //        {
+                return false;
+            }
+            string CurrentUserRole = "Admin";
             if (this.UserRole.Contains(CurrentUserRole))
             {
 
@@ -30,7 +29,29 @@ namespace System.Web.Mvc
             {
                 return false;
             }
-            return base.AuthorizeCore(httpContext);
+
+            //    UserBAL obj = new UserBAL();
+            //var role=obj.GetAuthorizeRole();
+            //    string CurrentUserRole = role.description;
+            //    //       // UserBLL objUserBLL = new UserBLL();
+
+            //    //        var role = objUserBLL.GetAuthorizeRole();
+            //    //        if (role != null)
+            //    //        {
+            //    if (this.UserRole.Contains(CurrentUserRole))
+            //    {
+
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        return false;
+            //    }
+            //    return base.AuthorizeCore(httpContext);
+        }
+        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
+        {
+            base.HandleUnauthorizedRequest(filterContext);
         }
     }
 }

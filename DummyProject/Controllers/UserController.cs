@@ -8,7 +8,7 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using DummyProjectStateClass;
 using DummyProjectBAL;
-using DummyProject.CustomFilters;
+//using DummyProject.CustomFilters;
 using System.Net.Http.Headers;
 using System.Data.SqlClient;
 using DummyProject.Filters;
