@@ -23,17 +23,14 @@ namespace DummyProject.Filters
         public override void OnAuthorization(HttpActionContext actionContext)
 
          {
-
+           
             //HttpResponseMessage errorResponse = null;
             var request = actionContext.Request;
-            
             try
             {
+                #region check token exists
                 IEnumerable<string> authHeaderValues;
                 request.Headers.TryGetValues("Authorization", out authHeaderValues);
-             
-
-
                 if (authHeaderValues == null)
                 {
                     Result outResult = new Result
@@ -44,6 +41,7 @@ namespace DummyProject.Filters
                     actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
                     return;
                 }
+                #endregion
 
                 var bearerToken = authHeaderValues.ElementAt(0);
                 var token = bearerToken.StartsWith("Bearer ") ? bearerToken.Substring(7) : bearerToken;
@@ -51,15 +49,17 @@ namespace DummyProject.Filters
                 Result objResult = null;
                 UserBAL objUserBLL = new UserBAL();
 
+                #region check Expiry date from cache
                 var jsonSerializer = new JavaScriptSerializer();
                 var payloadJson = JsonWebToken.Decode(token, secret);
                 var payloadData = jsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson);
                 object emailid;
-                object clientidvar;
-                if (payloadData != null && (payloadData.TryGetValue("emailid", out emailid) && payloadData.TryGetValue("clientid", out clientidvar)))
+                object clientidvar =0;
+                object roleidvar=0;
+                if (payloadData != null && (payloadData.TryGetValue("emailid", out emailid) && payloadData.TryGetValue("clientid", out clientidvar) && payloadData.TryGetValue("roleid", out roleidvar)))
                 {
                     objResult = objUserBLL.ReturnUserProfileCache_ClientEmailid(Convert.ToString(clientidvar), Convert.ToString(emailid));
-                    if (objResult.expirydate > DateTime.Now)
+                    if (objResult.expirydate < DateTime.Now)
                     {
                         Result outResult = new Result
                         {
@@ -70,21 +70,22 @@ namespace DummyProject.Filters
                         actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
                         return;
                     }
+                    else
+                    {
+                        objResult.expirydate = DateTime.Now.AddSeconds(Convert.ToInt32(ConfigurationManager.AppSettings.Get("cacheextendtime")));
+                        objUserBLL.CreateUserProfileCache(objResult);
+                    }
 
                 }
+                #endregion
+
+                #region check Role authorization from db
                
-                int Roleid = 0;
-                int clientid = 0;
-                Thread.CurrentPrincipal = ValidateToken(
-                    token,
-                    secret,
-                    true,out  Roleid,out clientid
-                    );
 
                 var apiname = actionContext.ControllerContext.RouteData.Values["action"];
                 var APIID = (int)((APIName)Enum.Parse(typeof(APIName), Convert.ToString(apiname)));
                
-                int status = objUserBLL.IsUserAuthorized(Convert.ToInt32(APIID), Roleid,clientid);
+                int status = objUserBLL.IsUserAuthorized(Convert.ToInt32(APIID), Convert.ToInt32(roleidvar), Convert.ToInt32(clientidvar));
                 if (status == 0)
                 {
                     Result outResult = new Result
@@ -96,11 +97,14 @@ namespace DummyProject.Filters
                     actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized, outResult);
                     return;
                 }
-
+                #endregion
+                
+                Thread.CurrentPrincipal = ValidateToken(token,secret,true);
                 if (HttpContext.Current != null)
                 {
                     HttpContext.Current.User = Thread.CurrentPrincipal;
                 }
+                
             }
             catch (SignatureVerificationException ex)
             {
@@ -125,18 +129,14 @@ namespace DummyProject.Filters
      
         }
 
-        private static ClaimsPrincipal ValidateToken(string token, string secret, bool checkExpiration,out int roleid, out int clientid)
+        private static ClaimsPrincipal ValidateToken(string token, string secret, bool checkExpiration)
         {
-            int roleid1 =0;
-            int clientid1 = 0;
+            //int roleid1 =0;
+            //int clientid1 = 0;
             var jsonSerializer = new JavaScriptSerializer();
             var payloadJson = JsonWebToken.Decode(token, secret);
             var payloadData = jsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson);
-
-           
             
-
-          
             var subject = new ClaimsIdentity("Federation", ClaimTypes.Name, ClaimTypes.Role);
             var claims = new List<Claim>();
 
@@ -167,7 +167,7 @@ namespace DummyProject.Filters
                             claims.Add(new Claim(ClaimTypes.Email, pair.Value.ToString(), ClaimValueTypes.Email));
                             break;
                         case "roleid":
-                            roleid1 = Convert.ToInt32(pair.Value);
+                           // roleid1 = Convert.ToInt32(pair.Value);
                             claims.Add(new Claim(ClaimTypes.Role, pair.Value.ToString(), ClaimValueTypes.Integer));
                             break;
                         case "userid":
@@ -177,7 +177,7 @@ namespace DummyProject.Filters
                             claims.Add(new Claim(ClaimTypes.Expiration, pair.Value.ToString(), ClaimValueTypes.String));
                             break;
                         case "clientid":
-                            clientid1 = Convert.ToInt32(pair.Value);
+                           // clientid1 = Convert.ToInt32(pair.Value);
                             claims.Add(new Claim(ClaimTypes.GroupSid, pair.Value.ToString(), ClaimValueTypes.Integer));
                             break;
                             //default:
@@ -187,8 +187,8 @@ namespace DummyProject.Filters
                 }
 
             subject.AddClaims(claims);
-            roleid = roleid1;
-            clientid = clientid1;
+            //roleid = roleid1;
+            //clientid = clientid1;
             return new ClaimsPrincipal(subject);
         }
 
