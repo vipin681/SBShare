@@ -182,9 +182,6 @@ namespace DummyProjectBAL
                         lastname = objUser.lastname == null ? "" : objUser.lastname,
                         emailaddress = emailaddress,
                         clientid = clientid,
-                        issuedat = DateTime.Now,
-                        expirydate = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])),
-                        token = token1,
                         encryptedpassword= userPassword
 
                     };

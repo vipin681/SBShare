@@ -18,6 +18,9 @@ using DummyProject;
 using StackExchange.Redis;
 using System.Text;
 using RedisConnectionTest;
+using DummyProjectDAL;
+using Newtonsoft.Json;
+using System.Configuration;
 
 namespace DummyProject.Controllers
 {
@@ -380,16 +383,24 @@ namespace DummyProject.Controllers
         {
             HttpResponseMessage response;
             Result objResult = null;
+            TokenDetails tokenclass = new TokenDetails();
             UserBAL objUserBLL = new UserBAL();
             string token = "";
 
-            if (!objUserBLL.CheckinUserProfileCache(Convert.ToString(clientid), emailaddress, Password))
+            if (!CommonFunctions.IsKeyexistsinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails"))
             {
                 objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
-                objUserBLL.CreateUserProfileCache(objResult);
+                if (token != "")
+                {
+                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
+                    tokenclass.token = token;
+                    tokenclass.expirydate = Convert.ToInt32(expiry);
+                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", JsonConvert.SerializeObject(objResult));
+                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
+                }
                 if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
                 {
-                    objResult.token = "";
                     objResult.encryptedpassword = "";
                     response = Request.CreateResponse(HttpStatusCode.OK, objResult);
                     response.Headers.Add("Authorization", token);
@@ -401,15 +412,19 @@ namespace DummyProject.Controllers
             }
             else
             {
-                objResult = objUserBLL.ReturnUserProfileCache(Convert.ToString(clientid), emailaddress, Password);
+                //clientid + "_" + emailid
+                objResult = CommonFunctions.ReturnUserProfileCache(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", Password);
                 if (objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
                 {
-                    objUserBLL.CreateUserProfileCache(objResult);
-                    token = objResult.token;
+                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
+                    tokenclass.token = objResult.token;
+                    tokenclass.expirydate = Convert.ToInt32(expiry);
+                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
                     objResult.token = "";
                     objResult.encryptedpassword = "";
                     response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-                    response.Headers.Add("Authorization", token);
+                    response.Headers.Add("Authorization", tokenclass.token);
                 }
                 else
                 {

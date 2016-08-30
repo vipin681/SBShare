@@ -424,6 +424,10 @@
       <Project>{4e38698d-8641-4366-846e-f1ce68b71808}</Project>
       <Name>DummyProjectBAL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DummyProjectDAL\DummyProjectDAL.csproj">
+      <Project>{5217AC8B-1F84-4EB2-851F-2F4A9A682425}</Project>
+      <Name>DummyProjectDAL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DummyProjectStateClass\DummyProjectStateClass.csproj">
       <Project>{0efef4bb-7e94-47ec-846b-01b119c00459}</Project>
       <Name>DummyProjectStateClass</Name>
