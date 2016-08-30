@@ -108,7 +108,7 @@ namespace DummyProjectDAL
         public static int expiryafteraddingseconds(int addseconds)
         {
             var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
+            var expiry = Math.Round((DateTime.UtcNow.AddSeconds(addseconds) - unixEpoch).TotalSeconds);
             return Convert.ToInt32(expiry);
         }
 
