@@ -15,6 +15,7 @@ using System.Configuration;
 using System.Web.Script.Serialization;
 using System.Collections;
 using static DummyProjectStateClass.EnumClass;
+using DummyProjectDAL;
 
 namespace DummyProject.Filters
 {
@@ -47,6 +48,7 @@ namespace DummyProject.Filters
                 var token = bearerToken.StartsWith("Bearer ") ? bearerToken.Substring(7) : bearerToken;
                 var secret = ConfigurationManager.AppSettings.Get("JWTsecret");
                 Result objResult = null;
+                TokenDetails objtokendetails = null;
                 UserBAL objUserBLL = new UserBAL();
 
                 #region check Expiry date from cache
@@ -58,7 +60,7 @@ namespace DummyProject.Filters
                 object roleidvar=0;
                 if (payloadData != null && (payloadData.TryGetValue("emailid", out emailid) && payloadData.TryGetValue("clientid", out clientidvar) && payloadData.TryGetValue("roleid", out roleidvar)))
                 {
-                    objResult = objUserBLL.ReturnUserProfileCache_ClientEmailid(Convert.ToString(clientidvar), Convert.ToString(emailid));
+                    objtokendetails = CommonFunctions.ReturnTokenCache(Convert.ToString(clientidvar) + "_" + Convert.ToString(emailid) + "_tokendetails");
                     if (objResult.expirydate < DateTime.Now)
                     {
                         Result outResult = new Result

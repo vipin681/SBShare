@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using RedisConnectionTest;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -104,6 +105,13 @@ namespace DummyProjectDAL
 
         }
 
+        public static int expiryafteraddingseconds(int addseconds)
+        {
+            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
+            return Convert.ToInt32(expiry);
+        }
+
         #region  redis
         public static bool IsKeyexistsinRedis(string key)
         {
@@ -146,11 +154,57 @@ namespace DummyProjectDAL
             return finalresult;
         }
 
+        public static TokenDetails ReturnTokenCache(string key)
+        {
+            TokenDetails finalresult = new TokenDetails();
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(key);
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+            finalresult.expirydate = Convert.ToInt32(obj.expirydate);
+            finalresult.token = Convert.ToString(obj.token);
+            return finalresult;
+        }
+
+        public static Result ReturnUserProfileCache_withoutpass(string key)
+        {
+            Result finalresult = new Result();
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(key);
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+
+           
+                finalresult.firstname = Convert.ToString(obj.firstname);
+                finalresult.lastname = Convert.ToString(obj.lastname);
+                finalresult.UserID = Convert.ToInt32(obj.UserID);
+                finalresult.RoleID = Convert.ToString(obj.RoleID);
+                finalresult.emailaddress = Convert.ToString(obj.emailaddress);
+                DateTime dt = Convert.ToDateTime(obj.issuedat);
+                dt = dt.AddMinutes(5);
+                finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
+                finalresult.expirydate = dt;
+                finalresult.clientid = Convert.ToInt32(obj.clientid);
+                finalresult.token = Convert.ToString(obj.token);
+                finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+                finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
+         
+
+
+            return finalresult;
+        }
+
         public static bool CreateRedisKeyValue(string Key,string value)
         {
             var cache = RedisConnectorHelper.Connection.GetDatabase();
             cache.StringSet(Key, value);
             return true;
+        }
+
+        public static DateTime FromUnixTime(long unixTime)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return epoch.AddSeconds(unixTime);
         }
         #endregion
 
