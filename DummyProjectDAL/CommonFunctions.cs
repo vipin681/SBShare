@@ -1,7 +1,11 @@
-﻿using System;
+﻿using DummyProjectStateClass;
+using Newtonsoft.Json;
+using RedisConnectionTest;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -99,5 +103,56 @@ namespace DummyProjectDAL
             return newChars;
 
         }
+
+        #region  redis
+        public static bool IsKeyexistsinRedis(string key)
+        {
+
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.KeyExists(key);
+            return value;
+        }
+
+        public static Result ReturnUserProfileCache(string key,string password)
+        {
+            Result finalresult = new Result();
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(key);
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+
+            if (password == Convert.ToString(obj.encryptedpassword))
+            {
+                finalresult.firstname = Convert.ToString(obj.firstname);
+                finalresult.lastname = Convert.ToString(obj.lastname);
+                finalresult.UserID = Convert.ToInt32(obj.UserID);
+                finalresult.RoleID = Convert.ToString(obj.RoleID);
+                finalresult.emailaddress = Convert.ToString(obj.emailaddress);
+                DateTime dt = Convert.ToDateTime(obj.issuedat);
+                dt = dt.AddMinutes(5);
+                finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
+                finalresult.expirydate = dt;
+                finalresult.clientid = Convert.ToInt32(obj.clientid);
+                finalresult.token = Convert.ToString(obj.token);
+                finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+                finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
+            }
+            else
+            {
+
+            }
+
+
+            return finalresult;
+        }
+
+        public static bool CreateRedisKeyValue(string Key,string value)
+        {
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            cache.StringSet(Key, value);
+            return true;
+        }
+        #endregion
+
     }
 }

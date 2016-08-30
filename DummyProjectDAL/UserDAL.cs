@@ -12,6 +12,7 @@ using NLog;
 using RedisConnectionTest;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using System.Configuration;
 
 namespace DummyProjectDAL
 {
@@ -527,7 +528,7 @@ namespace DummyProjectDAL
             finalresult.RoleID = Convert.ToString(obj.RoleID);
             finalresult.emailaddress = Convert.ToString(obj.emailaddress);
             DateTime dt = Convert.ToDateTime(obj.issuedat);
-            dt = dt.AddMinutes(5);
+            dt = dt.AddSeconds(Convert.ToInt32(ConfigurationManager.AppSettings.Get("cacheextendtime")));
             finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
             finalresult.expirydate = dt;
             finalresult.clientid = Convert.ToInt32(obj.clientid);

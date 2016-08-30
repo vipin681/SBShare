@@ -275,6 +275,7 @@
     <Compile Include="Result.cs" />
     <Compile Include="Role.cs" />
     <Compile Include="StudentModel.cs" />
+    <Compile Include="TokenDetails.cs" />
     <Compile Include="UpdateUserPassword.cs" />
     <Compile Include="UserDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

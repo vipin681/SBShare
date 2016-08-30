@@ -148,7 +148,7 @@ namespace DummyProjectBAL
                 {
                     #region Create Token region
                     var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    var expiry = Math.Round((DateTime.UtcNow.AddMinutes(5) - unixEpoch).TotalSeconds);
+                    var expiry = Math.Round((DateTime.UtcNow.AddYears(5) - unixEpoch).TotalSeconds);
                     var issuedAt = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
 
 
@@ -182,9 +182,6 @@ namespace DummyProjectBAL
                         lastname = objUser.lastname == null ? "" : objUser.lastname,
                         emailaddress = emailaddress,
                         clientid = clientid,
-                        issuedat = DateTime.Now,
-                        expirydate = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])),
-                        token = token1,
                         encryptedpassword= userPassword
 
                     };
