@@ -382,9 +382,10 @@ namespace DummyProject.Controllers
             Result objResult = null;
             UserBAL objUserBLL = new UserBAL();
             string token = "";
-
+           
             if (!objUserBLL.CheckinUserProfileCache(Convert.ToString(clientid), emailaddress, Password))
             {
+
                 objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
                 objUserBLL.CreateUserProfileCache(objResult);
                 if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
@@ -526,6 +527,38 @@ namespace DummyProject.Controllers
             return userBAL1.checkcache();
 
         }
+
+        /// <summary>
+        /// Sign Out
+        /// </summary>
+        /// <param name="">
+        /// Enter Theme Id to change</param>
+        /// /// <param name="">
+        /// Enter userid for specific user</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Secure]
+        public HttpResponseMessage LogOut(string clientid, string emailid, string password)
+        {
+            Result objResult = null;
+            UserBAL userBAL = new UserBAL();
+            HttpResponseMessage response = new HttpResponseMessage();
+            objResult.Results = userBAL.checkcache();
+            userBAL.setcache(objResult.Results);
+            return response;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
         #region all
 
