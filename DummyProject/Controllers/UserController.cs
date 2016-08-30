@@ -392,10 +392,9 @@ namespace DummyProject.Controllers
                 objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
                 if (token != "")
                 {
-                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
                     tokenclass.token = token;
-                    tokenclass.expirydate = Convert.ToInt32(expiry);
+                    tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+
                     CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", JsonConvert.SerializeObject(objResult));
                     CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
                 }
@@ -412,14 +411,12 @@ namespace DummyProject.Controllers
             }
             else
             {
-                //clientid + "_" + emailid
                 objResult = CommonFunctions.ReturnUserProfileCache(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", Password);
                 if (objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
                 {
-                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
                     tokenclass.token = objResult.token;
-                    tokenclass.expirydate = Convert.ToInt32(expiry);
+                    tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+
                     CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
                     objResult.token = "";
                     objResult.encryptedpassword = "";
