@@ -522,22 +522,112 @@ namespace DummyProject.Controllers
         }
         #endregion
 
-        [HttpGet]
-        //[Secure]
-        public void setcache(string str)
-        {
-            UserBAL userBAL1 = new UserBAL();
-            userBAL1.setcache(str);
-        }
+        //[HttpGet]
+        ////[Secure]
+        //public void setcache(string str)
+        //{
+        //    UserBAL userBAL1 = new UserBAL();
+        //    userBAL1.setcache(str);
+        //}
 
-        [HttpGet]
-        //[Secure]
-        public string getcache(string str)
-        {
-            UserBAL userBAL1 = new UserBAL();
-            return userBAL1.checkcache();
+        //[HttpGet]
+        ////[Secure]
+        //public string getcache(string str)
+        //{
+        //    UserBAL userBAL1 = new UserBAL();
+        //    return userBAL1.checkcache();
 
+        //}
+
+
+        #region LogOut
+        /// <summary>
+        /// LogOut User
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage LogOut(string emailaddress, string Password, int clientid)
+        {
+            HttpResponseMessage response;
+            Result objResult = null;
+            TokenDetails tokenclass = new TokenDetails();
+            UserBAL objUserBLL = new UserBAL();
+            string token = "";
+
+            if (!CommonFunctions.IsKeyexistsinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails"))
+            {
+                //objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
+                if (token != "")
+                {
+                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
+                    tokenclass.token = token;
+                    tokenclass.expirydate = Convert.ToInt32(expiry);
+                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", JsonConvert.SerializeObject(objResult));
+                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
+                }
+                if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
+                {
+                    objResult.encryptedpassword = "";
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    response.Headers.Add("Authorization", token);
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                }
+            }
+            else
+            {
+                //clientid + "_" + emailid
+                objResult = CommonFunctions.ReturnUserProfileCache(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", Password);
+                if (objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
+                {
+                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
+                    tokenclass.token = objResult.token;
+                    tokenclass.expirydate = Convert.ToInt32(expiry);
+                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
+                    objResult.token = "";
+                    objResult.encryptedpassword = "";
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    response.Headers.Add("Authorization", tokenclass.token);
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.Unauthorized, "Invalid credentials");
+                }
+            }
+            return response;
         }
+        #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         #region all
 
