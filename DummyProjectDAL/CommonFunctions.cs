@@ -109,6 +109,7 @@ namespace DummyProjectDAL
 
         }
 
+        #region Token
         public static int expiryafteraddingseconds(int addseconds)
         {
             var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -178,6 +179,7 @@ namespace DummyProjectDAL
             //clientid = clientid1;
             return new ClaimsPrincipal(subject);
         }
+        #endregion
 
         #region  redis
         public static bool IsKeyexistsinRedis(string key)

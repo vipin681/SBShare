@@ -27,19 +27,111 @@ namespace DummyProject.Controllers
     /// <summary>
     /// APIs for Crud operation on user and Login page
     /// </summary>
-  
+
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
     public class UserController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         Exception e = new Exception();
+
+        #region CheckLogin
+        /// <summary>
+        /// check is user a valid user in Login page
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [AllowAnonymous]
+        public HttpResponseMessage CheckLogin(string emailaddress, string Password, int clientid)
+        {
+            logger.Debug("Login API started");
+            HttpResponseMessage response;
+            Result objResult = null;
+            TokenDetails tokenclass = new TokenDetails();
+            UserDetails userdetails = new UserDetails();
+            UserBAL objUserBLL = new UserBAL();
+            string token = "";
+            logger.Debug("cheking expiry from cache started");
+            if (CommonFunctions.IsKeyexistsinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails"))
+            {
+                logger.Debug("cache not existed and IsValidUser_BAL started");
+                objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
+                if (token != "")
+                {
+                    logger.Debug("IsValidUser_BAL finished and creating redis key for token");
+                    #region create token  Redis
+                    tokenclass.token = token;
+                    tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+                    tokenclass.userid = objResult.UserID;
+                    tokenclass.encryptedpassword = Password;
+                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
+                    #endregion
+
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                }
+                if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
+                {
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    response.Headers.Add("Authorization", token);
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                }
+            }
+            else
+            {
+                logger.Debug("ReturnUserProfileCache1 starting ");
+                tokenclass = CommonFunctions.ReturnUserProfileCache1(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", Password);
+                if (tokenclass.encryptedpassword != "")
+                {
+                    tokenclass.token = tokenclass.token;
+                    tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
+                    logger.Debug("Redis Replaced with new expiry date");
+                    objResult = new Result();
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                    response.Headers.Add("Authorization", tokenclass.token);
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.Unauthorized, "Invalid credentials");
+                }
+            }
+            logger.Debug("Login API finished");
+            return response;
+        }
+        #endregion
+
+        #region LogOut
+        /// <summary>
+        /// LogOut User
+        /// </summary>
+        ///  /// <param name="emailaddress">
+        /// Enter emailaddress for specific user</param>
+        /// <param name="clientid">
+        /// Enter client ID for specific user eg. 20 for pennsylvania</param>
+        /// <returns></returns>
+
+        [HttpPost]
+        public HttpResponseMessage LogOut(string emailaddress, int clientid)
+        {
+            Result objResult = new Result();
+            HttpResponseMessage response;
+            CommonFunctions.DeleteKeyinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails");
+            objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+            response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            return response;
+        }
+        #endregion
+        
         #region Get User
         /// <summary>
         /// Get all the user list
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-       [Secure]
+        [Secure]
         public HttpResponseMessage GetUserList(int clientid)
         {
             StringBuilder sb = new StringBuilder();
@@ -49,76 +141,34 @@ namespace DummyProject.Controllers
             UserBAL userBAL = new UserBAL();
             try
             {
-                
-                    objResult = userBAL.GetUserList(clientid);
-                    if (objResult != null || objResult.Results != "")
-                    {
-                        objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                        objResult.errormsg = "";
-                        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-                    }
-                    else
-                    {
-                        objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
-                        objResult.errormsg = "Data Empty!";
-                        response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
-                    }
-                
+
+                objResult = userBAL.GetUserList(clientid);
+                if (objResult != null || objResult.Results != "")
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
+                    objResult.errormsg = "";
+                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                }
+                else
+                {
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
+                    objResult.errormsg = "Data Empty!";
+                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
+                }
+
             }
             catch (Exception ex)
             {
 
                 logger.ErrorException("Data Empty", ex);
-                
+
             }
 
             logger.Debug("get all users finished");
             return response;
         }
         #endregion
-
-        #region Update Password
-        /// <summary>
-        /// Update Password
-        /// </summary>
-        /// <param name="userPassword">
-        /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Secure]
-        public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
-        {
-            logger.Info("Started");
-            logger.Debug("Update  user started");
-            HttpResponseMessage response = new HttpResponseMessage(); ;
-            Result objResult = null;
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            UserBAL userBLL = new UserBAL();
-            try
-            {
-                logger.Debug("BLL started");
-                objResult = userBLL.UpdateUserPassword(userPassword);
-                if (objResult.Results == 1)
-                {
-                    response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
-                }
-                else
-                {
-                    response = Request.CreateResponse(HttpStatusCode.BadRequest, "Something went wrong");
-                }
-                return response;
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorException("Data Empty", ex);
-            }
-
-            logger.Debug("update user finished");
-            return response;
-        }
-        #endregion
-
+        
         #region Get User by id
         /// <summary>
         /// Get all the user list by id
@@ -129,7 +179,7 @@ namespace DummyProject.Controllers
         /// Enter corresponding clientid to search for specific user</param>
         /// <returns></returns>
         [HttpGet]
-      //  [Secure]
+        //  [Secure]
         public HttpResponseMessage GetUserById(int ID, int clientid)
         {
             logger.Debug("get all user by id started");
@@ -239,7 +289,7 @@ namespace DummyProject.Controllers
                     var level = LogLevel.Debug;
                     logger.Log(level, "BLL started");
                     objResult = userBLL.InsertUser(user);
-                  //  objResult.token.ToString();
+                    //  objResult.token.ToString();
 
 
                 }
@@ -339,90 +389,44 @@ namespace DummyProject.Controllers
 
         #endregion
 
-        #region CheckLogin
+        #region Update Password
         /// <summary>
-        /// check is user a valid user in Login page
+        /// Update Password
         /// </summary>
-        /// <returns></returns>
-        [HttpPost]
-        [AllowAnonymous]
-        public HttpResponseMessage CheckLogin(string emailaddress, string Password, int clientid)
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            TokenDetails tokenclass = new TokenDetails();
-            UserDetails userdetails = new UserDetails();
-            UserBAL objUserBLL = new UserBAL();
-            string token = "";
-
-            if (CommonFunctions.IsKeyexistsinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails"))
-            {
-                objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
-                if (token != "")
-                {
-                    #region create token  Redis
-                    tokenclass.token = token;
-                    tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
-                    tokenclass.userid = objResult.UserID;
-                    tokenclass.encryptedpassword = Password;
-                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
-                    #endregion
-
-                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                }
-                if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
-                {
-                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-                    response.Headers.Add("Authorization", token);
-                }
-                else
-                {
-                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
-                }
-            }
-            else
-            {
-                tokenclass = CommonFunctions.ReturnUserProfileCache1(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", Password);
-                if (tokenclass.encryptedpassword != "")
-                {
-                    tokenclass.token = tokenclass.token;
-                    tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
-                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
-                    objResult = new Result();
-                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-                    response.Headers.Add("Authorization", tokenclass.token);
-                }
-                else
-                {
-                    response = Request.CreateResponse(HttpStatusCode.Unauthorized, "Invalid credentials");
-                }
-            }
-            return response;
-        }
-        #endregion
-
-        #region RefreshToken
-        /// <summary>
-        /// New token will be generated by providing a old valid token(Exp date will b extended)
-        /// </summary>
+        /// <param name="userPassword">
+        /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
         /// <returns></returns>
         [HttpPost]
         [Secure]
-        public HttpResponseMessage RefreshToken(string OldToken)
+        public HttpResponseMessage UpdatePassword(UpdateUserPassword userPassword)
         {
-            HttpResponseMessage response;
+            logger.Info("Started");
+            logger.Debug("Update  user started");
+            HttpResponseMessage response = new HttpResponseMessage(); ;
             Result objResult = null;
-            UserBAL objUserBLL = new UserBAL();
-            objResult = objUserBLL.RefreshToken(OldToken);
-            if (objResult != null)
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            UserBAL userBLL = new UserBAL();
+            try
             {
-                response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+                logger.Debug("BLL started");
+                objResult = userBLL.UpdateUserPassword(userPassword);
+                if (objResult.Results == 1)
+                {
+                    response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
+                }
+                else
+                {
+                    response = Request.CreateResponse(HttpStatusCode.BadRequest, "Something went wrong");
+                }
+                return response;
             }
-            else
+            catch (Exception ex)
             {
-                response = Request.CreateResponse(HttpStatusCode.BadRequest, "token is already expired");
+                logger.ErrorException("Data Empty", ex);
             }
+
+            logger.Debug("update user finished");
             return response;
         }
         #endregion
@@ -492,85 +496,7 @@ namespace DummyProject.Controllers
         }
         #endregion
 
-        //[HttpGet]
-        ////[Secure]
-        //public void setcache(string str)
-        //{
-        //    UserBAL userBAL1 = new UserBAL();
-        //    userBAL1.setcache(str);
-        //}
-
-        //[HttpGet]
-        ////[Secure]
-        //public string getcache(string str)
-        //{
-        //    UserBAL userBAL1 = new UserBAL();
-        //    return userBAL1.checkcache();
-
-        //}
-
-
-        #region LogOut
-        /// <summary>
-        /// LogOut User
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost]
-        public HttpResponseMessage LogOut(string emailaddress, string Password, int clientid)
-        {
-            HttpResponseMessage response;
-            Result objResult = null;
-            TokenDetails tokenclass = new TokenDetails();
-            UserBAL objUserBLL = new UserBAL();
-            string token = "";
-
-            if (!CommonFunctions.IsKeyexistsinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails"))
-            {
-                //objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
-                if (token != "")
-                {
-                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
-                    tokenclass.token = token;
-                    tokenclass.expirydate = Convert.ToInt32(expiry);
-                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", JsonConvert.SerializeObject(objResult));
-                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
-                }
-                if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
-                {
-                    objResult.encryptedpassword = "";
-                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-                    response.Headers.Add("Authorization", token);
-                }
-                else
-                {
-                    response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
-                }
-            }
-            else
-            {
-                //clientid + "_" + emailid
-                objResult = CommonFunctions.ReturnUserProfileCache(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", Password);
-                if (objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
-                {
-                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    var expiry = Math.Round((DateTime.UtcNow.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"])) - unixEpoch).TotalSeconds);
-                    tokenclass.token = objResult.token;
-                    tokenclass.expirydate = Convert.ToInt32(expiry);
-                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
-                    objResult.token = "";
-                    objResult.encryptedpassword = "";
-                    response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-                    response.Headers.Add("Authorization", tokenclass.token);
-                }
-                else
-                {
-                    response = Request.CreateResponse(HttpStatusCode.Unauthorized, "Invalid credentials");
-                }
-            }
-            return response;
-        }
-        #endregion
+       
 
 
 
