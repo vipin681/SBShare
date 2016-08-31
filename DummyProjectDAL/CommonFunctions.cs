@@ -140,6 +140,8 @@ namespace DummyProjectDAL
                 dt = dt.AddMinutes(5);
                 finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
                 finalresult.expirydate = dt;
+                finalresult.Expirydate =dt;
+                //finalresult.Expirydate =CommonFunctions.FromUnixTime(long.Parse(dt.ToString()));
                 finalresult.clientid = Convert.ToInt32(obj.clientid);
                 finalresult.token = Convert.ToString(obj.token);
                 finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);

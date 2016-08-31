@@ -25,6 +25,7 @@ namespace DummyProjectStateClass
         public int clientid { get; set; }
         public DateTime issuedat { get; set; }
         public DateTime expirydate { get; set; }
+        public DateTime Expirydate { get; set; }
         public string token { get; set; }
         public string encryptedpassword { get; set; }
     }
