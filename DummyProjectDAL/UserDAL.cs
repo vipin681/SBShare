@@ -22,6 +22,8 @@ namespace DummyProjectDAL
         #region GetUser
         public Result GetUserList(int clientid)
         {
+
+            
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 UserDetails user = null;

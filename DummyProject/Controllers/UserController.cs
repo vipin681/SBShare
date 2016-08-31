@@ -112,15 +112,17 @@ namespace DummyProject.Controllers
         /// <param name="clientid">
         /// Enter client ID for specific user eg. 20 for pennsylvania</param>
         /// <returns></returns>
-
+        [AllowAnonymous]
         [HttpPost]
         public HttpResponseMessage LogOut(string emailaddress, int clientid)
         {
+            logger.Debug("Logout API started");
             Result objResult = new Result();
             HttpResponseMessage response;
             CommonFunctions.DeleteKeyinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails");
             objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
             response = Request.CreateResponse(HttpStatusCode.OK, objResult);
+            logger.Debug("Logout API finished");
             return response;
         }
         #endregion
@@ -141,8 +143,9 @@ namespace DummyProject.Controllers
             UserBAL userBAL = new UserBAL();
             try
             {
-
+                logger.Debug("GetUserList DAL started");
                 objResult = userBAL.GetUserList(clientid);
+                logger.Debug("GetUserList DAL finished");
                 if (objResult != null || objResult.Results != "")
                 {
                     objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
@@ -179,14 +182,17 @@ namespace DummyProject.Controllers
         /// Enter corresponding clientid to search for specific user</param>
         /// <returns></returns>
         [HttpGet]
-        //  [Secure]
+        [Secure]
         public HttpResponseMessage GetUserById(int ID, int clientid)
         {
             logger.Debug("get all user by id started");
             HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
+
+            logger.Debug("GetUserDetailsByID BAL started");
             objResult = userBAL.GetUserDetailsByID(ID, clientid);
+            logger.Debug("GetUserDetailsByID BAL ended");
             CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + ID.ToString() + "_userdetails", JsonConvert.SerializeObject(objResult.Results));
             try
             {
@@ -230,7 +236,9 @@ namespace DummyProject.Controllers
             UserBAL userBAL = new UserBAL();
             try
             {
+                logger.Debug("GetUserDetailsByID BAL started");
                 objResult = userBAL.GetUserDetailsBysearch(searchbar);
+                logger.Debug("GetUserDetailsBysearch BAL ended");
                 if (objResult.Results != null)
                 {
                     objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
@@ -269,7 +277,6 @@ namespace DummyProject.Controllers
         /// <returns>A value</returns>
         [HttpPost]
         [AllowAnonymous]
-        //  [Secure]
         public HttpResponseMessage SaveUserDetails(UserDetails user)
         {
             logger.Info("Debug Started");
@@ -286,19 +293,16 @@ namespace DummyProject.Controllers
             {
                 if (user.userid == 0)
                 {
-                    var level = LogLevel.Debug;
-                    logger.Log(level, "BLL started");
+                    logger.Debug("InsertUser BAL started");
                     objResult = userBLL.InsertUser(user);
-                    //  objResult.token.ToString();
-
-
+                    logger.Debug("InsertUser BAL ended");
+                    
                 }
                 else
                 {
-                    // user.UpdatedBy = userID;
-                    //Exception e = new Exception();
-                    //logger.ErrorException("Data Empty", e);
+                    logger.Debug("UpdateUser BAL started");
                     objResult = userBLL.UpdateUser(user);
+                    logger.Debug("UpdateUser BAL ended");
                 }
 
             }
@@ -361,7 +365,9 @@ namespace DummyProject.Controllers
                 }
                 else
                 {
+                    logger.Debug("UpdateUser BAL started");
                     objResult = userBLL.UpdateUser(user);
+                    logger.Debug("UpdateUser BAL finished");
                 }
             }
             catch (Exception e)
@@ -409,8 +415,9 @@ namespace DummyProject.Controllers
             UserBAL userBLL = new UserBAL();
             try
             {
-                logger.Debug("BLL started");
+                logger.Debug("UpdateUserPassword BAL started");
                 objResult = userBLL.UpdateUserPassword(userPassword);
+                logger.Debug("UpdateUserPassword BAL finished");
                 if (objResult.Results == 1)
                 {
                     response = Request.CreateResponse(HttpStatusCode.OK, "Password updated successfully");
@@ -439,11 +446,14 @@ namespace DummyProject.Controllers
         [Secure]
         public HttpResponseMessage GetRole()
         {
+            logger.Debug("GetRole API started");
             HttpResponseMessage response;
             Result objResult = null;
             //  Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL objUserBAL = new UserBAL();
+            logger.Debug("GetRole BAL finished");
             objResult = objUserBAL.GetRole();
+            logger.Debug("GetRole BAL finished");
             if (objResult != null & objResult.Results != null)
             {
                 objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
@@ -454,6 +464,7 @@ namespace DummyProject.Controllers
                 objResult.Status = Convert.ToString((int)HttpStatusCode.NotFound);
                 response = Request.CreateResponse(HttpStatusCode.OK, "Data Empty!");
             }
+            logger.Debug("GetRole API finished");
             return response;
         }
         #endregion

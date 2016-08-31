@@ -83,6 +83,7 @@ namespace DummyProjectBAL
         {
             UserDAL userDAL = new UserDAL();
             return userDAL.GetUserDetailsByID(ID,clientid);
+            
         }
         #endregion
 
