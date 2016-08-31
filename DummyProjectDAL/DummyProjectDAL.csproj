@@ -260,8 +260,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonEnums.cs" />
     <Compile Include="CommonFunctions.cs" />
+    <Compile Include="ConnectHelperDAL.cs" />
     <Compile Include="DbHelper.cs" />
+    <Compile Include="Redisfiles\DefaultJsonSerializer.cs" />
+    <Compile Include="Redisfiles\IJsonSerializer.cs" />
+    <Compile Include="Redisfiles\JWT.cs" />
+    <Compile Include="Redisfiles\SignatureVerificationException.cs" />
+    <Compile Include="UserBAL.cs" />
     <Compile Include="UserDAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

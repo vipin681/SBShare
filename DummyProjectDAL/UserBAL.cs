@@ -106,7 +106,7 @@ namespace DummyProjectBAL
 
              };
             var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
-            string token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+            string token = JsonWebToken.Encode(payload, secretKey, JwtHashAlgorithm.HS256);
             return token;
         }
         #endregion
@@ -166,7 +166,7 @@ namespace DummyProjectBAL
 
                          };
                     var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
-                    token1 = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+                    token1 = JsonWebToken.Encode(payload, secretKey, JwtHashAlgorithm.HS256);
 
                     #endregion
 
@@ -304,7 +304,7 @@ namespace DummyProjectBAL
 
                          };
                 var secretKey = ConfigurationManager.AppSettings.Get("JWTsecret");
-                 token = DummyProjectBAL.JsonWebToken.Encode(payload, secretKey, DummyProjectBAL.JwtHashAlgorithm.HS256);
+                 token = JsonWebToken.Encode(payload, secretKey, JwtHashAlgorithm.HS256);
                 return new Result
                 {
                     Status = Convert.ToString((int)HttpStatusCode.OK),
@@ -477,39 +477,7 @@ namespace DummyProjectBAL
             return userDAL.GetAuthorizeRole();
         }
 
-        public string checkcache()
-        {
-            UserDAL userDAL = new UserDAL();
-            string finalstr = userDAL.ReadData();
-            finalstr = finalstr.Substring(2, finalstr.Length - 2);
-            return finalstr;
-        }
-        public void setcache(dynamic data)
-        {
-            UserDAL userDAL = new UserDAL();
-            userDAL.writeData(data);
-        }
-        public void CreateUserProfileCache(dynamic data)
-        {
-            UserDAL userDAL = new UserDAL();
-            userDAL.CreateUserProfileCache(data);
-        }
-       
-        public bool CheckinUserProfileCache(string clientid, string emailid, string password)
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.CheckinUserProfileCache(clientid, emailid, password);
-        }
-        public Result ReturnUserProfileCache(string clientid, string emailid, string password)
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.ReturnUserProfileCache(clientid, emailid, password);
-        }
-        public Result ReturnUserProfileCache_ClientEmailid(string clientid, string emailid)
-        {
-            UserDAL userDAL = new UserDAL();
-            return userDAL.ReturnUserProfileCache_ClientEmailid(clientid, emailid);
-        }
+      
 
 
     }

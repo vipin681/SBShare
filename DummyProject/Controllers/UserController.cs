@@ -39,7 +39,7 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-       
+       [Secure]
         public HttpResponseMessage GetUserList(int clientid)
         {
             StringBuilder sb = new StringBuilder();
@@ -351,6 +351,7 @@ namespace DummyProject.Controllers
             HttpResponseMessage response;
             Result objResult = null;
             TokenDetails tokenclass = new TokenDetails();
+            UserDetails userdetails = new UserDetails();
             UserBAL objUserBLL = new UserBAL();
             string token = "";
 
@@ -359,17 +360,18 @@ namespace DummyProject.Controllers
                 objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
                 if (token != "")
                 {
+                    #region create token  Redis
                     tokenclass.token = token;
                     tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
                     tokenclass.userid = objResult.UserID;
                     tokenclass.encryptedpassword = Password;
-                    
                     CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
+                    #endregion
+
                     objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
                 }
                 if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
                 {
-                    objResult.encryptedpassword = "";
                     response = Request.CreateResponse(HttpStatusCode.OK, objResult);
                     response.Headers.Add("Authorization", token);
                 }
