@@ -27,10 +27,10 @@ namespace DummyProjectBAL
         #endregion
 
         #region SearchUser
-        public Result GetUserDetailsBysearch(string searchstring)
+        public Result GetUserDetailsBysearch(string searchstring,int clientid)
         {
             UserDAL userDAL = new UserDAL();
-            return userDAL.GetUserListByID(searchstring);
+            return userDAL.GetUserListByID(searchstring, clientid);
         }
         #endregion
 
@@ -45,10 +45,10 @@ namespace DummyProjectBAL
         #endregion
         
         #region ChangeTheme
-        public Result ChangeTheme(int themeid, int userid)
+        public Result ChangeTheme(int themeid, int userid,int clientid)
         {
             UserDAL userDAL = new UserDAL();
-            Result result = userDAL.ChangeTheme(themeid,userid);
+            Result result = userDAL.ChangeTheme(themeid,userid, clientid);
             return result;
 
         }
@@ -113,10 +113,10 @@ namespace DummyProjectBAL
         #endregion
 
         #region Get User Role List
-        public Result GetRole()
+        public Result GetRole(int clientid)
         {
             UserDAL userDAL = new UserDAL();
-            return userDAL.GetRole();
+            return userDAL.GetRole(clientid);
         }
         #endregion
 
@@ -131,10 +131,10 @@ namespace DummyProjectBAL
         }
 
 
-        public Result GetUserListByID(String keyword)
+        public Result GetUserListByID(String keyword,int clientid)
         {
             UserDAL userDAL = new UserDAL();
-            return userDAL.GetUserListByID(keyword);
+            return userDAL.GetUserListByID(keyword,clientid);
         }
 
         public Result IsValidUser(String emailaddress, String userPassword,int clientid,out string token)

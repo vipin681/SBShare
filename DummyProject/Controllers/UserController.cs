@@ -38,6 +38,12 @@ namespace DummyProject.Controllers
         /// <summary>
         /// check is user a valid user in Login page
         /// </summary>
+        /// <param name="emailaddress">
+        /// Enter emailaddress for login</param>
+        ///  <param name="Password">
+        /// Enter Password for login</param>
+        ///  <param name="clientid">
+        /// Enter clientid for login eg. 20 for virginia</param>
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
@@ -110,7 +116,7 @@ namespace DummyProject.Controllers
         ///  /// <param name="emailaddress">
         /// Enter emailaddress for specific user</param>
         /// <param name="clientid">
-        /// Enter client ID for specific user eg. 20 for pennsylvania</param>
+        /// Enter client ID for specific user eg. 20 for Virginia</param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
@@ -126,11 +132,13 @@ namespace DummyProject.Controllers
             return response;
         }
         #endregion
-        
+
         #region Get User
         /// <summary>
         /// Get all the user list
         /// </summary>
+        ///  <param name="clientid">
+        /// Enter clientid for login eg. 20 for virginia</param>
         /// <returns></returns>
         [HttpGet]
         [Secure]
@@ -171,15 +179,15 @@ namespace DummyProject.Controllers
             return response;
         }
         #endregion
-        
+
         #region Get User by id
         /// <summary>
         /// Get all the user list by id
         /// </summary>
         /// <param name="ID">
         /// Enter corresponding Userid to search for specific user</param>
-        /// /// <param name="clientid">
-        /// Enter corresponding clientid to search for specific user</param>
+        /// <param name="clientid">
+        /// Enter corresponding clientid to search for specific user eg. 20 for virginia</param>
         /// <returns></returns>
         [HttpGet]
         [Secure]
@@ -225,10 +233,12 @@ namespace DummyProject.Controllers
         /// </summary> 
         /// <param name="searchbar">
         /// Enter any string to filter on basis of First name,LastName,workerid  and emailid</param>
+        /// /// <param name="clientid">
+        /// Enter any clientid eg. 20 for virginia</param>
         /// <returns></returns>
         [HttpGet]
         [Secure]
-        public HttpResponseMessage GetSearchResult(string searchbar)
+        public HttpResponseMessage GetSearchResult(string searchbar, int clientid)
         {
             logger.Debug("SearchResult function started for searching");
             HttpResponseMessage response = new HttpResponseMessage();
@@ -237,7 +247,7 @@ namespace DummyProject.Controllers
             try
             {
                 logger.Debug("GetUserDetailsByID BAL started");
-                objResult = userBAL.GetUserDetailsBysearch(searchbar);
+                objResult = userBAL.GetUserDetailsBysearch(searchbar, clientid);
                 logger.Debug("GetUserDetailsBysearch BAL ended");
                 if (objResult.Results != null)
                 {
@@ -400,7 +410,8 @@ namespace DummyProject.Controllers
         /// Update Password
         /// </summary>
         /// <param name="userPassword">
-        /// Enter corresponding Userid,Password,modifiedby,modifieddate to change password for specific user</param>
+        /// Enter corresponding Userid,Password,modifiedby,modifieddate,clientid (eg. 20 for virginia )to change password for specific user</param>
+        /// <returns></returns>
         /// <returns></returns>
         [HttpPost]
         [Secure]
@@ -444,7 +455,7 @@ namespace DummyProject.Controllers
         /// </summary>
         [HttpGet]
         [Secure]
-        public HttpResponseMessage GetRole()
+        public HttpResponseMessage GetRole(int clientid)
         {
             logger.Debug("GetRole API started");
             HttpResponseMessage response;
@@ -452,7 +463,7 @@ namespace DummyProject.Controllers
             //  Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL objUserBAL = new UserBAL();
             logger.Debug("GetRole BAL finished");
-            objResult = objUserBAL.GetRole();
+            objResult = objUserBAL.GetRole(clientid);
             logger.Debug("GetRole BAL finished");
             if (objResult != null & objResult.Results != null)
             {
@@ -475,12 +486,14 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <param name="themeid">
         /// Enter Theme Id to change</param>
-        /// /// <param name="userid">
+        ///<param name="userid">
         /// Enter userid for specific user</param>
+        /// ///<param name="clientid">
+        /// Enter client id for specific user  eg. 20 for virginia</param>
         /// <returns></returns>
         [HttpPost]
         [Secure]
-        public HttpResponseMessage ChangeTheme(int themeid, int userid)
+        public HttpResponseMessage ChangeTheme(int themeid, int userid,int clientid)
         {
             logger.Info("Change Theme API Started");
             logger.Debug("Change Theme API started");
@@ -492,7 +505,7 @@ namespace DummyProject.Controllers
             try
             {
                 logger.Debug(" Change Theme BLL started");
-                objResult = userBLL.ChangeTheme(themeid, userid);
+                objResult = userBLL.ChangeTheme(themeid, userid, clientid);
                 logger.Debug(" Change Theme BLL finished");
                 response = Request.CreateResponse(HttpStatusCode.OK, "Theme successfully");
             }
@@ -571,7 +584,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             //  Int64 userID = Int64.Parse(User.Identity.Name);
             UserBAL objUserBAL = new UserBAL();
-            objResult = objUserBAL.GetUserListByID(keyword);
+           // objResult = objUserBAL.GetUserListByID(keyword);
             if (objResult != null)
             {
                 response = Request.CreateResponse(HttpStatusCode.OK, objResult);

@@ -56,7 +56,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region SearchUser
-        public Result GetUserListByID(String keyword)
+        public Result GetUserListByID(String keyword,int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -68,6 +68,7 @@ namespace DummyProjectDAL
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Connection = conn;
                     sqlcmd.Parameters.Add("@TypeHeadKeyword", SqlDbType.NVarChar, 200).Value = keyword;
+                    sqlcmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                     sqlad.Fill(ds);
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
@@ -339,7 +340,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region GetRole
-        public Result GetRole()
+        public Result GetRole(int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -347,7 +348,7 @@ namespace DummyProjectDAL
                 string strQuery;
                 SqlCommand cmd;
 
-                strQuery = "Select roleid,description FROM security.Role WHERE status=1";
+                strQuery = "Select roleid,description FROM security.Role WHERE status=1 and clientid=" + clientid;
                 cmd = new SqlCommand(strQuery);
                 cmd.Connection = conn;
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
@@ -374,7 +375,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region ChangeTheme
-        public Result ChangeTheme(int themeid, int userid)
+        public Result ChangeTheme(int themeid, int userid,int clientid)
         {
             try
             {
@@ -384,11 +385,12 @@ namespace DummyProjectDAL
                     string strQuery;
                     SqlCommand cmd;
 
-                    strQuery = "UPDATE security.Users SET themeid=@paramthemeid   WHERE userid = @paramuserid ";
+                    strQuery = "UPDATE security.Users SET themeid=@paramthemeid   WHERE userid = @paramuserid and clientid=@clientid";
                     cmd = new SqlCommand(strQuery);
                     cmd.Connection = conn;
                     cmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userid;
                     cmd.Parameters.Add("@paramthemeid", SqlDbType.Int).Value = themeid;
+                    cmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                     cmd.ExecuteNonQuery();
                     return new Result
                     {
