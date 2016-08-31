@@ -27,6 +27,7 @@ namespace DummyProject.Controllers
     /// <summary>
     /// APIs for Crud operation on user and Login page
     /// </summary>
+  
     [EnableCors(origins: "*", headers: " *", methods: "*", SupportsCredentials = true)]
     public class UserController : ApiController
     {
@@ -38,47 +39,18 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        //[Secure]
+       
         public HttpResponseMessage GetUserList(int clientid)
         {
-
-            var cache = RedisConnectorHelper.Connection.GetDatabase();
             StringBuilder sb = new StringBuilder();
-            //var keys = cache.HashScan("1002*");
-
-            // Create connectionMultiplexer. Creating connectionMultiplexer is costly so it is recommended to store and reuse it.
-            var connectionMultiplexer = ConnectionMultiplexer.Connect("localhost,abortConnect=false"); // replace localhost with your redis db address
-
-            // You can either create a RedisType by using RedisTypeFactory or by instantiating the desired type directly. 
-            var redisTypeFactory = new RedisTypeFactory(connectionMultiplexer);
-
-            var redisDictionary = redisTypeFactory.GetDictionary<int, UserDetails>("UserDetailsList");
-
-
-            var re = Request;
-            var headers = re.Headers;
-
-            if (headers.Contains("Custom"))
-            {
-                string token = headers.GetValues("Custom").First();
-            }
-
-
-
             logger.Debug("get all users started");
             HttpResponseMessage response = new HttpResponseMessage();
             Result objResult = new Result();
             UserBAL userBAL = new UserBAL();
-        
-
             try
             {
-                objResult.Results = userBAL.checkcache();
-                //objResult.Results=
-                if (objResult == null || objResult.Results == "" || objResult.Results == null)
-                {
+                
                     objResult = userBAL.GetUserList(clientid);
-                    userBAL.setcache(objResult.Results);
                     if (objResult != null || objResult.Results != "")
                     {
                         objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
@@ -91,16 +63,8 @@ namespace DummyProject.Controllers
                         objResult.errormsg = "Data Empty!";
                         response = Request.CreateResponse(HttpStatusCode.NotFound, "Data Empty!");
                     }
-                }
-                else
-                {
-                        objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
-                        objResult.errormsg = "";
-                        response = Request.CreateResponse(HttpStatusCode.OK, objResult);
-                    
-                }
+                
             }
-
             catch (Exception ex)
             {
 
@@ -161,9 +125,11 @@ namespace DummyProject.Controllers
         /// </summary>
         /// <param name="ID">
         /// Enter corresponding Userid to search for specific user</param>
+        /// /// <param name="clientid">
+        /// Enter corresponding clientid to search for specific user</param>
         /// <returns></returns>
         [HttpGet]
-        [Secure]
+      //  [Secure]
         public HttpResponseMessage GetUserById(int ID, int clientid)
         {
             logger.Debug("get all user by id started");
@@ -171,6 +137,7 @@ namespace DummyProject.Controllers
             Result objResult = null;
             UserBAL userBAL = new UserBAL();
             objResult = userBAL.GetUserDetailsByID(ID, clientid);
+            CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + ID.ToString() + "_userdetails", JsonConvert.SerializeObject(objResult.Results));
             try
             {
                 if (objResult != null)
@@ -387,16 +354,18 @@ namespace DummyProject.Controllers
             UserBAL objUserBLL = new UserBAL();
             string token = "";
 
-            if (!CommonFunctions.IsKeyexistsinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails"))
+            if (CommonFunctions.IsKeyexistsinRedis(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails"))
             {
                 objResult = objUserBLL.IsValidUser(emailaddress, Password, clientid, out token);
                 if (token != "")
                 {
                     tokenclass.token = token;
                     tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
-
-                    CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", JsonConvert.SerializeObject(objResult));
+                    tokenclass.userid = objResult.UserID;
+                    tokenclass.encryptedpassword = Password;
+                    
                     CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
                 }
                 if (objResult != null && objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
                 {
@@ -411,15 +380,14 @@ namespace DummyProject.Controllers
             }
             else
             {
-                objResult = CommonFunctions.ReturnUserProfileCache(Convert.ToString(clientid) + "_" + emailaddress + "_userdetails", Password);
-                if (objResult.Status == Convert.ToString((int)HttpStatusCode.OK))
+                tokenclass = CommonFunctions.ReturnUserProfileCache1(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", Password);
+                if (tokenclass.encryptedpassword != "")
                 {
-                    tokenclass.token = objResult.token;
+                    tokenclass.token = tokenclass.token;
                     tokenclass.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
-
                     CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientid) + "_" + emailaddress + "_tokendetails", JsonConvert.SerializeObject(tokenclass));
-                    objResult.token = "";
-                    objResult.encryptedpassword = "";
+                    objResult = new Result();
+                    objResult.Status = Convert.ToString((int)HttpStatusCode.OK);
                     response = Request.CreateResponse(HttpStatusCode.OK, objResult);
                     response.Headers.Add("Authorization", tokenclass.token);
                 }

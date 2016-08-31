@@ -11,6 +11,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace DummyProjectDAL
 {
@@ -108,17 +109,101 @@ namespace DummyProjectDAL
         public static int expiryafteraddingseconds(int addseconds)
         {
             var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var expiry = Math.Round((DateTime.UtcNow.AddSeconds(addseconds) - unixEpoch).TotalSeconds);
+            var expiry = Math.Round((DateTime.Now.AddSeconds(addseconds) - unixEpoch).TotalSeconds);
             return Convert.ToInt32(expiry);
         }
 
         #region  redis
         public static bool IsKeyexistsinRedis(string key)
         {
+            try {
+                var jsonSerializer = new JavaScriptSerializer();
+                var cache = RedisConnectorHelper.Connection.GetDatabase();
+                var value = cache.StringGet(key);
+                var payloadData = jsonSerializer.Deserialize<Dictionary<string, object>>(value.ToString());
+                object expdt = 0;
+                payloadData.TryGetValue("expirydate", out expdt);
+                if (FromUnixTime(Convert.ToInt64(expdt)) > DateTime.Now)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
+                
+        }
+
+        public static bool DeleteKeyinRedis(string key)
+        {
 
             var cache = RedisConnectorHelper.Connection.GetDatabase();
-            var value = cache.KeyExists(key);
+            var value = cache.KeyDelete(key);
             return value;
+        }
+
+        public static TokenDetails ReturnUserProfileCache1(string key, string password)
+        {
+            TokenDetails finalresult = new TokenDetails();
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(key);
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+
+            if (password == Convert.ToString(obj.encryptedpassword))
+            {
+
+                finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+                finalresult.expirydate = Convert.ToInt32(obj.expirydate);
+                finalresult.token = Convert.ToString(obj.token);
+                finalresult.userid = Convert.ToInt32(obj.userid);
+
+                //finalresult..firstname = Convert.ToString(obj.firstname);
+                //finalresult.lastname = Convert.ToString(obj.lastname);
+                //finalresult.UserID = Convert.ToInt32(obj.UserID);
+                //finalresult.RoleID = Convert.ToString(obj.RoleID);
+                //finalresult.emailaddress = Convert.ToString(obj.emailaddress);
+                //DateTime dt = Convert.ToDateTime(obj.issuedat);
+                //dt = dt.AddMinutes(5);
+                //finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
+                //finalresult.expirydate = dt;
+                //finalresult.clientid = Convert.ToInt32(obj.clientid);
+                //finalresult.token = Convert.ToString(obj.token);
+                //finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+                //finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
+            }
+            else
+            {
+
+            }
+
+
+            return finalresult;
+        }
+
+        public static TokenDetails ReturnUserProfileCache2(string key)
+        {
+            TokenDetails finalresult = new TokenDetails();
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            var value = cache.StringGet(key);
+            string result = value.ToString();
+            dynamic obj = JsonConvert.DeserializeObject(result);
+
+           
+                finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+                finalresult.expirydate = Convert.ToInt32(obj.expirydate);
+                finalresult.token = Convert.ToString(obj.token);
+                finalresult.userid = Convert.ToInt32(obj.userid);
+
+           
+
+
+            return finalresult;
         }
 
         public static Result ReturnUserProfileCache(string key,string password)
@@ -131,6 +216,12 @@ namespace DummyProjectDAL
 
             if (password == Convert.ToString(obj.encryptedpassword))
             {
+
+                //finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
+                //finalresult.expirydate = Convert.ToInt32(obj.expirydate);
+                //finalresult.token = Convert.ToString(obj.token);
+                //finalresult.userid = Convert.ToInt32(obj.userid);
+
                 finalresult.firstname = Convert.ToString(obj.firstname);
                 finalresult.lastname = Convert.ToString(obj.lastname);
                 finalresult.UserID = Convert.ToInt32(obj.UserID);
@@ -194,10 +285,31 @@ namespace DummyProjectDAL
             return finalresult;
         }
 
+        /// <summary>
+        /// create key in redis without timeout
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="value"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public static bool CreateRedisKeyValue(string Key,string value)
         {
             var cache = RedisConnectorHelper.Connection.GetDatabase();
             cache.StringSet(Key, value);
+            return true;
+        }
+
+        /// <summary>
+        /// create key in redis with timeout in seconds
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="value"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static bool CreateRedisKeyValue(string Key, string value,int time)
+        {
+            var cache = RedisConnectorHelper.Connection.GetDatabase();
+            cache.StringSet(Key, value, TimeSpan.FromSeconds(time));
             return true;
         }
 

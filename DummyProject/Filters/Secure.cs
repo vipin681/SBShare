@@ -61,7 +61,7 @@ namespace DummyProject.Filters
                 object roleidvar=0;
                 if (payloadData != null && (payloadData.TryGetValue("emailid", out emailid) && payloadData.TryGetValue("clientid", out clientidvar) && payloadData.TryGetValue("roleid", out roleidvar)))
                 {
-                    objtokendetails = CommonFunctions.ReturnTokenCache(Convert.ToString(clientidvar) + "_" + Convert.ToString(emailid) + "_tokendetails");
+                    objtokendetails = CommonFunctions.ReturnUserProfileCache2(Convert.ToString(clientidvar) + "_" + Convert.ToString(emailid) + "_tokendetails");
                     if (CommonFunctions.FromUnixTime(objtokendetails.expirydate) < DateTime.Now)
                     {
                         Result outResult = new Result
@@ -75,7 +75,7 @@ namespace DummyProject.Filters
                     }
                     else
                     {
-                        objtokendetails = new TokenDetails();
+                       // objtokendetails = new TokenDetails();
                         objtokendetails.expirydate = CommonFunctions.expiryafteraddingseconds(Convert.ToInt32(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
                         objtokendetails.token = token;
                         CommonFunctions.CreateRedisKeyValue(Convert.ToString(clientidvar) + "_" + Convert.ToString(emailid) + "_tokendetails", JsonConvert.SerializeObject(objtokendetails));

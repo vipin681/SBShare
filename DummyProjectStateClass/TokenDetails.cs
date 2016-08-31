@@ -10,5 +10,7 @@ namespace DummyProjectStateClass
     {
         public string token { get; set; }
         public int expirydate { get; set; }
+        public int userid { get; set; }
+        public string encryptedpassword { get; set; }
     }
 }
