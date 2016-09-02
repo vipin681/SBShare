@@ -12,5 +12,6 @@ namespace DummyProjectStateClass
         public String Password { get; set; }
         public Nullable<Int64> modifiedby { get; set; }
         public DateTime modifieddate { get; set; }
+        public Int32 ClientId { get; set; }
     }
 }

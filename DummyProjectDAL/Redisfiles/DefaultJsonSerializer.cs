@@ -2,7 +2,7 @@
 
 using System.Web.Script.Serialization;
 
-namespace DummyProjectBAL
+namespace DummyProjectDAL
 {
     /// <summary>
     /// JSON Serializer using JavaScriptSerializer

@@ -22,6 +22,8 @@ namespace DummyProjectDAL
         #region GetUser
         public Result GetUserList(int clientid)
         {
+
+            
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
                 UserDetails user = null;
@@ -54,7 +56,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region SearchUser
-        public Result GetUserListByID(String keyword)
+        public Result GetUserListByID(String keyword,int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -66,6 +68,7 @@ namespace DummyProjectDAL
                     sqlcmd.CommandType = CommandType.StoredProcedure;
                     sqlcmd.Connection = conn;
                     sqlcmd.Parameters.Add("@TypeHeadKeyword", SqlDbType.NVarChar, 200).Value = keyword;
+                    sqlcmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                     sqlad.Fill(ds);
                     if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                     {
@@ -337,7 +340,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region GetRole
-        public Result GetRole()
+        public Result GetRole(int clientid)
         {
             using (SqlConnection conn = DbHelper.CreateConnection())
             {
@@ -345,7 +348,7 @@ namespace DummyProjectDAL
                 string strQuery;
                 SqlCommand cmd;
 
-                strQuery = "Select roleid,description FROM security.Role WHERE status=1";
+                strQuery = "Select roleid,description FROM security.Role WHERE status=1 and clientid=" + clientid;
                 cmd = new SqlCommand(strQuery);
                 cmd.Connection = conn;
                 SqlDataAdapter sqlad = new SqlDataAdapter(cmd);
@@ -372,7 +375,7 @@ namespace DummyProjectDAL
         #endregion
 
         #region ChangeTheme
-        public Result ChangeTheme(int themeid, int userid)
+        public Result ChangeTheme(int themeid, int userid,int clientid)
         {
             try
             {
@@ -382,11 +385,12 @@ namespace DummyProjectDAL
                     string strQuery;
                     SqlCommand cmd;
 
-                    strQuery = "UPDATE security.Users SET themeid=@paramthemeid   WHERE userid = @paramuserid ";
+                    strQuery = "UPDATE security.Users SET themeid=@paramthemeid   WHERE userid = @paramuserid and clientid=@clientid";
                     cmd = new SqlCommand(strQuery);
                     cmd.Connection = conn;
                     cmd.Parameters.Add("@paramuserid", SqlDbType.Int).Value = userid;
                     cmd.Parameters.Add("@paramthemeid", SqlDbType.Int).Value = themeid;
+                    cmd.Parameters.Add("@clientid", SqlDbType.Int).Value = clientid;
                     cmd.ExecuteNonQuery();
                     return new Result
                     {
@@ -400,144 +404,10 @@ namespace DummyProjectDAL
             }
         }
         #endregion
+        
 
-        public string ReadData()
-        {
-            var cache = RedisConnectorHelper.Connection.GetDatabase();
-            StringBuilder sb = new StringBuilder();
-            //var keys = cache.HashScan("1002*");
+       
 
-            // Create connectionMultiplexer. Creating connectionMultiplexer is costly so it is recommended to store and reuse it.
-            var connectionMultiplexer = ConnectionMultiplexer.Connect("localhost,abortConnect=false"); // replace localhost with your redis db address
-
-            // You can either create a RedisType by using RedisTypeFactory or by instantiating the desired type directly. 
-            var redisTypeFactory = new RedisTypeFactory(connectionMultiplexer);
-
-            var redisDictionary = redisTypeFactory.GetDictionary<int, UserDetails>("UserDetailsList");
-            int i = 0;
-
-            // Iterate through dictionary
-            foreach (var person in redisDictionary)
-            {
-
-                i = i + 1;
-                sb.Append(JsonConvert.SerializeObject(person));
-                if (i < 10)
-                {
-                    break;
-                }
-            }
-            return sb.ToString();
-            //return cache.StringGet("10*");
-            // var devicesCount = 10000;
-            //for (int i = 0; i < 1000; i++)
-            //{
-            //    var value = cache.StringGet("emp_" + i.ToString());
-
-            //    sb.Append(",");
-            //    sb.Append(value);
-            //}
-            //return sb.ToString();
-        }
-        public void writeData(dynamic data)
-        {
-            List<UserDetails> emp = new List<UserDetails>();
-            DataTable dt = data as DataTable;
-            emp = (from DataRow row in dt.Rows
-                   select new UserDetails
-                   {
-                       userid = Convert.ToInt32(row["userid"]),
-                       firstname = Convert.ToString(row["fName"]),
-                       lastname = Convert.ToString(row["lName"]),
-                       password = Convert.ToString(row["password"]),
-                       fullname = Convert.ToString(row["Fullname"]),
-                       emailaddress = Convert.ToString(row["emailId"]),
-                       workerid = Convert.ToString(row["workerid"]),
-                       status = Convert.ToBoolean(row["status"]),
-                       clientid = Convert.ToInt32(row["CLIENTID"])
-                   }).ToList();
-
-            var cache = RedisConnectorHelper.Connection.GetDatabase();
-
-            foreach (var eachemp in emp)
-            {
-                cache.StringSet(Convert.ToString(eachemp.clientid) + "_" + Convert.ToString(eachemp.userid), JsonConvert.SerializeObject(eachemp));
-            }
-        }
-
-
-        public void CreateUserProfileCache(Result data)
-        {
-
-            var cache = RedisConnectorHelper.Connection.GetDatabase();
-            cache.StringSet(Convert.ToString(data.clientid) + "_" + Convert.ToString(data.emailaddress), JsonConvert.SerializeObject(data));
-        }
-
-        public bool CheckinUserProfileCache(string clientid, string emailid, string password)
-        {
-
-            var cache = RedisConnectorHelper.Connection.GetDatabase();
-            var value = cache.KeyExists(clientid + "_" + emailid);
-            return value;
-        }
-
-        public Result ReturnUserProfileCache(string clientid, string emailid, string password)
-        {
-            Result finalresult = new Result();
-            var cache = RedisConnectorHelper.Connection.GetDatabase();
-            var value = cache.StringGet(clientid + "_" + emailid);
-            string result = value.ToString();
-            dynamic obj = JsonConvert.DeserializeObject(result);
-
-            if (password == Convert.ToString(obj.encryptedpassword))
-            {
-                finalresult.firstname = Convert.ToString(obj.firstname);
-                finalresult.lastname = Convert.ToString(obj.lastname);
-                finalresult.UserID = Convert.ToInt32(obj.UserID);
-                finalresult.RoleID = Convert.ToString(obj.RoleID);
-                finalresult.emailaddress = Convert.ToString(obj.emailaddress);
-                DateTime dt = Convert.ToDateTime(obj.issuedat);
-                dt = dt.AddMinutes(5);
-                finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
-                finalresult.expirydate = dt;
-                finalresult.clientid = Convert.ToInt32(obj.clientid);
-                finalresult.token = Convert.ToString(obj.token);
-                finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
-                finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
-            }
-            else
-            {
-
-            }
-
-
-            return finalresult;
-        }
-
-        public Result ReturnUserProfileCache_ClientEmailid(string clientid, string emailid)
-        {
-            Result finalresult = new Result();
-            var cache = RedisConnectorHelper.Connection.GetDatabase();
-            var value = cache.StringGet(clientid + "_" + emailid);
-            string result = value.ToString();
-            dynamic obj = JsonConvert.DeserializeObject(result);
-
-            finalresult.firstname = Convert.ToString(obj.firstname);
-            finalresult.lastname = Convert.ToString(obj.lastname);
-            finalresult.UserID = Convert.ToInt32(obj.UserID);
-            finalresult.RoleID = Convert.ToString(obj.RoleID);
-            finalresult.emailaddress = Convert.ToString(obj.emailaddress);
-            DateTime dt = Convert.ToDateTime(obj.issuedat);
-            dt = dt.AddSeconds(Convert.ToInt32(ConfigurationManager.AppSettings.Get("cacheextendtime")));
-            finalresult.issuedat = Convert.ToDateTime(obj.issuedat);
-            finalresult.expirydate = dt;
-            finalresult.clientid = Convert.ToInt32(obj.clientid);
-            finalresult.token = Convert.ToString(obj.token);
-            finalresult.encryptedpassword = Convert.ToString(obj.encryptedpassword);
-            finalresult.Status = Convert.ToString((int)HttpStatusCode.OK);
-
-            return finalresult;
-        }
 
 
 

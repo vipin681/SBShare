@@ -1,4 +1,4 @@
-﻿namespace DummyProjectBAL
+﻿namespace DummyProjectDAL
 {
     /// <summary>
     /// Provides JSON Serialize and Deserialize.  Allows custom serializers used.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DummyProjectBAL
+namespace DummyProjectDAL
 {
 	public class SignatureVerificationException : Exception
 	{

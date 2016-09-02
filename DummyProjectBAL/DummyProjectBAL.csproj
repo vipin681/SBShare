@@ -260,11 +260,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultJsonSerializer.cs" />
-    <Compile Include="IJsonSerializer.cs" />
-    <Compile Include="JWT.cs" />
-    <Compile Include="SignatureVerificationException.cs" />
-    <Compile Include="UserBAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

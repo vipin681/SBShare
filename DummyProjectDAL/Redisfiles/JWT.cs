@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DummyProjectBAL
+namespace DummyProjectDAL
 {
     public enum JwtHashAlgorithm
     {

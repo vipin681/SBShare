@@ -2,16 +2,19 @@
 using Newtonsoft.Json;
 using RedisConnectionTest;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using DummyProjectBAL;
 
 namespace DummyProjectDAL
 {
@@ -106,12 +109,77 @@ namespace DummyProjectDAL
 
         }
 
+        #region Token
         public static int expiryafteraddingseconds(int addseconds)
         {
             var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var expiry = Math.Round((DateTime.Now.AddSeconds(addseconds) - unixEpoch).TotalSeconds);
             return Convert.ToInt32(expiry);
         }
+
+        public static ClaimsPrincipal ValidateToken(string token, string secret, bool checkExpiration)
+        {
+            //int roleid1 =0;
+            //int clientid1 = 0;
+            var jsonSerializer = new JavaScriptSerializer();
+            var payloadJson = JsonWebToken.Decode(token, secret);
+            var payloadData = jsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson);
+
+            var subject = new ClaimsIdentity("Federation", ClaimTypes.Name, ClaimTypes.Role);
+            var claims = new List<Claim>();
+
+            if (payloadData != null)
+                foreach (var pair in payloadData)
+                {
+                    var claimType = pair.Key;
+
+                    var source = pair.Value as ArrayList;
+
+                    if (source != null)
+                    {
+                        claims.AddRange(from object item in source
+                                        select new Claim(claimType, item.ToString(), ClaimValueTypes.String));
+
+                        continue;
+                    }
+
+                    switch (pair.Key)
+                    {
+                        case "firstname":
+                            claims.Add(new Claim(ClaimTypes.Name, pair.Value.ToString(), ClaimValueTypes.String));
+                            break;
+                        case "lastname":
+                            claims.Add(new Claim(ClaimTypes.Surname, pair.Value.ToString(), ClaimValueTypes.String));
+                            break;
+                        case "emailid":
+                            claims.Add(new Claim(ClaimTypes.Email, pair.Value.ToString(), ClaimValueTypes.Email));
+                            break;
+                        case "roleid":
+                            // roleid1 = Convert.ToInt32(pair.Value);
+                            claims.Add(new Claim(ClaimTypes.Role, pair.Value.ToString(), ClaimValueTypes.Integer));
+                            break;
+                        case "userid":
+                            claims.Add(new Claim(ClaimTypes.UserData, pair.Value.ToString(), ClaimValueTypes.Integer));
+                            break;
+                        case "exp":
+                            claims.Add(new Claim(ClaimTypes.Expiration, pair.Value.ToString(), ClaimValueTypes.String));
+                            break;
+                        case "clientid":
+                            // clientid1 = Convert.ToInt32(pair.Value);
+                            claims.Add(new Claim(ClaimTypes.GroupSid, pair.Value.ToString(), ClaimValueTypes.Integer));
+                            break;
+                            //default:
+                            //     claims.Add(new Claim(claimType, pair.Value.ToString(), ClaimValueTypes.String));
+                            //     break;
+                    }
+                }
+
+            subject.AddClaims(claims);
+            //roleid = roleid1;
+            //clientid = clientid1;
+            return new ClaimsPrincipal(subject);
+        }
+        #endregion
 
         #region  redis
         public static bool IsKeyexistsinRedis(string key)
